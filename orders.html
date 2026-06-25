@@ -1,18 +1,93 @@
-{
-  "nav_colors": true,
-  "name": "دکان اکبری (نسخه آزمایشی)",
-  "short_name": "دکان اکبری",
-  "description": "اپلیکیشن فروشگاهی دکان اکبری",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#f4f4f4",
-  "theme_color": "#ef4056",
-  "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3081/3081840.png",
-      "sizes": "512-512",
-      "type": "image/png"
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تاریخچه سفارشات شما</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; padding: 20px; background: #f4f4f4; direction: rtl; text-align: right; }
+    .orders-container { max-width: 800px; margin: 30px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .order-card { background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-right: 4px solid #2ecc71; }
+    .order-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; font-size: 0.9rem; color: #555; }
+    .order-items { font-size: 1rem; color: #333; line-height: 1.6; }
+    .order-price { margin-top: 10px; text-align: left; font-weight: bold; color: #2ecc71; font-size: 1.1rem; }
+    .btn-back { text-decoration: none; color: #333; font-size: 0.9rem; display: inline-block; margin-bottom: 15px; font-weight: bold; }
+    .loading-text { text-align: center; color: #777; padding: 20px; font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+
+<div class="orders-container">
+  <a href="index.html" class="btn-back">⬅ بازگشت به فروشگاه</a>
+  <h1>📦 تاریخچه سفارشات شما</h1>
+  
+  <div id="orders-list">
+    <p class="loading-text">در حال بارگذاری تاریخچه خریدها...</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.4"></script>
+
+<script>
+const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function loadCustomerOrders() {
+  let ordersListDiv = document.getElementById("orders-list");
+  
+  let isLoggedIn = localStorage.getItem("customer_logged_in");
+  let customerPhone = localStorage.getItem("customer_phone");
+
+  if (isLoggedIn !== "true" || !customerPhone) {
+    ordersListDiv.innerHTML = "<h3 style='text-align:center; color:#ff3b30; padding: 20px;'>لطفاً ابتدا وارد حساب کاربری خود شوید تا تاریخچه سفارشات را ببینید.</h3>";
+    return;
+  }
+
+  // فرستادن درخواست با مرتب‌سازی بر اساس ستون id جدید
+  const { data: orders, error } = await supabaseClient
+    .from('Customer_Order')
+    .select('*')
+    .eq('Phone', customerPhone)
+    .order('id', { ascending: false }); // جدیدترین فاکتورها در بالا قرار می‌گیرند
+
+  if (error) {
+    console.error("خطای سوپابیس:", error.message);
+    ordersListDiv.innerHTML = `<p style='text-align:center; color:red;'>خطا در بارگذاری اطلاعات دیتابیس!<br><small>${error.message}</small></p>`;
+    return;
+  }
+
+  if (!orders || orders.length === 0) {
+    ordersListDiv.innerHTML = "<h3 style='text-align:center; color:#999; padding: 20px;'>شما تا کنون هیچ سفارشی با این شماره موبایل ثبت نکرده‌اید.</h3>";
+    return;
+  }
+
+  ordersListDiv.innerHTML = "";
+  
+  orders.forEach((order) => {
+    let displayItems = order.Items;
+    if (order.Items && order.Items.includes("اجناس: ")) {
+      displayItems = order.Items.split("اجناس: ")[1];
     }
-  ]
+
+    ordersListDiv.innerHTML += `
+      <div class="order-card">
+        <div class="order-header">
+          <span>شماره فاکتور: #${order.id}</span>
+          <span>شماره تماس: ${order.Phone || customerPhone}</span>
+        </div>
+        <div class="order-items">
+          🛒 <strong>اقلام فاکتور:</strong> ${displayItems || order.Items}
+        </div>
+        <div class="order-price">
+          قیمت پرداخت شده: ${order.Total_Price ? order.Total_Price + " افغانی" : "نامشخص"}
+        </div>
+      </div>
+    `;
+  });
 }
+
+document.addEventListener("DOMContentLoaded", loadCustomerOrders);
+</script>
+</body>
+</html>
