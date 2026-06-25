@@ -1,148 +1,18 @@
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>سفارشات من - دکان اکبری</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body { font-family: Tahoma, sans-serif; padding: 15px; background: #f4f4f4; direction: rtl; padding-bottom: 80px; }
-    .order-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-right: 5px solid #2ecc71; text-align: right; }
-    .order-header { display: flex; justify-content: space-between; font-size: 0.85rem; color: #666; margin-bottom: 8px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
-    .order-items { font-size: 0.9rem; color: #333; white-space: pre-line; line-height: 1.5; }
-    .order-price { font-weight: bold; color: #2ecc71; margin-top: 8px; font-size: 0.95rem; }
-    .phone-box { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center; }
-    .phone-box input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; text-align: center; box-sizing: border-box; margin: 10px 0; font-size: 1rem; }
-    .phone-box button { width: 100%; padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-    .change-phone-link { display: block; text-align: center; font-size: 0.8rem; color: #888; margin-top: 8px; text-decoration: underline; cursor: pointer; }
-  </style>
-</head>
-<body>
-
-<div style="max-width: 600px; margin: 0 auto;">
-  <h2>📋 سفارشات من</h2>
-  <a href="index.html" style="text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold;">⬅ بازگشت به فروشگاه</a>
-  <br><br>
-
-  <div id="phone-entry-section" class="phone-box" style="display:none;">
-    <p>برای دیدن سفارش‌هایت، شماره تلفنی که هنگام ثبت سفارش وارد کرده بودی را بنویس:</p>
-    <input type="tel" id="phone-input" placeholder="مثال: 0700000000">
-    <button onclick="submitPhone()">نمایش سفارش‌های من</button>
-    <p id="phone-error" style="color:#ff3b30; font-size:0.85rem; display:none;"></p>
-  </div>
-
-  <div id="orders-list-container"></div>
-  <a id="change-phone-link" class="change-phone-link" style="display:none;" onclick="changePhone()">تغییر شماره تلفن</a>
-</div>
-
-<nav class="dk-bottom-nav">
-  <a href="index.html" class="nav-item">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-text">خانه</span>
-  </a>
-  <a href="cart.html" class="nav-item">
-    <span class="nav-icon">🛒</span>
-    <span class="nav-text">سبد خرید</span>
-  </a>
-  <a href="orders.html" class="nav-item active">
-    <span class="nav-icon">📋</span>
-    <span class="nav-text">سفارشات من</span>
-  </a>
-</nav>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const PHONE_STORAGE_KEY = "dk_customer_phone";
-
-  function escapeHtml(value) {
-    if (value === null || value === undefined) return "";
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    let savedPhone = localStorage.getItem(PHONE_STORAGE_KEY);
-    if (savedPhone) {
-      loadOrdersForPhone(savedPhone);
-    } else {
-      document.getElementById("phone-entry-section").style.display = "block";
+{
+  "nav_colors": true,
+  "name": "دکان اکبری (نسخه آزمایشی)",
+  "short_name": "دکان اکبری",
+  "description": "اپلیکیشن فروشگاهی دکان اکبری",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f4f4f4",
+  "theme_color": "#ef4056",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3081/3081840.png",
+      "sizes": "512-512",
+      "type": "image/png"
     }
-  });
-
-  function submitPhone() {
-    let phone = document.getElementById("phone-input").value.trim();
-    let errorEl = document.getElementById("phone-error");
-    errorEl.style.display = "none";
-
-    if (!phone || phone.length < 6) {
-      errorEl.textContent = "لطفاً شماره تلفن معتبر وارد کن.";
-      errorEl.style.display = "block";
-      return;
-    }
-
-    localStorage.setItem(PHONE_STORAGE_KEY, phone);
-    document.getElementById("phone-entry-section").style.display = "none";
-    loadOrdersForPhone(phone);
-  }
-
-  function changePhone() {
-    localStorage.removeItem(PHONE_STORAGE_KEY);
-    document.getElementById("orders-list-container").innerHTML = "";
-    document.getElementById("change-phone-link").style.display = "none";
-    document.getElementById("phone-input").value = "";
-    document.getElementById("phone-entry-section").style.display = "block";
-  }
-
-  async function loadOrdersForPhone(phone) {
-    let container = document.getElementById("orders-list-container");
-    container.innerHTML = "در حال بارگذاری سفارشات...";
-    document.getElementById("change-phone-link").style.display = "block";
-
-    try {
-      // استفاده از تابع امن دیتابیس به‌جای SELECT مستقیم از کل جدول
-      // این طوری فقط سفارش‌های همین شماره تلفن برگردانده می‌شود
-      const { data: orders, error } = await supabaseClient
-        .rpc('get_orders_by_phone', { customer_phone: phone });
-
-      if (error) {
-        container.innerHTML = `<p style="color:red;">خطا در لود سفارشات: ${escapeHtml(error.message)}</p>`;
-        return;
-      }
-
-      if (!orders || orders.length === 0) {
-        container.innerHTML = "<p style='text-align:center; color:#888;'>هیچ سفارشی برای این شماره یافت نشد.</p>";
-        return;
-      }
-
-      container.innerHTML = "";
-      orders.forEach(order => {
-        container.innerHTML += `
-          <div class="order-card">
-            <div class="order-header">
-              <span>📦 شماره فاکتور: #${escapeHtml(order.id)}</span>
-              <span>📞 تلفن: ${escapeHtml(order.Phone || 'ثبت نشده')}</span>
-            </div>
-            <div class="order-items">
-              ${escapeHtml(order.Items || 'جزئیاتی ثبت نشده است')}
-            </div>
-            <div class="order-price">
-              مبلغ فاکتور: ${escapeHtml(order.Total_Price || 0)} افغانی
-            </div>
-          </div>
-        `;
-      });
-    } catch (err) {
-      container.innerHTML = `<p style="color:red;">خطای ارتباط با سرور: ${escapeHtml(err.message)}</p>`;
-    }
-  }
-</script>
-
-</body>
-</html>
+  ]
+}
