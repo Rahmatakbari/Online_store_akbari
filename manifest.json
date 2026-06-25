@@ -1,0 +1,18 @@
+{
+  "nav_colors": true,
+  "name": "دکان اکبری (نسخه آزمایشی)",
+  "short_name": "دکان اکبری",
+  "description": "اپلیکیشن فروشگاهی دکان اکبری",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f4f4f4",
+  "theme_color": "#ef4056",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3081/3081840.png",
+      "sizes": "512-512",
+      "type": "image/png"
+    }
+  ]
+}

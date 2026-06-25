@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>سبد خرید - دکان اکبری</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+    /* ===== صفحه سبد خرید ===== */
+    .cart-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    /* ===== آیتم سبد ===== */
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cart-item:last-child { border-bottom: none; }
+
+    .cart-item-info { flex: 1; }
+
+    .cart-item-title {
+      font-size: .92rem;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1.5;
+    }
+
+    .cart-item-unit {
+      font-size: .78rem;
+      color: var(--gray);
+      margin-bottom: 8px;
+    }
+
+    /* کنترل تعداد */
+    .qty-controls {
+      display: inline-flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .btn-qty {
+      width: 30px; height: 30px;
+      border: none;
+      background: #f4f5f7;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: var(--text);
+      transition: background .2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-qty:hover { background: #e8e8e8; }
+    .qty-num {
+      width: 34px;
+      text-align: center;
+      font-size: .9rem;
+      font-weight: bold;
+      border-right: 1.5px solid var(--border);
+      border-left: 1.5px solid var(--border);
+    }
+
+    /* سمت راست آیتم */
+    .cart-item-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      min-width: 90px;
+    }
+    .cart-item-price {
+      font-size: .95rem;
+      font-weight: bold;
+      color: var(--primary);
+      direction: ltr;
+    }
+    .btn-delete {
+      background: none;
+      border: 1.5px solid #ffcdd2;
+      color: #e53935;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: .78rem;
+      font-family: inherit;
+      transition: .2s;
+    }
+    .btn-delete:hover { background: #ffebee; }
+
+    /* ===== کارت سبد ===== */
+    .cart-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .cart-card h2 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    /* ===== سبد خالی ===== */
+    .empty-cart {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray);
+    }
+    .empty-cart .empty-icon { font-size: 3.5rem; margin-bottom: 12px; }
+    .empty-cart p { margin-bottom: 16px; font-size: .92rem; }
+    .btn-go-shop {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 10px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: .9rem;
+      transition: background .2s;
+    }
+    .btn-go-shop:hover { background: var(--primary-hover); }
+
+    /* ===== باکس جمع کل ===== */
+    .total-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      font-size: .88rem;
+      color: var(--gray);
+      border-bottom: 1px dashed var(--border);
+    }
+    .total-row:last-child { border-bottom: none; }
+    .total-row.grand {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--text);
+      padding-top: 12px;
+    }
+    .total-row .val { color: var(--primary); font-weight: bold; direction: ltr; }
+
+    /* ===== فرم سفارش ===== */
+    .order-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .order-card h3 {
+      font-size: .98rem;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: .82rem;
+      font-weight: bold;
+      color: var(--text);
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .88rem;
+      outline: none;
+      transition: border-color .2s;
+      background: #fafafa;
+      color: var(--text);
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      background: white;
+    }
+    /* ✅ اعتبارسنجی */
+    .form-group input.error,
+    .form-group textarea.error {
+      border-color: #e53935;
+      background: #fff5f5;
+    }
+    .field-error {
+      color: #e53935;
+      font-size: .75rem;
+      margin-top: 4px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    .form-group textarea { resize: vertical; min-height: 75px; }
+    .form-group input[type="tel"] { direction: ltr; text-align: left; }
+
+    /* ===== دکمه ثبت ===== */
+    .btn-submit {
+      width: 100%;
+      border: none;
+      background: #2ecc71;
+      color: white;
+      padding: 13px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      margin-top: 4px;
+    }
+    .btn-submit:hover { background: #27ae60; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { background: #a5d6a7; cursor: not-allowed; }
+
+    /* ===== صفحه موفقیت ===== */
+    .success-screen {
+      text-align: center;
+      padding: 50px 20px;
+      display: none;
+    }
+    .success-screen .s-icon { font-size: 4rem; margin-bottom: 16px; }
+    .success-screen h2 { color: #2ecc71; margin-bottom: 10px; }
+    .success-screen p { color: var(--gray); font-size: .9rem; line-height: 1.7; margin-bottom: 20px; }
+    .success-screen a {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 11px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* ===== مودال تأیید حذف ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: white;
+      border-radius: 16px;
+      padding: 24px 20px;
+      max-width: 300px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal-box .m-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .modal-box p { font-size: .9rem; color: var(--gray); margin-bottom: 20px; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-actions button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-family: inherit;
+      font-weight: bold;
+      font-size: .88rem;
+      cursor: pointer;
+    }
+    .btn-confirm-del { background: #e53935; color: white; }
+    .btn-cancel-del { background: #f4f5f7; color: var(--text); }
+
+  </style>
+</head>
+<body>
+
+<!-- هدر -->
+<header class="dk-header">
+  <div class="dk-header-row">
+    <span class="dk-logo-red">🛒 اکبری خوراکه فروشی</span>
+    <div class="dk-notification-icon">🔔</div>
+  </div>
+</header>
+
+<!-- محتوا -->
+<div class="cart-wrapper">
+
+  <!-- صفحه موفقیت (مخفی) -->
+  <div class="success-screen" id="success-screen">
+    <div class="s-icon">🎉</div>
+    <h2>سفارش شما ثبت شد!</h2>
+    <p>سفارشتان با موفقیت برای دکان اکبری ارسال گردید.<br>به زودی با شما تماس گرفته می‌شود.</p>
+    <a href="index.html">🏠 بازگشت به فروشگاه</a>
+  </div>
+
+  <!-- محتوای اصلی سبد -->
+  <div id="main-cart-content">
+
+    <!-- لیست آیتم‌ها -->
+    <div class="cart-card">
+      <h2>🛒 سبد خرید شما</h2>
+      <div id="cart-list-container">
+        <div class="empty-cart">
+          <div class="empty-icon">🛒</div>
+          <p>در حال بارگذاری...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- جمع کل (مخفی اگر سبد خالی) -->
+    <div class="total-card" id="total-card" style="display:none;">
+      <div class="total-row">
+        <span>تعداد اقلام</span>
+        <span class="val" id="total-items">۰</span>
+      </div>
+      <div class="total-row grand">
+        <span>جمع کل</span>
+        <span class="val" id="cart-total-price">۰ افغانی</span>
+      </div>
+    </div>
+
+    <!-- فرم سفارش (مخفی اگر سبد خالی) -->
+    <div class="order-card" id="order-card" style="display:none;">
+      <h3>📞 مشخصات گیرنده جهت تحویل</h3>
+
+      <div class="form-group">
+        <label>نام و نام خانوادگی *</label>
+        <input type="text" id="order-name" placeholder="مثال: محمد اکبری">
+        <div class="field-error" id="err-name">نام را وارد کنید</div>
+      </div>
+
+      <div class="form-group">
+        <label>شماره تماس *</label>
+        <input type="tel" id="order-phone" placeholder="0799XXXXXX" maxlength="12">
+        <div class="field-error" id="err-phone">شماره معتبر وارد کنید (مثال: 0799123456)</div>
+      </div>
+
+      <div class="form-group">
+        <label>آدرس دقیق *</label>
+        <textarea id="order-address" placeholder="کابل، دشت برچی، ایستگاه دوم، کوچه دکان اکبری..."></textarea>
+        <div class="field-error" id="err-address">آدرس را وارد کنید</div>
+      </div>
+
+      <button class="btn-submit" id="btn-send-order" onclick="submitOrder()">
+        🚀 ثبت نهایی و ارسال سفارش
+      </button>
+    </div>
+
+  </div><!-- /main-cart-content -->
+</div>
+
+<!-- مودال تأیید حذف -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-box">
+    <div class="m-icon">🗑️</div>
+    <p id="modal-msg">آیا این محصول از سبد حذف شود؟</p>
+    <div class="modal-actions">
+      <button class="btn-cancel-del" onclick="closeModal()">انصراف</button>
+      <button class="btn-confirm-del" onclick="confirmDelete()">حذف کن</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ناوبری پایین -->
+<nav class="dk-bottom-nav">
+  <a href="index.html" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-text">خانه</span>
+  </a>
+  <a href="cart.html" class="nav-item active" style="position:relative;">
+    <span class="nav-icon">🛒</span>
+    <span id="cart-badge">0</span>
+    <span class="nav-text">سبد خرید</span>
+  </a>
+  <a href="orders.html" class="nav-item">
+    <span class="nav-icon">📋</span>
+    <span class="nav-text">سفارشات</span>
+  </a>
+  <div class="nav-item" onclick="handleAuthAction()">
+    <span class="nav-icon" id="user-avatar-icon">👤</span>
+    <span class="nav-text" id="user-welcome">ورود</span>
+  </div>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let cartItems = [];
+  let pendingDeleteIndex = -1;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    checkUserSession();
+    loadCart();
+    prefillForm();
+  });
+
+  // ۱. خواندن سبد
+  function loadCart() {
+    cartItems = JSON.parse(localStorage.getItem("cart_items")) || [];
+    renderCart();
+  }
+
+  // ۲. رندر
+  function renderCart() {
+    const container = document.getElementById("cart-list-container");
+    const totalCard  = document.getElementById("total-card");
+    const orderCard  = document.getElementById("order-card");
+    const totalEl    = document.getElementById("cart-total-price");
+    const itemsEl    = document.getElementById("total-items");
+
+    if (cartItems.length === 0) {
+      container.innerHTML = `
+        <div class="empty-cart">
+          <div class="empty-icon">🛒</div>
+          <p>سبد خرید شما خالی است</p>
+          <a href="index.html" class="btn-go-shop">🛍️ رفتن به فروشگاه</a>
+        </div>`;
+      totalCard.style.display = "none";
+      orderCard.style.display = "none";
+      updateCartBadge();
+      return;
+    }
+
+    container.innerHTML = "";
+    let grandTotal = 0;
+    let totalQty   = 0;
+
+    cartItems.forEach((item, i) => {
+      const itemTotal = item.price * item.qty;
+      grandTotal += itemTotal;
+      totalQty   += item.qty;
+
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = `
+        <div class="cart-item-info">
+          <div class="cart-item-title">${item.title}</div>
+          <div class="cart-item-unit">واحد: ${item.unitName} | هر واحد: ${fmt(item.price)} افغانی</div>
+          <div class="qty-controls">
+            <button class="btn-qty" onclick="changeQty(${i}, -1)">−</button>
+            <div class="qty-num">${item.qty}</div>
+            <button class="btn-qty" onclick="changeQty(${i}, 1)">+</button>
+          </div>
+        </div>
+        <div class="cart-item-right">
+          <div class="cart-item-price">${fmt(itemTotal)} <small style="font-size:.7rem;color:var(--gray);font-weight:normal;">افغانی</small></div>
+          <button class="btn-delete" onclick="askDelete(${i})">🗑️ حذف</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+
+    // ✅ اعداد با کاما
+    totalEl.innerText = `${fmt(grandTotal)} افغانی`;
+    itemsEl.innerText = `${totalQty} عدد`;
+
+    totalCard.style.display = "block";
+    orderCard.style.display = "block";
+    updateCartBadge();
+  }
+
+  // ✅ فرمت عدد با کاما
+  function fmt(n) {
+    return Number(n).toLocaleString('fa-AF');
+  }
+
+  // تغییر تعداد
+  function changeQty(i, delta) {
+    cartItems[i].qty += delta;
+    if (cartItems[i].qty <= 0) {
+      askDelete(i);
+    } else {
+      save();
+      renderCart();
+    }
+  }
+
+  // ✅ مودال تأیید حذف
+  function askDelete(i) {
+    pendingDeleteIndex = i;
+    document.getElementById("modal-msg").innerText =
+      `«${cartItems[i].title}» از سبد خرید حذف شود؟`;
+    document.getElementById("delete-modal").classList.add("show");
+  }
+  function closeModal() {
+    document.getElementById("delete-modal").classList.remove("show");
+    pendingDeleteIndex = -1;
+  }
+  function confirmDelete() {
+    if (pendingDeleteIndex < 0) return;
+    const title = cartItems[pendingDeleteIndex].title;
+    cartItems.splice(pendingDeleteIndex, 1);
+    save();
+    closeModal();
+    renderCart();
+    showToast(`«${title}» از سبد حذف شد`);
+  }
+
+  function save() {
+    localStorage.setItem("cart_items", JSON.stringify(cartItems));
+  }
+
+  // ✅ پر کردن خودکار فرم
+  function prefillForm() {
+    const name  = localStorage.getItem("customer_name");
+    const phone = localStorage.getItem("customer_phone");
+    if (name)  document.getElementById("order-name").value  = name;
+    if (phone) document.getElementById("order-phone").value = phone;
+  }
+
+  // ✅ اعتبارسنجی فرم
+  function validateForm() {
+    let valid = true;
+
+    const name = document.getElementById("order-name").value.trim();
+    const phone = document.getElementById("order-phone").value.trim();
+    const address = document.getElementById("order-address").value.trim();
+
+    // نام
+    const errName = document.getElementById("err-name");
+    if (!name || name.length < 3) {
+      document.getElementById("order-name").classList.add("error");
+      errName.classList.add("show");
+      valid = false;
+    } else {
+      document.getElementById("order-name").classList.remove("error");
+      errName.classList.remove("show");
+    }
+
+    // تلفن — باید با 07 یا 07 شروع شود، ۱۰ رقم
+    const phoneRegex = /^07\d{8}$/;
+    const errPhone = document.getElementById("err-phone");
+    if (!phoneRegex.test(phone.replace(/\s/g,''))) {
+      document.getElementById("order-phone").classList.add("error");
+      errPhone.classList.add("show");
+      valid = false;
+    } else {
+      document.getElementById("order-phone").classList.remove("error");
+      errPhone.classList.remove("show");
+    }
+
+    // آدرس
+    const errAddr = document.getElementById("err-address");
+    if (!address || address.length < 10) {
+      document.getElementById("order-address").classList.add("error");
+      errAddr.classList.add("show");
+      valid = false;
+    } else {
+      document.getElementById("order-address").classList.remove("error");
+      errAddr.classList.remove("show");
+    }
+
+    return { valid, name, phone, address };
+  }
+
+  // ✅ ثبت سفارش
+  async function submitOrder() {
+    if (cartItems.length === 0) {
+      showToast("سبد خرید خالی است!");
+      return;
+    }
+
+    const { valid, name, phone, address } = validateForm();
+    if (!valid) {
+      showToast("لطفاً همه فیلدها را درست پر کنید");
+      return;
+    }
+
+    const btn = document.getElementById("btn-send-order");
+    btn.disabled = true;
+    btn.innerText = "⏳ در حال ثبت سفارش...";
+
+    const itemsText = cartItems.map(item =>
+      `🔹 ${item.title} (${item.unitName}) — تعداد: ${item.qty} | قیمت: ${fmt(item.price)} افغانی`
+    ).join("\n");
+
+    const grandTotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
+
+    const invoice = `مشتری: ${name}\nتلفن: ${phone}\nآدرس: ${address}\n\n📝 اجناس:\n${itemsText}\n\n💰 جمع کل: ${fmt(grandTotal)} افغانی`;
+
+    const { error } = await supabaseClient.from('Customer_Order').insert([{
+      Phone: phone,
+      Items: invoice,
+      Total_Price: grandTotal
+    }]);
+
+    btn.disabled = false;
+    btn.innerText = "🚀 ثبت نهایی و ارسال سفارش";
+
+    if (error) {
+      showToast("❌ خطا در ثبت: " + error.message);
+    } else {
+      // ✅ ذخیره اطلاعات برای دفعه بعد
+      localStorage.setItem("customer_name",  name);
+      localStorage.setItem("customer_phone", phone);
+      localStorage.removeItem("cart_items");
+
+      // نمایش صفحه موفقیت
+      document.getElementById("main-cart-content").style.display = "none";
+      document.getElementById("success-screen").style.display = "block";
+      updateCartBadge();
+    }
+  }
+
+  // بج سبد
+  function updateCartBadge() {
+    const badge = document.getElementById("cart-badge");
+    if (!badge) return;
+    const cart  = JSON.parse(localStorage.getItem("cart_items")) || [];
+    const total = cart.reduce((s, i) => s + i.qty, 0);
+    badge.innerText = total;
+    badge.style.display = total > 0 ? "block" : "none";
+  }
+
+  // Toast
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2600);
+  }
+
+  // لاگین
+  function checkUserSession() {
+    const loggedIn = localStorage.getItem("customer_logged_in") === "true";
+    const name = localStorage.getItem("customer_name");
+    const welcome = document.getElementById("user-welcome");
+    const icon    = document.getElementById("user-avatar-icon");
+    if (loggedIn && welcome) {
+      welcome.innerText = name ? name.substring(0, 8) : "خروج";
+      welcome.style.color = "#ef4056";
+      if (icon) icon.innerText = "🚪";
+    }
+  }
+
+  function handleAuthAction() {
+    if (localStorage.getItem("customer_logged_in") === "true") {
+      if (confirm("آیا می‌خواهید خارج شوید؟")) {
+        localStorage.clear();
+        window.location.reload();
+      }
+    } else {
+      window.location.href = "login.html";
+    }
+  }
+</script>
+<script src="app.js"></script>
+</body>
+</html>

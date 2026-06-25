@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>مدیریت سفارشات دکان اکبری</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; padding: 15px; background: #f0f3f6; direction: rtl; margin: 0; }
+    .admin-container { max-width: 800px; margin: 20px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ef4056; padding-bottom: 15px; margin-bottom: 20px; }
+    .admin-header h2 { margin: 0; color: #3f4064; }
+    .refresh-btn { background: #ef4056; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .logout-btn { background: #eee; color: #333; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-right: 8px; }
+    .order-card { background: #fff; border: 1px solid #e2e2e5; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative; }
+    .order-card.status-pending { border-right: 6px solid #f1c40f; }
+    .order-card.status-preparing { border-right: 6px solid #3498db; }
+    .order-card.status-shipped { border-right: 6px solid #e67e22; }
+    .order-card.status-delivered { border-right: 6px solid #2ecc71; }
+
+    .order-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-size: 0.85rem; color: #777; margin-bottom: 10px; background: #f8f9fa; padding: 8px; border-radius: 6px; }
+    .order-details { font-size: 0.95rem; color: #333; white-space: pre-line; line-height: 1.6; margin: 12px 0; padding: 5px; }
+    .order-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; flex-wrap: wrap; gap: 8px; }
+    .total-price { font-weight: bold; color: #2ecc71; font-size: 1.05rem; }
+
+    .status-select { padding: 6px; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; outline: none; background: #fff; cursor: pointer; }
+    .nav-links { margin-bottom: 15px; }
+    .nav-links a { text-decoration: none; color: #008eb9; font-weight: bold; font-size: 0.9rem; margin-left: 15px; }
+
+    .login-box { max-width: 380px; margin: 100px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+    .login-box input { width: 100%; padding: 10px; margin: 12px 0; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; text-align: center; box-sizing: border-box; }
+    .login-box button { background-color: #ef4056; color:white; width:100%; border-radius:8px; padding:10px; border:none; cursor:pointer; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div id="login-section" class="login-box">
+  <h2>🔒 ورود به پنل سفارشات</h2>
+  <input type="email" id="admin-email" placeholder="ایمیل" autocomplete="username">
+  <input type="password" id="admin-password" placeholder="رمز عبور" autocomplete="current-password">
+  <button id="login-btn" onclick="doLogin()">ورود به سیستم</button>
+  <p id="login-error" style="color:#ef4056; font-size:0.85rem; margin-top:10px; display:none;"></p>
+</div>
+
+<div id="admin-container" class="admin-container" style="display:none;">
+  <div class="admin-header">
+    <h2>🛠️ پنل مدیریت سفارشات دریافتی</h2>
+    <div>
+      <button class="refresh-btn" onclick="loadAllIncomingOrders()">🔄 به‌روزرسانی لیست</button>
+      <button class="logout-btn" onclick="doLogout()">🚪 خروج</button>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="index.html">🏪 مشاهده فروشگاه</a>
+    <a href="admin.html">➕ افزودن جنس جدید</a>
+  </div>
+
+  <div id="admin-orders-container">در حال دریافت آخرین سفارشات...</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return "";
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function showAdmin() {
+    document.getElementById("login-section").style.display = "none";
+    document.getElementById("admin-container").style.display = "block";
+    loadAllIncomingOrders();
+  }
+
+  function showLogin() {
+    document.getElementById("admin-container").style.display = "none";
+    document.getElementById("login-section").style.display = "block";
+  }
+
+  async function doLogin() {
+    let email = document.getElementById("admin-email").value.trim();
+    let password = document.getElementById("admin-password").value;
+    let btn = document.getElementById("login-btn");
+    let errorEl = document.getElementById("login-error");
+    errorEl.style.display = "none";
+
+    if (!email || !password) {
+      errorEl.textContent = "لطفاً ایمیل و رمز عبور را وارد کنید.";
+      errorEl.style.display = "block";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "در حال ورود...";
+
+    try {
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        errorEl.textContent = "ورود ناموفق بود: ایمیل یا رمز عبور اشتباه است.";
+        errorEl.style.display = "block";
+      } else {
+        document.getElementById("admin-password").value = "";
+        showAdmin();
+      }
+    } catch (err) {
+      errorEl.textContent = "خطای ارتباط با سرور: " + err.message;
+      errorEl.style.display = "block";
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "ورود به سیستم";
+    }
+  }
+
+  async function doLogout() {
+    if (!confirm("آیا می‌خواهید از پنل خارج شوید؟")) return;
+    await supabaseClient.auth.signOut();
+    showLogin();
+  }
+
+  supabaseClient.auth.onAuthStateChange((event) => {
+    if (event === "SIGNED_OUT") showLogin();
+  });
+
+  async function initAuth() {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data && data.session) {
+      showAdmin();
+    } else {
+      showLogin();
+    }
+  }
+  initAuth();
+
+  // 🚀 تابع لود کردن تمام سفارشات دکان از سوپابیس (فقط برای ادمین لاگین‌شده کار می‌کند)
+  async function loadAllIncomingOrders() {
+    let container = document.getElementById("admin-orders-container");
+    container.innerHTML = "<p style='text-align:center; color:#666;'>در حال خواندن اطلاعات دیتابیس...</p>";
+
+    try {
+      const { data: orders, error } = await supabaseClient
+        .from('Customer_Order')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) {
+        container.innerHTML = `<p style="color:red; text-align:center;">خطا در ارتباط با سوپابیس: ${escapeHtml(error.message)}</p>`;
+        return;
+      }
+
+      if (!orders || orders.length === 0) {
+        container.innerHTML = "<p style='text-align:center; color:#888; padding:30px;'>هنوز هیچ سفارشی ثبت نشده است.</p>";
+        return;
+      }
+
+      container.innerHTML = "";
+      orders.forEach(order => {
+        let statusClass = order.status ? `status-${order.status}` : 'status-pending';
+        let currentStatus = order.status || 'pending';
+
+        let dateStr = order.created_at
+          ? new Date(order.created_at).toLocaleTimeString('fa-IR') + " - " + new Date(order.created_at).toLocaleDateString('fa-IR')
+          : 'نامشخص';
+
+        let phone = escapeHtml(order.Phone || '');
+
+        container.innerHTML += `
+          <div class="order-card ${statusClass}">
+            <div class="order-meta">
+              <span>📦 <strong>شماره فاکتور: #${escapeHtml(order.id)}</strong></span>
+              <span>🕒 زمان: ${escapeHtml(dateStr)}</span>
+              <span>📞 تلفن مشتری: <a href="tel:${phone}" style="text-decoration:none; color:#008eb9; font-weight:bold;">${phone}</a></span>
+            </div>
+
+            <div class="order-details">
+              ${escapeHtml(order.Items || 'هیچ جزئیاتی ثبت نشده است')}
+            </div>
+
+            <div class="order-footer">
+              <div class="total-price">مبلغ کل: ${escapeHtml(order.Total_Price || 0)} افغانی</div>
+
+              <div>
+                <label style="font-size:0.8rem; color:#555;">وضعیت سفارش: </label>
+                <select class="status-select" onchange="updateOrderStatus(${order.id}, this.value, this)">
+                  <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>⏳ در انتظار بررسی</option>
+                  <option value="preparing" ${currentStatus === 'preparing' ? 'selected' : ''}>👨‍🍳 در حال آماده‌سازی</option>
+                  <option value="shipped" ${currentStatus === 'shipped' ? 'selected' : ''}>🛵 ارسال شده</option>
+                  <option value="delivered" ${currentStatus === 'delivered' ? 'selected' : ''}>✅ تحویل داده شد</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    } catch (err) {
+      container.innerHTML = `<p style="color:red; text-align:center;">خطای ارتباط با سرور: ${escapeHtml(err.message)}</p>`;
+    }
+  }
+
+  // 📝 تابع آپدیت آنلاین وضعیت سفارش در سوپابیس
+  async function updateOrderStatus(orderId, newStatus, selectEl) {
+    if (selectEl) selectEl.disabled = true;
+    try {
+      const { error } = await supabaseClient
+        .from('Customer_Order')
+        .update({ status: newStatus })
+        .eq('id', orderId);
+
+      if (error) {
+        alert("خطا در تغییر وضعیت: " + error.message);
+        if (selectEl) selectEl.disabled = false;
+      } else {
+        loadAllIncomingOrders();
+      }
+    } catch (err) {
+      alert("خطای ارتباط با سرور: " + err.message);
+      if (selectEl) selectEl.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
