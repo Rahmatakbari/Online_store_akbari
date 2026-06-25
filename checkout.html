@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>تکمیل سفارش - دکان اکبری</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+    .checkout-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    /* ===== کارت‌ها ===== */
+    .co-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .co-card h3 {
+      font-size: .97rem;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    /* ===== خلاصه سبد ===== */
+    .order-summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 9px 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: .85rem;
+    }
+    .order-summary-item:last-child { border-bottom: none; }
+    .order-summary-item .item-name { color: var(--text); flex: 1; }
+    .order-summary-item .item-meta { font-size: .75rem; color: var(--gray); margin-top: 2px; }
+    .order-summary-item .item-price {
+      color: var(--primary);
+      font-weight: bold;
+      direction: ltr;
+      white-space: nowrap;
+      margin-right: 10px;
+    }
+
+    /* ===== باکس قیمت‌ها ===== */
+    .price-summary {
+      background: #fafafa;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 14px;
+      border: 1px solid var(--border);
+    }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      font-size: .86rem;
+      color: var(--gray);
+      border-bottom: 1px dashed var(--border);
+    }
+    .price-row:last-child { border-bottom: none; }
+    .price-row.total-row {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--text);
+      padding-top: 12px;
+    }
+    .price-row .pval { font-weight: bold; color: var(--primary); direction: ltr; }
+    .price-row.total-row .pval { font-size: 1.05rem; }
+
+    /* ===== انتخاب منطقه ===== */
+    .area-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .area-option {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: .2s;
+      background: white;
+    }
+    .area-option:hover { border-color: var(--primary); }
+    .area-option.selected {
+      border-color: var(--primary);
+      background: #fff5f6;
+    }
+    .area-option .area-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+    .area-option .area-name { font-size: .78rem; font-weight: bold; color: var(--text); display: block; }
+    .area-option .area-cost { font-size: .72rem; color: var(--primary); display: block; margin-top: 2px; }
+
+    /* ===== فرم ===== */
+    .form-group { margin-bottom: 13px; }
+    .form-group label {
+      display: block;
+      font-size: .82rem;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .88rem;
+      outline: none;
+      background: #fafafa;
+      color: var(--text);
+      transition: border-color .2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      background: white;
+    }
+    .form-group input.error,
+    .form-group textarea.error { border-color: #e53935; background: #fff5f5; }
+    .field-error { color: #e53935; font-size: .74rem; margin-top: 4px; display: none; }
+    .field-error.show { display: block; }
+    .form-group input[type="tel"] { direction: ltr; text-align: left; }
+    .form-group textarea { min-height: 75px; resize: vertical; }
+
+    /* ===== دکمه ثبت ===== */
+    .btn-checkout {
+      width: 100%;
+      border: none;
+      background: #2ecc71;
+      color: white;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+    .btn-checkout:hover { background: #27ae60; }
+    .btn-checkout:active { transform: scale(.98); }
+    .btn-checkout:disabled { background: #a5d6a7; cursor: not-allowed; }
+
+    /* ===== صفحه موفقیت ===== */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 50px 20px;
+    }
+    .success-screen .s-icon { font-size: 4rem; margin-bottom: 14px; }
+    .success-screen h2 { color: #2ecc71; margin-bottom: 10px; }
+    .success-screen p { color: var(--gray); font-size: .9rem; line-height: 1.8; margin-bottom: 20px; }
+    .success-screen a {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* ===== سبد خالی ===== */
+    .empty-checkout {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--gray);
+    }
+    .empty-checkout .e-icon { font-size: 3rem; margin-bottom: 14px; }
+    .empty-checkout a {
+      display: inline-block;
+      margin-top: 14px;
+      background: var(--primary);
+      color: white;
+      padding: 10px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- هدر -->
+<header class="dk-header">
+  <div class="dk-header-row">
+    <span class="dk-logo-red">🛒 اکبری خوراکه فروشی</span>
+    <div class="dk-notification-icon">🔔</div>
+  </div>
+</header>
+
+<!-- محتوا -->
+<div class="checkout-wrapper">
+
+  <!-- صفحه موفقیت -->
+  <div class="success-screen" id="success-screen">
+    <div class="s-icon">🎉</div>
+    <h2>سفارش ثبت شد!</h2>
+    <p>
+      سفارش شما با موفقیت ثبت گردید<br>
+      و فاکتور فوراً برای مدیریت دکان ارسال شد.<br>
+      <strong>به زودی با شما تماس گرفته می‌شود.</strong>
+    </p>
+    <a href="index.html">🏠 بازگشت به فروشگاه</a>
+  </div>
+
+  <!-- محتوای اصلی -->
+  <div id="main-checkout">
+
+    <a href="cart.html" class="btn-back">⬅ بازگشت به سبد خرید</a>
+
+    <!-- خلاصه سفارش -->
+    <div class="co-card" id="summary-card">
+      <h3>🧾 خلاصه سفارش شما</h3>
+      <div id="summary-items"></div>
+      <div class="price-summary">
+        <div class="price-row">
+          <span>قیمت اجناس</span>
+          <span class="pval" id="items-total">۰ افغانی</span>
+        </div>
+        <div class="price-row">
+          <span>🚚 کرایه موتر</span>
+          <span class="pval" id="delivery-cost">۰ افغانی</span>
+        </div>
+        <div class="price-row total-row">
+          <span>💵 جمع کل</span>
+          <span class="pval" id="final-total">۰ افغانی</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- انتخاب منطقه -->
+    <div class="co-card">
+      <h3>📍 ساحه تحویل بار</h3>
+      <div class="area-grid" id="area-grid">
+        <div class="area-option selected" onclick="selectArea(this, 0)" data-cost="0">
+          <span class="area-icon">🏪</span>
+          <span class="area-name">تحویل در دکان</span>
+          <span class="area-cost">رایگان</span>
+        </div>
+        <div class="area-option" onclick="selectArea(this, 150)" data-cost="150">
+          <span class="area-icon">🏘️</span>
+          <span class="area-name">منطقه ۱ (نزدیک)</span>
+          <span class="area-cost">۱۵۰ افغانی</span>
+        </div>
+        <div class="area-option" onclick="selectArea(this, 300)" data-cost="300">
+          <span class="area-icon">🏙️</span>
+          <span class="area-name">منطقه ۲ (مرکز)</span>
+          <span class="area-cost">۳۰۰ افغانی</span>
+        </div>
+        <div class="area-option" onclick="selectArea(this, 500)" data-cost="500">
+          <span class="area-icon">🗺️</span>
+          <span class="area-name">منطقه ۳ (دوردست)</span>
+          <span class="area-cost">۵۰۰ افغانی</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- فرم مشخصات -->
+    <div class="co-card">
+      <h3>👤 مشخصات گیرنده</h3>
+
+      <div class="form-group">
+        <label>نام و نام خانوادگی *</label>
+        <input type="text" id="co-name" placeholder="مثال: احمد رحیمی">
+        <div class="field-error" id="err-name">نام را وارد کنید (حداقل ۳ حرف)</div>
+      </div>
+
+      <div class="form-group">
+        <label>شماره تماس *</label>
+        <input type="tel" id="co-phone" placeholder="0799123456" maxlength="12">
+        <div class="field-error" id="err-phone">شماره معتبر وارد کنید (مثال: 0799123456)</div>
+      </div>
+
+      <div class="form-group">
+        <label>آدرس دقیق *</label>
+        <textarea id="co-address" placeholder="کوچه، نمبر حویلی یا نشانه‌های مشخص برای موتر باربری..."></textarea>
+        <div class="field-error" id="err-address">آدرس را کامل‌تر بنویسید</div>
+      </div>
+
+      <button class="btn-checkout" id="btn-submit" onclick="submitOrder()">
+        🚀 ثبت نهایی و ارسال سفارش
+      </button>
+    </div>
+
+  </div><!-- /main-checkout -->
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ناوبری پایین -->
+<nav class="dk-bottom-nav">
+  <a href="index.html" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-text">خانه</span>
+  </a>
+  <a href="cart.html" class="nav-item" style="position:relative;">
+    <span class="nav-icon">🛒</span>
+    <span id="cart-badge">0</span>
+    <span class="nav-text">سبد خرید</span>
+  </a>
+  <a href="orders.html" class="nav-item">
+    <span class="nav-icon">📋</span>
+    <span class="nav-text">سفارشات</span>
+  </a>
+  <div class="nav-item" onclick="handleAuthAction()">
+    <span class="nav-icon" id="user-avatar-icon">👤</span>
+    <span class="nav-text" id="user-welcome">ورود</span>
+  </div>
+</nav>
+
+<!-- ابتدا supabase، بعد app.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+  // ✅ توکن تلگرام — اینجا بمان، در سرور نگه نگیری
+  const TG_TOKEN   = "8850075372:AAFA5I-VcQiFqA4Bw5LdskwB83XzujUtSUc";
+  const TG_CHAT_ID = "6718562294";
+
+  let cartItems    = [];
+  let itemsSubtotal = 0;
+  let deliveryCost  = 0;
+  let selectedAreaName = "تحویل در دکان";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    cartItems = getCart(); // از app.js
+    updateCartBadge();
+
+    if (cartItems.length === 0) {
+      document.getElementById("main-checkout").innerHTML = `
+        <div class="empty-checkout">
+          <div class="e-icon">🛒</div>
+          <p>سبد خرید شما خالی است!</p>
+          <a href="index.html">🛍️ رفتن به فروشگاه</a>
+        </div>`;
+      return;
+    }
+
+    itemsSubtotal = getCartTotal(); // از app.js
+    renderSummary();
+    prefillForm();
+  });
+
+  // ✅ رندر خلاصه اجناس
+  function renderSummary() {
+    const container = document.getElementById("summary-items");
+    container.innerHTML = "";
+    cartItems.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "order-summary-item";
+      div.innerHTML = `
+        <div>
+          <div class="item-name">${item.title}</div>
+          <div class="item-meta">${item.unitName} × ${item.qty}</div>
+        </div>
+        <div class="item-price">${fmtPrice(item.price * item.qty)} <small style="font-size:.7rem;font-weight:normal;color:var(--gray);">افغانی</small></div>
+      `;
+      container.appendChild(div);
+    });
+    updatePriceDisplay();
+  }
+
+  // ✅ آپدیت نمایش قیمت‌ها
+  function updatePriceDisplay() {
+    const final = itemsSubtotal + deliveryCost;
+    document.getElementById("items-total").innerText  = fmtPrice(itemsSubtotal) + " افغانی";
+    document.getElementById("delivery-cost").innerText = fmtPrice(deliveryCost) + " افغانی";
+    document.getElementById("final-total").innerText  = fmtPrice(final) + " افغانی";
+  }
+
+  // ✅ انتخاب منطقه با کارت
+  function selectArea(el, cost) {
+    document.querySelectorAll(".area-option").forEach(a => a.classList.remove("selected"));
+    el.classList.add("selected");
+    deliveryCost = cost;
+    selectedAreaName = el.querySelector(".area-name").innerText;
+    updatePriceDisplay();
+  }
+
+  // پر کردن خودکار فرم
+  function prefillForm() {
+    const name    = localStorage.getItem("customer_name");
+    const phone   = localStorage.getItem("customer_phone");
+    const address = localStorage.getItem("customer_address");
+    if (name)    document.getElementById("co-name").value    = name;
+    if (phone)   document.getElementById("co-phone").value   = phone;
+    if (address) document.getElementById("co-address").value = address;
+  }
+
+  // ✅ اعتبارسنجی
+  function validateForm() {
+    let valid = true;
+    const name    = document.getElementById("co-name").value.trim();
+    const phone   = document.getElementById("co-phone").value.trim().replace(/\s/g,"");
+    const address = document.getElementById("co-address").value.trim();
+
+    const nameOk = name.length >= 3;
+    setFieldError("co-name",    "err-name",    !nameOk);
+    if (!nameOk) valid = false;
+
+    const phoneOk = /^07\d{8}$/.test(phone);
+    setFieldError("co-phone",   "err-phone",   !phoneOk);
+    if (!phoneOk) valid = false;
+
+    const addrOk = address.length >= 10;
+    setFieldError("co-address", "err-address", !addrOk);
+    if (!addrOk) valid = false;
+
+    return { valid, name, phone, address };
+  }
+
+  // ✅ ثبت سفارش
+  async function submitOrder() {
+    const { valid, name, phone, address } = validateForm();
+    if (!valid) { showToast("لطفاً همه فیلدها را درست پر کنید"); return; }
+
+    const btn = document.getElementById("btn-submit");
+    btn.disabled = true;
+    btn.innerText = "⏳ در حال ثبت سفارش...";
+
+    const finalTotal = itemsSubtotal + deliveryCost;
+    const date       = new Date().toLocaleString("fa-IR");
+
+    // ساخت متن فاکتور
+    const itemsText = cartItems.map(i =>
+      `🔹 ${i.title} (${i.unitName}) × ${i.qty} = ${fmtPrice(i.price * i.qty)} افغانی`
+    ).join("\n");
+
+    const invoice = `مشتری: ${name}\nتلفن: ${phone}\nساحه: ${selectedAreaName}\nآدرس: ${address}\n\n📝 اجناس:\n${itemsText}\n\n🌾 اجناس: ${fmtPrice(itemsSubtotal)} افغانی\n🚚 کرایه: ${fmtPrice(deliveryCost)} افغانی\n💵 جمع: ${fmtPrice(finalTotal)} افغانی`;
+
+    // ۱. ثبت در Supabase
+    const sb = getSupabase();
+    const { error: sbError } = await sb.from("Customer_Order").insert([{
+      Phone:       phone,
+      Items:       invoice,
+      Total_Price: finalTotal
+    }]);
+
+    if (sbError) {
+      showToast("❌ خطا در ثبت: " + sbError.message);
+      btn.disabled = false;
+      btn.innerText = "🚀 ثبت نهایی و ارسال سفارش";
+      return;
+    }
+
+    // ۲. ذخیره محلی سفارش برای صفحه orders.html
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders.push({
+      name, phone, address,
+      areaName:     selectedAreaName,
+      deliveryCost: deliveryCost,
+      items:        cartItems,
+      itemsSubtotal,
+      finalTotal,
+      date
+    });
+    localStorage.setItem("orders", JSON.stringify(orders));
+    localStorage.setItem("customer_name",    name);
+    localStorage.setItem("customer_phone",   phone);
+    localStorage.setItem("customer_address", address);
+
+    // ۳. ارسال به تلگرام (بدون block شدن — اگر خطا داد ادامه می‌دهیم)
+    const tgMsg = `🚨 *سفارش جدید دکان اکبری* 🚨\n\n👤 *مشتری:* ${name}\n📞 *تلفن:* ${phone}\n📍 *ساحه:* ${selectedAreaName}\n🏠 *آدرس:* ${address}\n📅 *زمان:* ${date}\n\n🛒 *اجناس:*\n${itemsText}\n\n🌾 اجناس: ${fmtPrice(itemsSubtotal)} افغانی\n🚚 کرایه: ${fmtPrice(deliveryCost)} افغانی\n💵 *جمع کل: ${fmtPrice(finalTotal)} افغانی*`;
+
+    try {
+      await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: TG_CHAT_ID, text: tgMsg, parse_mode: "Markdown" })
+      });
+    } catch (e) {
+      console.warn("تلگرام ارسال نشد:", e);
+    }
+
+    // ۴. پاک کردن سبد و نمایش موفقیت
+    clearCart(); // از app.js
+    document.getElementById("main-checkout").style.display = "none";
+    document.getElementById("success-screen").style.display  = "block";
+  }
+
+  // تابع کمکی اعتبارسنجی فیلد
+  function setFieldError(inputId, errorId, hasError) {
+    const inp = document.getElementById(inputId);
+    const err = document.getElementById(errorId);
+    if (!inp || !err) return;
+    inp.classList.toggle("error", hasError);
+    err.classList.toggle("show",  hasError);
+  }
+</script>
+</body>
+</html>
