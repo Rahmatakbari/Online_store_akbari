@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>مشاهده محصول</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ===== صفحه جزئیات محصول ===== */
+    .detail-wrapper {
+      max-width: 600px;
+      margin: 16px auto;
+      padding: 0 14px;
+    }
+
+    /* دکمه بازگشت */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--gray);
+      text-decoration: none;
+      font-size: .88rem;
+      margin-bottom: 14px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: white;
+      border: 1px solid var(--border);
+      transition: .2s;
+    }
+    .btn-back:hover { color: var(--primary); border-color: var(--primary); }
+
+    /* کارت اصلی */
+    .detail-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    /* تصویر */
+    .detail-img-wrap {
+      position: relative;
+      background: #f8f8f8;
+      text-align: center;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .detail-img-wrap img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    /* ✅ بج موجودی روی تصویر */
+    .detail-stock-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: .75rem;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* بدنه کارت */
+    .detail-body {
+      padding: 18px;
+    }
+
+    .detail-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+
+    .detail-desc {
+      font-size: .88rem;
+      color: var(--gray);
+      line-height: 1.8;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    /* ✅ انتخاب واحد + نمایش قیمت */
+    .unit-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .unit-row label {
+      font-size: .82rem;
+      color: var(--gray);
+      white-space: nowrap;
+    }
+    .unit-row select {
+      flex: 1;
+    }
+
+    /* قیمت */
+    .detail-price-box {
+      background: #fff5f6;
+      border: 1.5px solid #ffd0d6;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .detail-price-label { font-size: .82rem; color: var(--gray); }
+    .detail-price-val {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary);
+      direction: ltr;
+    }
+    .detail-price-val span { font-size: .78rem; color: var(--gray); font-weight: normal; }
+
+    /* ✅ انتخاب تعداد */
+    .qty-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .qty-row label { font-size: .82rem; color: var(--gray); }
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .qty-btn {
+      width: 36px; height: 36px;
+      border: none;
+      background: #f4f5f7;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: var(--text);
+      transition: background .2s;
+    }
+    .qty-btn:hover { background: #e8e8e8; }
+    #qty-display {
+      width: 40px;
+      text-align: center;
+      font-size: .95rem;
+      font-weight: bold;
+      border: none;
+      border-right: 1.5px solid var(--border);
+      border-left: 1.5px solid var(--border);
+      background: white;
+      color: var(--text);
+    }
+
+    /* دکمه افزودن */
+    .btn-add-detail {
+      width: 100%;
+      border: none;
+      background: var(--primary);
+      color: white;
+      padding: 13px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: background .2s, transform .1s;
+    }
+    .btn-add-detail:hover { background: var(--primary-hover); }
+    .btn-add-detail:active { transform: scale(0.98); }
+    .btn-add-detail.added { background: #43a047; }
+    .btn-add-detail:disabled { background: #ccc; cursor: not-allowed; }
+
+    /* ===== پیام خطا ===== */
+    .not-found-box {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray);
+    }
+    .not-found-box .icon { font-size: 3rem; margin-bottom: 12px; }
+    .not-found-box h3 { margin-bottom: 10px; }
+    .not-found-box a {
+      display: inline-block;
+      margin-top: 14px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* ===== اسکلتون لودینگ ===== */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .skel-img  { height: 260px; }
+    .skel-line { height: 18px; margin-bottom: 10px; }
+    .skel-line.short { width: 60%; }
+    .skel-line.med   { width: 80%; }
+
+    @media (max-width: 480px) {
+      .detail-img-wrap { height: 210px; }
+      .detail-title { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== هدر ===== -->
+<header class="dk-header">
+  <div class="dk-header-row">
+    <span class="dk-logo-red">🛒 اکبری خوراکه فروشی</span>
+    <div class="dk-notification-icon">🔔</div>
+  </div>
+</header>
+
+<!-- ===== محتوا ===== -->
+<div class="detail-wrapper">
+  <a href="index.html" class="btn-back">⬅ بازگشت به فروشگاه</a>
+  <div id="product-content">
+    <!-- اسکلتون لودینگ -->
+    <div class="detail-card">
+      <div class="skeleton skel-img"></div>
+      <div class="detail-body">
+        <div class="skeleton skel-line med"></div>
+        <div class="skeleton skel-line short"></div>
+        <div class="skeleton skel-line med"></div>
+        <div class="skeleton skel-line short"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== پیام Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== ناوبری پایین ===== -->
+<nav class="dk-bottom-nav">
+  <a href="index.html" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-text">خانه</span>
+  </a>
+  <a href="cart.html" class="nav-item" style="position:relative;">
+    <span class="nav-icon">🛒</span>
+    <span id="cart-badge">0</span>
+    <span class="nav-text">سبد خرید</span>
+  </a>
+  <a href="orders.html" class="nav-item">
+    <span class="nav-icon">📋</span>
+    <span class="nav-text">سفارشات من</span>
+  </a>
+  <div class="nav-item" onclick="handleAuthAction()">
+    <span class="nav-icon" id="user-avatar-icon">👤</span>
+    <span class="nav-text" id="user-welcome">ورود</span>
+  </div>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentProduct = null;
+  let selectedQty = 1;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    checkUserSession();
+    updateCartBadge();
+    loadProduct();
+  });
+
+  // ✅ لود محصول از Supabase با آیدی URL
+  async function loadProduct() {
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
+    const contentDiv = document.getElementById("product-content");
+
+    if (!id) {
+      showNotFound(contentDiv, "آیدی محصول مشخص نشده است.");
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from('Products')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) {
+      showNotFound(contentDiv, "محصول مورد نظر یافت نشد.");
+      return;
+    }
+
+    currentProduct = data;
+    renderProduct(contentDiv, data);
+  }
+
+  // ✅ رندر اطلاعات کامل محصول
+  function renderProduct(container, p) {
+    let units = [];
+    try {
+      units = p.units ? (typeof p.units === 'string' ? JSON.parse(p.units) : p.units) : [];
+    } catch(e) {}
+
+    const inStock = p.stock === undefined || p.stock === null || p.stock > 0;
+    const imgSrc = p.Image_URL || `https://placehold.co/400x260/f0f0f0/aaa?text=${encodeURIComponent(p.Name)}`;
+    const firstPrice = units.length > 0 ? units[0].price : 0;
+
+    const unitsHtml = units.map((u, i) =>
+      `<option value="${i}" data-price="${u.price}">${u.name} — ${Number(u.price).toLocaleString()} افغانی</option>`
+    ).join("");
+
+    container.innerHTML = `
+      <div class="detail-card">
+
+        <!-- تصویر -->
+        <div class="detail-img-wrap">
+          <img
+            src="${imgSrc}"
+            alt="${p.Name}"
+            onerror="this.src='https://placehold.co/400x260/f0f0f0/aaa?text=بدون+تصویر'"
+          >
+          <span class="detail-stock-badge ${inStock ? 'in-stock' : 'out-of-stock'}">
+            ${inStock ? '✔ موجود' : '✖ ناموجود'}
+          </span>
+        </div>
+
+        <!-- اطلاعات -->
+        <div class="detail-body">
+          <h2 class="detail-title">${p.Name}</h2>
+          <p class="detail-desc">${p.description || 'بدون توضیحات اضافی'}</p>
+
+          ${units.length > 1 ? `
+          <!-- ✅ انتخاب واحد فروش -->
+          <div class="unit-row">
+            <label>واحد فروش:</label>
+            <select class="unit-selector" id="unit-select" onchange="onUnitChange(this)">
+              ${unitsHtml}
+            </select>
+          </div>` : ''}
+
+          <!-- ✅ نمایش قیمت -->
+          <div class="detail-price-box">
+            <span class="detail-price-label">قیمت:</span>
+            <span class="detail-price-val" id="price-display">
+              ${Number(firstPrice).toLocaleString()} <span>افغانی</span>
+            </span>
+          </div>
+
+          <!-- ✅ انتخاب تعداد -->
+          <div class="qty-row">
+            <label>تعداد:</label>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="changeQty(-1)">−</button>
+              <div id="qty-display">1</div>
+              <button class="qty-btn" onclick="changeQty(1)">+</button>
+            </div>
+          </div>
+
+          <!-- دکمه افزودن -->
+          <button
+            class="btn-add-detail"
+            id="btn-add"
+            onclick="addToCart()"
+            ${!inStock ? 'disabled' : ''}
+          >
+            ${inStock ? '🛒 افزودن به سبد خرید' : '⛔ این محصول ناموجود است'}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // ✅ تغییر قیمت هنگام تغییر واحد
+  function onUnitChange(select) {
+    const price = select.options[select.selectedIndex].dataset.price;
+    const display = document.getElementById("price-display");
+    if (display) {
+      display.innerHTML = `${Number(price).toLocaleString()} <span>افغانی</span>`;
+    }
+  }
+
+  // ✅ تغییر تعداد
+  function changeQty(delta) {
+    selectedQty = Math.max(1, selectedQty + delta);
+    const el = document.getElementById("qty-display");
+    if (el) el.innerText = selectedQty;
+  }
+
+  // ✅ افزودن به سبد — سازگار با cart_items
+  function addToCart() {
+    if (!currentProduct) return;
+
+    let units = [];
+    try {
+      units = typeof currentProduct.units === 'string'
+        ? JSON.parse(currentProduct.units)
+        : currentProduct.units || [];
+    } catch(e) {}
+
+    const selectEl = document.getElementById("unit-select");
+    const unitIndex = selectEl ? parseInt(selectEl.value) : 0;
+    const selectedUnit = units[unitIndex] || { name: 'عدد', price: 0 };
+
+    const cart = JSON.parse(localStorage.getItem("cart_items")) || [];
+    const idx = cart.findIndex(i =>
+      i.id === currentProduct.id && i.unitName === selectedUnit.name
+    );
+
+    if (idx > -1) {
+      cart[idx].qty += selectedQty;
+    } else {
+      cart.push({
+        id: currentProduct.id,
+        title: currentProduct.Name,
+        unitName: selectedUnit.name,
+        price: selectedUnit.price,
+        qty: selectedQty
+      });
+    }
+
+    localStorage.setItem("cart_items", JSON.stringify(cart));
+    updateCartBadge();
+
+    // انیمیشن دکمه
+    const btn = document.getElementById("btn-add");
+    if (btn) {
+      btn.classList.add('added');
+      btn.innerText = `✅ ${selectedQty} عدد به سبد اضافه شد`;
+      setTimeout(() => {
+        btn.classList.remove('added');
+        btn.innerText = '🛒 افزودن به سبد خرید';
+      }, 2000);
+    }
+
+    showToast(`«${currentProduct.Name}» — ${selectedQty} عدد به سبد اضافه شد`);
+  }
+
+  // پیام not found
+  function showNotFound(container, msg) {
+    container.innerHTML = `
+      <div class="not-found-box">
+        <div class="icon">😕</div>
+        <h3>${msg}</h3>
+        <p>لطفاً به صفحه اصلی برگردید.</p>
+        <a href="index.html">⬅ بازگشت به فروشگاه</a>
+      </div>
+    `;
+  }
+
+  // Toast
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // بج سبد
+  function updateCartBadge() {
+    const badge = document.getElementById("cart-badge");
+    if (!badge) return;
+    const cart = JSON.parse(localStorage.getItem("cart_items")) || [];
+    const total = cart.reduce((s, i) => s + i.qty, 0);
+    badge.innerText = total;
+    badge.style.display = total > 0 ? 'block' : 'none';
+  }
+
+  // بررسی لاگین
+  function checkUserSession() {
+    const loggedIn = localStorage.getItem("customer_logged_in") === "true";
+    const name = localStorage.getItem("customer_name");
+    const welcome = document.getElementById("user-welcome");
+    const icon = document.getElementById("user-avatar-icon");
+    if (loggedIn && welcome) {
+      welcome.innerText = name ? name.substring(0, 8) : "خروج";
+      welcome.style.color = "#ef4056";
+      if (icon) icon.innerText = "🚪";
+    }
+  }
+
+  function handleAuthAction() {
+    if (localStorage.getItem("customer_logged_in") === "true") {
+      if (confirm("آیا می‌خواهید از حساب خارج شوید؟")) {
+        localStorage.clear();
+        window.location.reload();
+      }
+    } else {
+      window.location.href = "login.html";
+    }
+  }
+</script>
+</body>
+</html>
