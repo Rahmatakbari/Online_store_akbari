@@ -75,6 +75,12 @@
       color: #888;
       text-decoration: none;
     }
+    .field-error {
+      color: #ef4056;
+      font-size: 0.8rem;
+      margin-top: 6px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -86,6 +92,7 @@
       <label>شماره موبایل:</label>
       <input type="tel" id="login-username" placeholder="مثال: 0799123456" style="direction:ltr; text-align:left;">
     </div>
+    <p class="field-error" id="login-error"></p>
     <button class="auth-btn" onclick="loginCustomer()">ورود به سیستم</button>
     <div class="toggle-link" onclick="toggleForm(true)">حساب کاربری ندارید؟ ثبت نام کنید</div>
   </div>
@@ -100,6 +107,7 @@
       <label>شماره موبایل:</label>
       <input type="tel" id="reg-username" placeholder="مثال: 0799123456" style="direction:ltr; text-align:left;">
     </div>
+    <p class="field-error" id="reg-error"></p>
     <button class="auth-btn" onclick="registerCustomer()" style="background: #4caf50;">تکمیل ثبت نام</button>
     <div class="toggle-link" onclick="toggleForm(false)">قبلاً ثبت نام کرده‌اید؟ ورود</div>
   </div>
@@ -113,30 +121,45 @@
     document.getElementById('register-form').style.display = showRegister ? 'block' : 'none';
   }
 
+  function showError(elId, msg) {
+    let el = document.getElementById(elId);
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
   function registerCustomer() {
     const name = document.getElementById('reg-name').value.trim();
     const username = document.getElementById('reg-username').value.trim();
+    document.getElementById('reg-error').style.display = 'none';
 
     if (!name || !username) {
-      alert("لطفاً تمام فیلدها را پر کنید.");
+      showError('reg-error', "لطفاً تمام فیلدها را پر کنید.");
+      return;
+    }
+    if (username.length < 6) {
+      showError('reg-error', "شماره موبایل معتبر وارد کنید.");
       return;
     }
 
-    // ذخیره یکپارچه اطلاعات برای استفاده در سبد و سفارشات
+    // ذخیره یکپارچه اطلاعات برای استفاده در سبد، سفارشات، و صفحه «سفارشات من»
     localStorage.setItem("customer_logged_in", "true");
     localStorage.setItem("customer_name", name);
     localStorage.setItem("customer_phone", username);
     localStorage.setItem("customer_username", username);
 
-    alert("ثبت نام با موفقیت انجام شد!");
     window.location.href = "cart.html"; // مستقیم بفرست به سبد خرید برای ادامه سفارش
   }
 
   function loginCustomer() {
     const username = document.getElementById('login-username').value.trim();
+    document.getElementById('login-error').style.display = 'none';
 
     if (!username) {
-      alert("لطفاً شماره موبایل خود را وارد کنید.");
+      showError('login-error', "لطفاً شماره موبایل خود را وارد کنید.");
+      return;
+    }
+    if (username.length < 6) {
+      showError('login-error', "شماره موبایل معتبر وارد کنید.");
       return;
     }
 
@@ -144,8 +167,7 @@
     localStorage.setItem("customer_name", "مشتری گرامی");
     localStorage.setItem("customer_phone", username);
     localStorage.setItem("customer_username", username);
-    
-    alert("خوش آمدید!");
+
     window.location.href = "cart.html"; // انتقال مستقیم به سبد خرید
   }
 </script>
