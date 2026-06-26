@@ -137,7 +137,6 @@
   <a href="index.html" style="text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold;">⬅ بازگشت به فروشگاه</a>
   <br><br>
 
-  <!-- بخش ورود شماره تلفن -->
   <div id="phone-entry-section" class="phone-box" style="display:none;">
     <p>برای دیدن سفارش‌هایت، شماره تلفنی که هنگام ثبت سفارش وارد کرده بودی را بنویس:</p>
     <input type="tel" id="phone-input" placeholder="مثال: 0700000000" inputmode="numeric">
@@ -145,12 +144,11 @@
     <p id="phone-error" style="color:#ff3b30; font-size:0.85rem; display:none; margin-top:8px;"></p>
   </div>
 
-  <!-- نمایش شماره وارد شده (فقط اطلاعاتی، بدون گزینه تغییر) -->
   <div id="phone-info-bar" style="display:none; background:#fff; border-radius:10px; padding:10px 15px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.06); font-size:0.85rem; color:#666; text-align:center;">
     📞 نمایش سفارشات برای شماره: <strong id="shown-phone" style="color:#2ecc71; direction:ltr; display:inline-block;"></strong>
+    <button onclick="changePhone()" style="background:none; border:none; color:#ff3b30; font-family:inherit; font-size:0.8rem; margin-right:8px; cursor:pointer; text-decoration:underline;">(تغییر شماره)</button>
   </div>
 
-  <!-- لیست سفارشات -->
   <div id="orders-list-container"></div>
 </div>
 
@@ -186,7 +184,6 @@
       .replace(/'/g, "&#39;");
   }
 
-  // فرمت تاریخ میلادی به شکل خوانا
   function formatDate(dateStr) {
     if (!dateStr) return "";
     try {
@@ -201,7 +198,6 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    // شماره ذخیره‌شده از checkout یا ورود قبلی
     let savedPhone = localStorage.getItem(PHONE_STORAGE_KEY);
     if (savedPhone) {
       showPhoneInfoBar(savedPhone);
@@ -216,6 +212,14 @@
     document.getElementById("shown-phone").textContent = phone;
   }
 
+  function changePhone() {
+    localStorage.removeItem(PHONE_STORAGE_KEY);
+    document.getElementById("phone-info-bar").style.display = "none";
+    document.getElementById("orders-list-container").innerHTML = "";
+    document.getElementById("phone-entry-section").style.display = "block";
+    document.getElementById("phone-input").value = "";
+  }
+
   function submitPhone() {
     let phone = document.getElementById("phone-input").value.trim();
     let errorEl = document.getElementById("phone-error");
@@ -227,20 +231,24 @@
       return;
     }
 
-    // ذخیره شماره (همین شماره در checkout هم استفاده می‌شود)
     localStorage.setItem(PHONE_STORAGE_KEY, phone);
     document.getElementById("phone-entry-section").style.display = "none";
     showPhoneInfoBar(phone);
     loadOrdersForPhone(phone);
   }
 
+  // ✅ تغییر اساسی: دریافت مستقیم داده‌ها از جدول بجای rpc
   async function loadOrdersForPhone(phone) {
     let container = document.getElementById("orders-list-container");
     container.innerHTML = '<div class="loading-msg">⏳ در حال بارگذاری سفارشات...</div>';
 
     try {
+      // دریافت مستقیم سفارشات از جدول 'Customer_Order' که فیلد Phone آن‌ها برابر با شماره مشتری است
       const { data: orders, error } = await supabaseClient
-        .rpc('get_orders_by_phone', { customer_phone: phone });
+        .from('Customer_Order')
+        .select('*')
+        .eq('Phone', phone)
+        .order('id', { ascending: false });
 
       if (error) {
         container.innerHTML = `<p style="color:red; text-align:center;">خطا در بارگذاری: ${escapeHtml(error.message)}</p>`;
@@ -251,25 +259,17 @@
         container.innerHTML = `
           <div class="empty-msg">
             <span class="emoji">📭</span>
-            هیچ سفارشی برای این شماره یافت نشد.<br>
-            <small>اگر شماره دیگری استفاده کرده‌ای، از پنل ادمین کمک بگیر.</small>
+            هیچ سفارشی برای شماره شما پیدا نشد.<br>
+            <small>اگر فکر می‌کنی اشتباهی رخ داده، شماره ثبت شده را بررسی کن.</small>
           </div>`;
         return;
       }
 
       container.innerHTML = "";
 
-      // مرتب‌سازی: جدیدترین اول
-      orders.sort((a, b) => b.id - a.id);
-
-      orders.forEach((order, index) => {
-        // شماره سفارش: از id دیتابیس (auto-increment) استفاده می‌کنیم
+      orders.forEach((order) => {
         const orderNum = escapeHtml(order.id);
-
-        // فرمت مبلغ
         const totalFormatted = Number(order.Total_Price || 0).toLocaleString('fa-AF');
-
-        // تاریخ (اگر ستون created_at داری)
         const dateStr = order.created_at ? formatDate(order.created_at) : "";
 
         container.innerHTML += `
