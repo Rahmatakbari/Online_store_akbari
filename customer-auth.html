@@ -60,6 +60,7 @@
       margin-top: 10px;
       font-family: inherit;
     }
+    .auth-btn:disabled { background: #ccc; cursor: not-allowed; }
     .toggle-link {
       text-align: center;
       margin-top: 15px;
@@ -92,8 +93,12 @@
       <label>شماره موبایل:</label>
       <input type="tel" id="login-username" placeholder="مثال: 0799123456" style="direction:ltr; text-align:left;">
     </div>
+    <div class="form-group">
+      <label>رمز عبور:</label>
+      <input type="password" id="login-password" placeholder="رمز عبور خودتان را وارد کنید">
+    </div>
     <p class="field-error" id="login-error"></p>
-    <button class="auth-btn" onclick="loginCustomer()">ورود به سیستم</button>
+    <button class="auth-btn" id="login-btn" onclick="loginCustomer()">ورود به سیستم</button>
     <div class="toggle-link" onclick="toggleForm(true)">حساب کاربری ندارید؟ ثبت نام کنید</div>
   </div>
 
@@ -107,18 +112,29 @@
       <label>شماره موبایل:</label>
       <input type="tel" id="reg-username" placeholder="مثال: 0799123456" style="direction:ltr; text-align:left;">
     </div>
+    <div class="form-group">
+      <label>رمز عبور:</label>
+      <input type="password" id="reg-password" placeholder="حداقل ۴ کاراکتر">
+    </div>
     <p class="field-error" id="reg-error"></p>
-    <button class="auth-btn" onclick="registerCustomer()" style="background: #4caf50;">تکمیل ثبت نام</button>
+    <button class="auth-btn" id="reg-btn" onclick="registerCustomer()" style="background: #4caf50;">تکمیل ثبت نام</button>
     <div class="toggle-link" onclick="toggleForm(false)">قبلاً ثبت نام کرده‌اید؟ ورود</div>
   </div>
 
   <a href="index.html" class="back-btn">⬅ بازگشت به صفحه اصلی دکان</a>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   function toggleForm(showRegister) {
     document.getElementById('login-form').style.display = showRegister ? 'none' : 'block';
     document.getElementById('register-form').style.display = showRegister ? 'block' : 'none';
+    document.getElementById('login-error').style.display = 'none';
+    document.getElementById('reg-error').style.display = 'none';
   }
 
   function showError(elId, msg) {
@@ -127,48 +143,107 @@
     el.style.display = 'block';
   }
 
-  function registerCustomer() {
+  // ✅ ثبت‌نام واقعی: رمز عبور به‌صورت هش‌شده در سرور ذخیره می‌شود
+  async function registerCustomer() {
     const name = document.getElementById('reg-name').value.trim();
-    const username = document.getElementById('reg-username').value.trim();
+    const phone = document.getElementById('reg-username').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const btn = document.getElementById('reg-btn');
     document.getElementById('reg-error').style.display = 'none';
 
-    if (!name || !username) {
+    if (!name || !phone || !password) {
       showError('reg-error', "لطفاً تمام فیلدها را پر کنید.");
       return;
     }
-    if (username.length < 6) {
+    if (phone.length < 6) {
       showError('reg-error', "شماره موبایل معتبر وارد کنید.");
       return;
     }
+    if (password.length < 4) {
+      showError('reg-error', "رمز عبور باید حداقل ۴ کاراکتر باشد.");
+      return;
+    }
 
-    // ذخیره یکپارچه اطلاعات برای استفاده در سبد، سفارشات، و صفحه «سفارشات من»
-    localStorage.setItem("customer_logged_in", "true");
-    localStorage.setItem("customer_name", name);
-    localStorage.setItem("customer_phone", username);
-    localStorage.setItem("customer_username", username);
+    btn.disabled = true;
+    btn.innerText = "در حال ثبت‌نام...";
 
-    window.location.href = "cart.html"; // مستقیم بفرست به سبد خرید برای ادامه سفارش
+    try {
+      const { data, error } = await supabaseClient.rpc('register_customer', {
+        p_name: name,
+        p_phone: phone,
+        p_password: password
+      });
+
+      if (error) {
+        showError('reg-error', "خطای ارتباط با سرور: " + error.message);
+        return;
+      }
+
+      const result = data && data[0];
+      if (!result || !result.success) {
+        showError('reg-error', (result && result.message) || "ثبت‌نام ناموفق بود.");
+        return;
+      }
+
+      // ذخیره نشست مشتری در گوشی (فقط بعد از تایید واقعی توسط سرور)
+      localStorage.setItem("customer_logged_in", "true");
+      localStorage.setItem("customer_id", result.customer_id);
+      localStorage.setItem("customer_name", result.customer_name);
+      localStorage.setItem("customer_phone", phone);
+
+      window.location.href = "cart.html";
+    } catch (err) {
+      showError('reg-error', "خطای غیرمنتظره: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "تکمیل ثبت نام";
+    }
   }
 
-  function loginCustomer() {
-    const username = document.getElementById('login-username').value.trim();
+  // ✅ ورود واقعی: رمز عبور با هش ذخیره‌شده در سرور مقایسه می‌شود
+  async function loginCustomer() {
+    const phone = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    const btn = document.getElementById('login-btn');
     document.getElementById('login-error').style.display = 'none';
 
-    if (!username) {
-      showError('login-error', "لطفاً شماره موبایل خود را وارد کنید.");
-      return;
-    }
-    if (username.length < 6) {
-      showError('login-error', "شماره موبایل معتبر وارد کنید.");
+    if (!phone || !password) {
+      showError('login-error', "لطفاً شماره موبایل و رمز عبور را وارد کنید.");
       return;
     }
 
-    localStorage.setItem("customer_logged_in", "true");
-    localStorage.setItem("customer_name", "مشتری گرامی");
-    localStorage.setItem("customer_phone", username);
-    localStorage.setItem("customer_username", username);
+    btn.disabled = true;
+    btn.innerText = "در حال ورود...";
 
-    window.location.href = "cart.html"; // انتقال مستقیم به سبد خرید
+    try {
+      const { data, error } = await supabaseClient.rpc('login_customer', {
+        p_phone: phone,
+        p_password: password
+      });
+
+      if (error) {
+        showError('login-error', "خطای ارتباط با سرور: " + error.message);
+        return;
+      }
+
+      const result = data && data[0];
+      if (!result || !result.success) {
+        showError('login-error', (result && result.message) || "ورود ناموفق بود.");
+        return;
+      }
+
+      localStorage.setItem("customer_logged_in", "true");
+      localStorage.setItem("customer_id", result.customer_id);
+      localStorage.setItem("customer_name", result.customer_name);
+      localStorage.setItem("customer_phone", phone);
+
+      window.location.href = "cart.html";
+    } catch (err) {
+      showError('login-error', "خطای غیرمنتظره: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "ورود به سیستم";
+    }
   }
 </script>
 
