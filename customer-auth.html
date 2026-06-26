@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ورود و ثبت نام مشتریان</title>
+  <title>ورود و ثبت نام مشتریان - دکان اکبری</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      font-family: Tahoma, Arial, sans-serif;
       background: #f4f5f7;
       direction: rtl;
       display: flex;
@@ -45,7 +45,6 @@
       border-radius: 8px;
       outline: none;
       font-family: inherit;
-      text-align: right;
     }
     .form-group input:focus { border-color: #ef4056; }
     .auth-btn {
@@ -59,6 +58,7 @@
       cursor: pointer;
       width: 100%;
       margin-top: 10px;
+      font-family: inherit;
     }
     .toggle-link {
       text-align: center;
@@ -83,12 +83,8 @@
   <div id="login-form">
     <div class="auth-title">🔐 ورود به حساب مشتری</div>
     <div class="form-group">
-      <label>شماره موبایل یا ایمیل:</label>
-      <input type="text" id="login-username" placeholder="مثال: 0799123456">
-    </div>
-    <div class="form-group">
-      <label>رمز عبور:</label>
-      <input type="password" id="login-password" placeholder="******">
+      <label>شماره موبایل:</label>
+      <input type="tel" id="login-username" placeholder="مثال: 0799123456" style="direction:ltr; text-align:left;">
     </div>
     <button class="auth-btn" onclick="loginCustomer()">ورود به سیستم</button>
     <div class="toggle-link" onclick="toggleForm(true)">حساب کاربری ندارید؟ ثبت نام کنید</div>
@@ -101,12 +97,8 @@
       <input type="text" id="reg-name" placeholder="نام خود را وارد کنید">
     </div>
     <div class="form-group">
-      <label>شماره موبایل یا ایمیل:</label>
-      <input type="text" id="reg-username" placeholder="مثال: 0799123456">
-    </div>
-    <div class="form-group">
-      <label>رمز عبور دلخواه:</label>
-      <input type="password" id="reg-password" placeholder="یک رمز عبور مطمئن">
+      <label>شماره موبایل:</label>
+      <input type="tel" id="reg-username" placeholder="مثال: 0799123456" style="direction:ltr; text-align:left;">
     </div>
     <button class="auth-btn" onclick="registerCustomer()" style="background: #4caf50;">تکمیل ثبت نام</button>
     <div class="toggle-link" onclick="toggleForm(false)">قبلاً ثبت نام کرده‌اید؟ ورود</div>
@@ -121,40 +113,40 @@
     document.getElementById('register-form').style.display = showRegister ? 'block' : 'none';
   }
 
-  // سیستم شبیه‌ساز ورود (Local) - بعداً می‌توانید به دیتابیس Supabase متصل کنید
   function registerCustomer() {
     const name = document.getElementById('reg-name').value.trim();
     const username = document.getElementById('reg-username').value.trim();
-    const password = document.getElementById('reg-password').value.trim();
 
-    if (!name || !username || !password) {
+    if (!name || !username) {
       alert("لطفاً تمام فیلدها را پر کنید.");
       return;
     }
 
+    // ذخیره یکپارچه اطلاعات برای استفاده در سبد و سفارشات
     localStorage.setItem("customer_logged_in", "true");
     localStorage.setItem("customer_name", name);
+    localStorage.setItem("customer_phone", username);
     localStorage.setItem("customer_username", username);
 
     alert("ثبت نام با موفقیت انجام شد!");
-    window.location.href = "index.html";
+    window.location.href = "cart.html"; // مستقیم بفرست به سبد خرید برای ادامه سفارش
   }
 
   function loginCustomer() {
     const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value.trim();
 
-    if (!username || !password) {
-      alert("لطفاً نام کاربری و رمز عبور را وارد کنید.");
+    if (!username) {
+      alert("لطفاً شماره موبایل خود را وارد کنید.");
       return;
     }
 
-    // شبیه‌سازی ورود
     localStorage.setItem("customer_logged_in", "true");
     localStorage.setItem("customer_name", "مشتری گرامی");
+    localStorage.setItem("customer_phone", username);
+    localStorage.setItem("customer_username", username);
     
     alert("خوش آمدید!");
-    window.location.href = "index.html";
+    window.location.href = "cart.html"; // انتقال مستقیم به سبد خرید
   }
 </script>
 
