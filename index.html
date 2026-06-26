@@ -2,7 +2,7 @@
 <html lang="fa">
 <head>
 <link rel="manifest" href="manifest.json">
-
+<link rel="orders" href="orders.html">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>فروشگاه مواد غذایی اکبری</title>
@@ -339,9 +339,10 @@
     <span class="nav-text">سبد خرید</span>
   </a>
   <a href="orders.html" class="nav-item">
-    <span class="nav-icon">📋</span>
-    <span class="nav-text">سفارشات من</span>
-  </a>
+  <span class="nav-icon">📋</span>
+  <span class="nav-text">سفارشات من</span>
+</a>
+ 
   <div class="nav-item" id="user-profile-toggle" onclick="handleAuthAction()">
     <span class="nav-icon" id="user-avatar-icon">👤</span>
     <span class="nav-text" id="user-welcome">ورود</span>
@@ -556,15 +557,17 @@
   }
 
   function handleAuthAction() {
-    if (localStorage.getItem("customer_logged_in") === "true") {
-      if (confirm("آیا می‌خواهید از حساب خارج شوید؟")) {
-        localStorage.clear();
-        window.location.reload();
-      }
-    } else {
-      window.location.href = "customer-auth.html";
+  if (localStorage.getItem("customer_logged_in") === "true") {
+    if (confirm("آیا می‌خواهید خارج شوید؟")) {
+      localStorage.clear();
+      window.location.reload();
     }
+  } else {
+    // باز کردن فایل احراز هویت مشتریان
+    window.location.href = "customer-auth.html"; 
   }
+}
+
   if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker
