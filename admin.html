@@ -3,503 +3,606 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>صفحه یافت نشد</title><!-- ✅ عنوان گمراه‌کننده -->
-  <link rel="stylesheet" href="style.css">
+  <title>پنل مدیریت فروشگاه اکبری</title>
   <style>
+    * { box-sizing: border-box; }
     body { font-family: Arial, Tahoma, sans-serif; padding: 20px; background: #f4f4f4; direction: rtl; }
     .admin-container { max-width: 1000px; margin: 0 auto; }
-    .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-    .login-box input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; text-align: center; box-sizing: border-box; }
-    .order-card, .form-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: right; }
+
+    .login-box {
+      max-width: 400px; margin: 100px auto; background: white;
+      padding: 30px; border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center;
+    }
+    .login-box input {
+      width: 100%; padding: 10px; margin: 12px 0;
+      border: 1.5px solid #ccc; border-radius: 8px;
+      font-family: inherit; text-align: center;
+    }
+    .login-box input:focus { border-color: #ef4056; outline: none; }
+
+    .order-card, .form-card {
+      background: white; padding: 20px; border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: right;
+    }
     .order-card { border-right: 5px solid #ff3b30; }
     .form-card { border-right: 5px solid #2ecc71; }
-    .order-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+
+    .order-header {
+      display: flex; justify-content: space-between;
+      border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;
+    }
     .order-items { background: #f9f9f9; padding: 10px; border-radius: 8px; font-size: 0.9rem; margin: 10px 0; }
-    .btn-clear { background-color: #ff3b30; color: white; padding: 10px 20px; font-size: 1rem; font-weight: bold; border-radius: 8px; margin-bottom: 20px; border: none; cursor: pointer;}
-    .btn-done { background-color: #2ecc71; color: white; margin-top: 10px; padding: 10px; width: 100%; border-radius: 8px; border: none; cursor: pointer; font-weight: bold;}
-    .price-details { background: #eef9f1; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 0.95rem; }
+    .order-items p { white-space: pre-line; }
+
+    .btn-clear {
+      background-color: #ff3b30; color: white; padding: 10px 20px;
+      font-size: 1rem; font-weight: bold; border-radius: 8px;
+      margin-bottom: 20px; border: none; cursor: pointer;
+    }
+    .btn-done {
+      background-color: #2ecc71; color: white; margin-top: 10px;
+      padding: 10px; width: 100%; border-radius: 8px; border: none;
+      cursor: pointer; font-weight: bold; font-family: inherit;
+    }
+    .price-details { background: #eef9f1; padding: 10px; border-radius: 6px; margin-top: 10px; }
+
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 0.9rem; }
-    .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; box-sizing: border-box; }
-    .product-list-item { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; gap: 10px; }
-    .btn-delete-prod { background-color: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
-    .btn-delete-prod:disabled, .btn-done:disabled { opacity: 0.5; cursor: not-allowed; }
-    .section-title-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-    .badge-count { background: #eee; color: #444; border-radius: 20px; padding: 2px 10px; font-size: 0.85rem; }
-    .btn-refresh { background: #eee; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.85rem; }
-    #image-preview { display: none; margin-top: 8px; max-width: 120px; max-height: 120px; border-radius: 8px; object-fit: cover; }
-    .search-box { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 14px; box-sizing: border-box; font-family: inherit; font-size: 0.95rem; }
-    .search-box:focus { outline: none; border-color: #ff3b30; box-shadow: 0 0 0 3px rgba(255,59,48,0.1); }
-    .order-search-wrap { background: white; border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-right: 5px solid #ff9500; }
-    .order-search-wrap label { display: block; font-weight: bold; font-size: 0.9rem; color: #444; margin-bottom: 8px; }
-    .order-search-row { display: flex; gap: 8px; align-items: center; }
-    .order-search-row input { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.95rem; direction: ltr; text-align: right; }
-    .order-search-row input:focus { outline: none; border-color: #ff9500; }
-    .btn-clear-search { background: #eee; color: #555; border: none; border-radius: 8px; padding: 10px 14px; font-family: inherit; cursor: pointer; font-size: 0.85rem; }
-    .search-result-info { font-size: 0.82rem; color: #888; margin-top: 6px; }
-    .highlight { background: #fff3cd; border-radius: 3px; padding: 0 2px; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 8px;
+      border: 1.5px solid #ccc; border-radius: 6px;
+      font-family: inherit;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: #2ecc71; outline: none;
+    }
 
-    /* ✅ پیام خطای رمز اشتباه */
-    .login-error {
-      color: #e53935;
-      font-size: 0.85rem;
-      margin-top: 8px;
-      display: none;
+    .product-list-item {
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #eee; padding: 10px 0; gap: 10px;
     }
-    /* ✅ بلاک شدن */
-    .blocked-msg {
-      color: #e53935;
-      font-weight: bold;
-      margin-top: 12px;
-      font-size: 0.9rem;
+    .btn-delete-prod {
+      background-color: #ff3b30; color: white; border: none;
+      padding: 6px 12px; border-radius: 6px; font-size: 0.85rem;
+      cursor: pointer; white-space: nowrap;
     }
+    .btn-delete-prod:disabled, .btn-done:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .section-title-row {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px;
+    }
+    .badge-count { background: #eee; color: #444; border-radius: 20px; padding: 2px 10px; font-size: 0.85rem; }
+    .btn-refresh { background: #eee; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+
+    #image-preview {
+      display: none; margin-top: 8px;
+      max-width: 120px; max-height: 120px;
+      border-radius: 8px; object-fit: cover;
+      border: 2px solid #eee;
+    }
+    .search-box {
+      width: 100%; padding: 8px; border: 1.5px solid #ccc;
+      border-radius: 6px; margin-bottom: 12px; font-family: inherit;
+    }
+    .search-box:focus { border-color: #ff9500; outline: none; }
+
+    /* ✅ NEW: Status badge for orders */
+    .status-badge {
+      display: inline-block; padding: 3px 8px; border-radius: 10px;
+      font-size: 0.75rem; font-weight: bold; margin-right: 8px;
+    }
+    .status-pending   { background: #fff8dc; color: #856404; }
+    .status-preparing { background: #dbeafe; color: #1d4ed8; }
+    .status-shipped   { background: #ffedd5; color: #9a3412; }
+    .status-delivered { background: #dcfce7; color: #166534; }
+
+    /* ✅ NEW: Toast notification */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #323232; color: white; padding: 10px 24px;
+      border-radius: 24px; font-size: 0.9rem; z-index: 9999;
+      opacity: 0; transition: opacity .3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ✅ NEW: Upload progress */
+    .upload-progress {
+      height: 6px; border-radius: 6px;
+      background: #eee; margin-top: 8px; display: none; overflow: hidden;
+    }
+    .upload-progress-bar {
+      height: 100%; width: 0%; background: #2ecc71;
+      transition: width .3s; border-radius: 6px;
+    }
+
+    .img-file-group { background: #f0f3f1; padding: 10px; border-radius: 8px; }
+
+    .unit-row { display: flex; gap: 10px; margin-top: 5px; }
+    .unit-row input { flex: 1; padding: 8px; border-radius: 6px; border: 1.5px solid #ccc; font-family: inherit; }
+    .unit-row input:focus { border-color: #2ecc71; outline: none; }
   </style>
 </head>
 <body>
 
-<!-- ✅ صفحه لاگین -->
+<!-- Login Screen -->
 <div id="login-section" class="login-box">
-  <h2>🔒 ورود</h2>
-  <input type="password" id="admin-password"
-    placeholder="رمز عبور"
-    onkeydown="if(event.key==='Enter') checkPassword()"
-    autocomplete="off">
-  <p class="login-error" id="login-error">❌ رمز اشتباه است!</p>
-  <p id="blocked-msg" class="blocked-msg" style="display:none;"></p>
+  <h2>🔒 ورود به پنل مدیریت دکان</h2>
+  <input type="email" id="admin-email" placeholder="ایمیل" autocomplete="username">
+  <input type="password" id="admin-password" placeholder="رمز عبور" autocomplete="current-password">
   <button id="login-btn" onclick="checkPassword()"
-    style="background-color:#ff3b30;color:white;width:100%;border-radius:8px;padding:10px;border:none;cursor:pointer;font-size:1rem;font-weight:bold;">
-    ورود
+    style="background-color:#ff3b30; color:white; width:100%; border-radius:8px; padding:11px; border:none; cursor:pointer; font-weight:bold;">
+    ورود به سیستم
   </button>
-  <p style="margin-top:16px; color:#bbb; font-size:0.78rem;">⚠️ این صفحه مخصوص مدیریت است.</p>
+  <p id="login-error" style="color:#ff3b30; font-size:0.85rem; margin-top:10px; display:none;"></p>
 </div>
 
-<!-- ✅ پنل ادمین -->
+<!-- Admin Panel -->
 <div id="admin-section" class="admin-container" style="display:none;">
-  <h1>⚙️ پنل مدیریت فروشگاه اکبری</h1>
-  <a href="index.html" style="text-decoration:none;font-weight:bold;color:#555;">⬅ بازگشت به فروشگاه</a>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+    <h1>⚙️ پنل مدیریت فروشگاه اکبری</h1>
+    <button onclick="logoutAdmin()"
+      style="background:#eee; border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-size:0.85rem;">
+      🚪 خروج
+    </button>
+  </div>
+  <a href="index.html" style="text-decoration:none; font-weight:bold; color:#555;">⬅ بازگشت به فروشگاه</a>
+  <a href="admin-orders.html" style="text-decoration:none; font-weight:bold; color:white; background:#ef4056; padding:8px 16px; border-radius:8px; margin-right:10px;">🛠️ پنل سفارشات</a>
   <br><br>
 
-  <!-- افزودن محصول -->
+  <!-- Add Product Form -->
   <div class="form-card">
-    <h2>➕ افزودن محصول جدید به دکان (آنلاین)</h2>
+    <h2>➕ افزودن محصول جدید به دکان</h2>
     <form id="product-form" onsubmit="addNewProduct(event)">
       <div class="form-group">
-        <label>نام محصول:</label>
-        <input type="text" id="p-title" required placeholder="مثال: لوبیا وطنی درجه یک">
+        <label>نام محصول: *</label>
+        <input type="text" id="p-title" required placeholder="مثال: لوبیا وطنی درجه یک" maxlength="100">
       </div>
-      <div class="form-group" style="background:#f0f3f1;padding:10px;border-radius:8px;">
-        <label>📸 انتخاب عکس محصول از حافظه گوشی:</label>
-        <input type="file" id="p-image-file" accept="image/*" required style="margin-top:5px;" onchange="previewImage(event)">
+
+      <div class="form-group img-file-group">
+        <label>📸 عکس محصول (حداکثر ۵ مگابایت): *</label>
+        <input type="file" id="p-image-file" accept="image/jpeg,image/png,image/webp,image/gif" required
+               style="margin-top:5px;" onchange="previewImage(event)">
         <img id="image-preview" alt="پیش‌نمایش عکس">
+        <div class="upload-progress" id="upload-progress">
+          <div class="upload-progress-bar" id="upload-bar"></div>
+        </div>
       </div>
+
       <div class="form-group">
         <label>توضیحات کوتاه:</label>
-        <textarea id="p-desc" rows="2" placeholder="توضیحات درباره کیفیت یا بسته‌بندی..."></textarea>
+        <textarea id="p-desc" rows="2" placeholder="توضیحات درباره کیفیت یا بسته‌بندی..." maxlength="300"></textarea>
       </div>
-      <div style="background:#f9f9f9;padding:10px;border-radius:8px;margin-bottom:12px;">
-        <strong>تنظیم واحد اول (ضروری):</strong>
-        <div style="display:flex;gap:10px;margin-top:5px;">
-          <input type="text" id="p-unit1-name" required placeholder="نام واحد (مثلا: بوجی ۵۰ کیلویی)" style="flex:2;padding:8px;border-radius:6px;border:1px solid #ccc;">
-          <input type="number" id="p-unit1-price" required min="1" step="1" placeholder="قیمت (افغانی)" style="flex:1;padding:8px;border-radius:6px;border:1px solid #ccc;">
+
+      <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:12px;">
+        <strong>واحد اول (ضروری):</strong>
+        <div class="unit-row">
+          <input type="text" id="p-unit1-name" required placeholder="نام واحد (مثلا: بوجی ۵۰ کیلویی)" maxlength="60">
+          <input type="number" id="p-unit1-price" required min="1" step="1" placeholder="قیمت (افغانی)">
         </div>
       </div>
-      <div style="background:#f9f9f9;padding:10px;border-radius:8px;margin-bottom:12px;">
-        <strong>تنظیم واحد دوم (اختیاری):</strong>
-        <div style="display:flex;gap:10px;margin-top:5px;">
-          <input type="text" id="p-unit2-name" placeholder="نام واحد (مثلا: کیلوگرم)" style="flex:2;padding:8px;border-radius:6px;border:1px solid #ccc;">
-          <input type="number" id="p-unit2-price" min="1" step="1" placeholder="قیمت (افغانی)" style="flex:1;padding:8px;border-radius:6px;border:1px solid #ccc;">
+
+      <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:12px;">
+        <strong>واحد دوم (اختیاری):</strong>
+        <div class="unit-row">
+          <input type="text" id="p-unit2-name" placeholder="نام واحد (مثلا: کیلوگرم)" maxlength="60">
+          <input type="number" id="p-unit2-price" min="1" step="1" placeholder="قیمت (افغانی)">
         </div>
       </div>
-      <button type="submit" style="background-color:#2ecc71;color:white;width:100%;padding:10px;border-radius:6px;font-weight:bold;border:none;cursor:pointer;">🚀 آپلود عکس و اضافه کردن به دکان</button>
+
+      <button type="submit"
+        style="background:#2ecc71; color:white; width:100%; padding:11px; border-radius:8px; font-weight:bold; border:none; cursor:pointer; font-family:inherit; font-size:0.95rem;">
+        🚀 آپلود و اضافه کردن به دکان
+      </button>
     </form>
   </div>
 
-  <!-- لیست اجناس -->
+  <!-- Products List -->
   <div class="form-card" style="border-right:5px solid #ff9500;">
     <div class="section-title-row">
-      <h2>📦 لیست اجناس موجود <span id="product-count" class="badge-count"></span></h2>
+      <h2>📦 لیست اجناس <span id="product-count" class="badge-count"></span></h2>
       <button class="btn-refresh" onclick="displayAdminProducts()">🔄 بروزرسانی</button>
     </div>
-    <input type="text" id="product-search" class="search-box" placeholder="🔍 جستجوی نام جنس..." oninput="filterProducts()">
-    <div id="admin-products-list">در حال بارگذاری اجناس...</div>
+    <input type="text" id="product-search" class="search-box" placeholder="جستجوی نام جنس..." oninput="filterProducts()">
+    <div id="admin-products-list">در حال بارگذاری...</div>
   </div>
 
-  <!-- جستجوی سفارشات -->
-  <div class="order-search-wrap">
-    <label>🔍 جستجو در سفارشات مشتریان</label>
-    <div class="order-search-row">
-      <input type="text" id="order-search-input"
-        placeholder="شماره تلفن، شماره فاکتور، یا نام جنس..."
-        oninput="filterOrders()"
-        onkeydown="if(event.key==='Escape') clearOrderSearch()">
-      <button class="btn-clear-search" onclick="clearOrderSearch()">✕</button>
-    </div>
-    <div id="search-result-info" class="search-result-info"></div>
-  </div>
-
-  <!-- سفارشات -->
-  <div class="section-title-row">
+  <!-- Orders List -->
+  <div class="section-title-row" style="margin-bottom:12px;">
     <h2>📦 سفارش‌های دریافتی <span id="order-count" class="badge-count"></span></h2>
     <button class="btn-refresh" onclick="displayOrders()">🔄 بروزرسانی</button>
   </div>
-  <div id="orders-list">در حال بارگذاری سفارشات...</div>
+  <div id="orders-list">در حال بارگذاری...</div>
   <br>
-  <button class="btn-clear" onclick="clearAllOrders()">🗑️ پاک کردن کل تاریخچه سفارش‌ها</button>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+  <button class="btn-clear" style="background:#2ecc71;" onclick="archiveAllOrders()">✅ بایگانی همه سفارشات</button>
+  <button class="btn-clear" onclick="clearAllOrders()">🗑️ پاک کردن کل تاریخچه</button>
 </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
-// ✅ رمز عبور جدید: akbari@2026
-// این هش فوق‌العاده قوی با الگوریتم SHA-512 و ترکیب نمک پیچیده ایجاد شده است.
-const CORRECT_HASH = "80f1ff0e071e6268fca8b688d070b4ba79da06981cf69be2d02c52bd85655bd51ef35c34cb2cbebc5046bebfccfa64e7c050fa8959f63f53cb0fc0a316130953";
+  let allProductsCache = [];
+  let isUploading = false;
 
-const MAX_ATTEMPTS = 5;       
-const LOCK_TIME_MS = 5 * 60 * 1000; 
-
-function getLockData() {
-  try {
-    return JSON.parse(localStorage.getItem('admin_lock') || '{"attempts":0,"lockedUntil":0}');
-  } catch(e) {
-    return { attempts: 0, lockedUntil: 0 };
-  }
-}
-
-function saveLockData(data) {
-  localStorage.setItem('admin_lock', JSON.stringify(data));
-}
-
-function isLocked() {
-  const lock = getLockData();
-  return lock.lockedUntil > Date.now();
-}
-
-function getRemainingLockTime() {
-  const lock = getLockData();
-  return Math.ceil((lock.lockedUntil - Date.now()) / 60000);
-}
-
-// ✅ تغییر به الگوریتم قدرتمندتر SHA-512 همراه با نمک پیچیده سرتاسری
-async function hashPassword(password) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password + "_SecureAkbariStoreSalt_2026_#99x!");
-  const hashBuffer = await crypto.subtle.digest('SHA-512', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function checkPassword() {
-  if (isLocked()) {
-    showBlockedMsg();
-    return;
+  // ✅ FIX: Comprehensive XSS escaping
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return "";
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
-  const pwd = document.getElementById("admin-password").value;
-  const errorEl = document.getElementById("login-error");
-  const btn = document.getElementById("login-btn");
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
+  }
 
-  btn.disabled = true;
-  btn.innerText = "در حال بررسی...";
-
-  const hash = await hashPassword(pwd);
-
-  if (hash === CORRECT_HASH) {
-    saveLockData({ attempts: 0, lockedUntil: 0 });
+  function showAdminPanel() {
     document.getElementById("login-section").style.display = "none";
     document.getElementById("admin-section").style.display = "block";
     displayOrders();
     displayAdminProducts();
-  } else {
-    const lock = getLockData();
-    lock.attempts = (lock.attempts || 0) + 1;
+  }
 
-    if (lock.attempts >= MAX_ATTEMPTS) {
-      lock.lockedUntil = Date.now() + LOCK_TIME_MS;
-      saveLockData(lock);
-      showBlockedMsg();
-    } else {
-      saveLockData(lock);
-      const remaining = MAX_ATTEMPTS - lock.attempts;
-      errorEl.textContent = `❌ رمز اشتباه است! ${remaining} تلاش دیگر باقی است.`;
+  function showLoginScreen() {
+    document.getElementById("admin-section").style.display = "none";
+    document.getElementById("login-section").style.display = "block";
+  }
+
+  async function checkPassword() {
+    const email    = document.getElementById("admin-email").value.trim();
+    const password = document.getElementById("admin-password").value;
+    const btn      = document.getElementById("login-btn");
+    const errorEl  = document.getElementById("login-error");
+    errorEl.style.display = "none";
+
+    if (!email || !password) {
+      errorEl.textContent = "لطفاً ایمیل و رمز عبور را وارد کنید.";
       errorEl.style.display = "block";
-      document.getElementById("admin-password").value = "";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "در حال ورود...";
+
+    try {
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        errorEl.textContent = "ورود ناموفق: نام کاربری یا رمز عبور اشتباه است.";
+        errorEl.style.display = "block";
+        document.getElementById("admin-password").value = "";
+      } else {
+        document.getElementById("admin-password").value = "";
+        showAdminPanel();
+      }
+    } catch (err) {
+      errorEl.textContent = "خطای ارتباط با سرور: " + err.message;
+      errorEl.style.display = "block";
+    } finally {
       btn.disabled = false;
-      btn.innerText = "ورود";
+      btn.textContent = "ورود به سیستم";
     }
   }
-}
 
-function showBlockedMsg() {
-  const mins = getRemainingLockTime();
-  document.getElementById("login-error").style.display = "none";
-  const blockedEl = document.getElementById("blocked-msg");
-  blockedEl.style.display = "block";
-  blockedEl.textContent = `🔒 حساب ${mins} دقیقه قفل شده است. دوباره امتحان کنید.`;
-  document.getElementById("login-btn").disabled = true;
-  document.getElementById("login-btn").innerText = `🔒 قفل (${mins} دقیقه)`;
-}
-
-window.addEventListener('load', () => {
-  if (isLocked()) showBlockedMsg();
-});
-
-// ─── توابع مدیریت فروشگاه ───────────────────────────────────────────
-
-const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
-let allProductsCache = [];
-let allOrdersCache = [];
-
-function escapeHtml(value) {
-  if (value === null || value === undefined) return "";
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function highlightText(text, term) {
-  if (!term) return escapeHtml(text);
-  let escaped = escapeHtml(text);
-  if (!term.trim()) return escaped;
-  let safeTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return escaped.replace(new RegExp(`(${safeTerm})`, 'gi'), '<span class="highlight">$1</span>');
-}
-
-function previewImage(event) {
-  let file = event.target.files[0];
-  let preview = document.getElementById("image-preview");
-  if (!file) { preview.style.display = "none"; return; }
-  if (file.size > MAX_IMAGE_SIZE_BYTES) {
-    alert("حجم عکس بیشتر از ۵ مگابایت است.");
-    event.target.value = "";
-    preview.style.display = "none";
-    return;
-  }
-  let reader = new FileReader();
-  reader.onload = (e) => { preview.src = e.target.result; preview.style.display = "block"; };
-  reader.readAsDataURL(file);
-}
-
-function filterProducts() {
-  let term = document.getElementById("product-search").value.trim().toLowerCase();
-  let filtered = allProductsCache.filter(p =>
-    (p.Name || "").toLowerCase().includes(term)
-  );
-  renderProductsList(filtered);
-}
-
-async function displayAdminProducts() {
-  let div = document.getElementById("admin-products-list");
-  div.innerHTML = "در حال دریافت کالاها...";
-  try {
-    const { data: products, error } = await supabaseClient.from('Products').select('*');
-    if (error) { div.innerHTML = "<p style='color:red;'>خطا: " + escapeHtml(error.message) + "</p>"; return; }
-    allProductsCache = products || [];
-    document.getElementById("product-count").textContent = allProductsCache.length;
-    renderProductsList(allProductsCache);
-  } catch (err) {
-    div.innerHTML = "<p style='color:red;'>خطای سرور: " + escapeHtml(err.message) + "</p>";
-  }
-}
-
-function renderProductsList(products) {
-  let div = document.getElementById("admin-products-list");
-  if (!products || products.length === 0) {
-    div.innerHTML = "<p style='color:#888;'>هیچ محصولی پیدا نشد.</p>";
-    return;
-  }
-  div.innerHTML = "";
-  products.forEach(p => {
-    let unitsText = "";
-    if (p.units) {
-      let u = typeof p.units === 'string' ? JSON.parse(p.units) : p.units;
-      unitsText = u.map(x => `${escapeHtml(x.name)}: ${escapeHtml(x.price)} افغانی`).join(" | ");
-    } else {
-      unitsText = `${escapeHtml(p.Price || 0)} افغانی`;
+  // Enter key for login
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && document.getElementById("login-section").style.display !== "none") {
+      checkPassword();
     }
-    let imgSrc = escapeHtml(p.Image_URL || "");
-    let name = escapeHtml(p.Name || "بدون نام");
-    div.innerHTML += `
-      <div class="product-list-item">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <img src="${imgSrc}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;" loading="lazy" onerror="this.style.opacity=0.3">
-          <div>
-            <strong style="font-size:0.95rem;">${name}</strong>
-            <p style="margin:3px 0 0 0;font-size:0.8rem;color:#666;">${unitsText}</p>
-          </div>
-        </div>
-        <button onclick="deleteProduct(${p.id}, this)" class="btn-delete-prod">🗑️ حذف جنس</button>
-      </div>`;
   });
-}
 
-async function deleteProduct(id, btnEl) {
-  if (!confirm("آیا این جنس از دکان آنلاین حذف شود؟")) return;
-  if (btnEl) { btnEl.disabled = true; btnEl.innerText = "در حال حذف..."; }
-  try {
-    const { error } = await supabaseClient.from('Products').delete().eq('id', id);
-    if (error) {
-      alert("خطا: " + error.message);
-      if (btnEl) { btnEl.disabled = false; btnEl.innerText = "🗑️ حذف جنس"; }
-    } else { displayAdminProducts(); }
-  } catch (err) {
-    alert("خطای سرور: " + err.message);
-    if (btnEl) { btnEl.disabled = false; btnEl.innerText = "🗑️ حذف جنس"; }
-  }
-}
-
-async function addNewProduct(event) {
-  event.preventDefault();
-  let submitBtn = document.querySelector("#product-form button[type='submit']");
-  let fileInput = document.getElementById("p-image-file");
-  if (!fileInput || fileInput.files.length === 0) { alert("لطفاً یک عکس انتخاب کنید!"); return; }
-  let file = fileInput.files[0];
-  if (file.size > MAX_IMAGE_SIZE_BYTES) { alert("حجم عکس بیشتر از ۵ مگابایت است."); return; }
-
-  let title = document.getElementById("p-title").value.trim();
-  let unit1Name = document.getElementById("p-unit1-name").value.trim();
-  let unit1Price = parseInt(document.getElementById("p-unit1-price").value, 10);
-  if (!title) { alert("نام محصول را وارد کنید."); return; }
-  if (!unit1Name || isNaN(unit1Price) || unit1Price <= 0) { alert("نام و قیمت واحد اول را وارد کنید."); return; }
-
-  let unit2Name = document.getElementById("p-unit2-name").value.trim();
-  let unit2PriceRaw = document.getElementById("p-unit2-price").value;
-  let unit2Price = parseInt(unit2PriceRaw, 10);
-  if (unit2Name && (unit2PriceRaw === "" || isNaN(unit2Price) || unit2Price <= 0)) {
-    alert("قیمت واحد دوم را نیز وارد کنید."); return;
+  async function logoutAdmin() {
+    if (!confirm("آیا می‌خواهید از پنل مدیریت خارج شوید؟")) return;
+    await supabaseClient.auth.signOut();
+    showLoginScreen();
   }
 
-  submitBtn.disabled = true;
-  submitBtn.innerText = "⏳ در حال آپلود...";
-  let fileName = Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+  async function initAuthState() {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data && data.session) showAdminPanel();
+    else showLoginScreen();
+  }
 
-  try {
-    const { error: storageError } = await supabaseClient.storage.from('product-images').upload(fileName, file);
-    if (storageError) { alert("خطا در آپلود عکس: " + storageError.message); return; }
+  supabaseClient.auth.onAuthStateChange((event) => {
+    if (event === "SIGNED_OUT") showLoginScreen();
+  });
 
-    const { data: urlData } = supabaseClient.storage.from('product-images').getPublicUrl(fileName);
-    let desc = document.getElementById("p-desc").value.trim();
-    let unitsArray = [{ name: unit1Name, price: unit1Price }];
-    if (unit2Name && unit2Price > 0) unitsArray.push({ name: unit2Name, price: unit2Price });
+  initAuthState();
 
-    const { error: tableError } = await supabaseClient.from('Products').insert([{
-      Name: title, Image_URL: urlData.publicUrl, description: desc, units: unitsArray
-    }]);
+  function previewImage(event) {
+    const file    = event.target.files[0];
+    const preview = document.getElementById("image-preview");
+    if (!file) { preview.style.display = "none"; return; }
+    if (file.size > MAX_IMAGE_BYTES) {
+      alert("حجم عکس بیشتر از ۵ مگابایت است. لطفاً فشرده‌سازی کنید.");
+      event.target.value = "";
+      preview.style.display = "none";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => { preview.src = e.target.result; preview.style.display = "block"; };
+    reader.readAsDataURL(file);
+  }
 
-    if (tableError) { alert("خطا در ثبت محصول: " + tableError.message); }
-    else {
-      alert("موفقیت‌آمیز! جنس جدید اضافه شد.");
+  function filterProducts() {
+    const term = document.getElementById("product-search").value.trim().toLowerCase();
+    const filtered = allProductsCache.filter(p =>
+      (p.Name || "").toLowerCase().includes(term) ||
+      (p.description || "").toLowerCase().includes(term)
+    );
+    renderProductsList(filtered);
+  }
+
+  async function displayAdminProducts() {
+    const div = document.getElementById("admin-products-list");
+    div.innerHTML = "در حال دریافت کالاها...";
+    try {
+      const { data: products, error } = await supabaseClient.from('Products').select('*').order('id', { ascending: false });
+      if (error) throw error;
+      allProductsCache = products || [];
+      document.getElementById("product-count").textContent = allProductsCache.length;
+      renderProductsList(allProductsCache);
+    } catch (err) {
+      div.innerHTML = `<p style="color:red;">خطا در لود محصولات: ${escapeHtml(err.message)}</p>`;
+    }
+  }
+
+  function renderProductsList(products) {
+    const div = document.getElementById("admin-products-list");
+    if (!products || products.length === 0) {
+      div.innerHTML = "<p style='color:#888;'>هیچ محصولی پیدا نشد.</p>";
+      return;
+    }
+    div.innerHTML = "";
+    products.forEach(p => {
+      let unitsText = "";
+      if (p.units) {
+        try {
+          const u = typeof p.units === 'string' ? JSON.parse(p.units) : p.units;
+          unitsText = u.map(x => `${escapeHtml(x.name)}: ${escapeHtml(x.price)} افغانی`).join(" | ");
+        } catch(e) { unitsText = ""; }
+      }
+
+      const item = document.createElement('div');
+      item.className = "product-list-item";
+
+      const img = document.createElement('img');
+      img.src   = p.Image_URL || '';
+      img.style.cssText = "width:50px; height:50px; border-radius:6px; object-fit:cover;";
+      img.loading = "lazy";
+      img.onerror = function() { this.style.opacity = '0.3'; };
+
+      const info = document.createElement('div');
+      const nameEl = document.createElement('strong');
+      nameEl.style.fontSize = "0.95rem";
+      nameEl.textContent = p.Name || 'بدون نام';
+      const priceEl = document.createElement('p');
+      priceEl.style.cssText = "margin:3px 0 0; font-size:0.8rem; color:#666;";
+      priceEl.textContent = unitsText;
+      info.appendChild(nameEl);
+      info.appendChild(priceEl);
+
+      const leftDiv = document.createElement('div');
+      leftDiv.style.cssText = "display:flex; align-items:center; gap:10px;";
+      leftDiv.appendChild(img);
+      leftDiv.appendChild(info);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = "btn-delete-prod";
+      delBtn.textContent = "🗑️ حذف جنس";
+      delBtn.addEventListener('click', () => deleteProduct(p.id, delBtn));
+
+      item.appendChild(leftDiv);
+      item.appendChild(delBtn);
+      div.appendChild(item);
+    });
+  }
+
+  async function deleteProduct(id, btnEl) {
+    if (!confirm("آیا مطمئن هستید؟ این عمل قابل بازگشت نیست.")) return;
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = "در حال حذف..."; }
+    try {
+      const { error } = await supabaseClient.from('Products').delete().eq('id', id);
+      if (error) throw error;
+      showToast("✅ جنس با موفقیت حذف شد");
+      displayAdminProducts();
+    } catch (err) {
+      showToast("❌ خطا در حذف: " + err.message);
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = "🗑️ حذف جنس"; }
+    }
+  }
+
+  async function addNewProduct(event) {
+    event.preventDefault();
+    if (isUploading) return;
+
+    const submitBtn = document.querySelector("#product-form button[type='submit']");
+    const fileInput = document.getElementById("p-image-file");
+
+    if (!fileInput || fileInput.files.length === 0) {
+      alert("لطفاً ابتدا یک عکس انتخاب کنید!");
+      return;
+    }
+
+    const file = fileInput.files[0];
+    if (file.size > MAX_IMAGE_BYTES) {
+      alert("حجم عکس بیشتر از ۵ مگابایت است.");
+      return;
+    }
+
+    const title     = document.getElementById("p-title").value.trim();
+    const unit1Name = document.getElementById("p-unit1-name").value.trim();
+    const unit1Price = parseInt(document.getElementById("p-unit1-price").value, 10);
+
+    if (!title) { alert("نام محصول را وارد کنید."); return; }
+    if (!unit1Name || isNaN(unit1Price) || unit1Price <= 0) {
+      alert("نام و قیمت واحد اول را به درستی وارد کنید.");
+      return;
+    }
+
+    const unit2Name  = document.getElementById("p-unit2-name").value.trim();
+    const unit2Price = parseInt(document.getElementById("p-unit2-price").value, 10);
+    if (unit2Name && (isNaN(unit2Price) || unit2Price <= 0)) {
+      alert("قیمت واحد دوم را به درستی وارد کنید.");
+      return;
+    }
+
+    isUploading = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "⏳ در حال آپلود عکس...";
+    const progressDiv = document.getElementById("upload-progress");
+    const progressBar = document.getElementById("upload-bar");
+    progressDiv.style.display = "block";
+    progressBar.style.width = "30%";
+
+    const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_")}`;
+
+    try {
+      const { error: storageError } = await supabaseClient
+        .storage.from('product-images').upload(fileName, file);
+
+      if (storageError) throw storageError;
+      progressBar.style.width = "70%";
+
+      const { data: urlData } = supabaseClient
+        .storage.from('product-images').getPublicUrl(fileName);
+
+      const desc = document.getElementById("p-desc").value.trim();
+      const unitsArray = [{ name: unit1Name, price: unit1Price }];
+      if (unit2Name && unit2Price > 0) unitsArray.push({ name: unit2Name, price: unit2Price });
+
+      const { error: tableError } = await supabaseClient.from('Products').insert([{
+        Name: title,
+        Image_URL: urlData.publicUrl,
+        description: desc,
+        units: unitsArray
+      }]);
+
+      if (tableError) throw tableError;
+
+      progressBar.style.width = "100%";
+      showToast("✅ جنس جدید با موفقیت به دکان اضافه شد");
       document.getElementById("product-form").reset();
       document.getElementById("image-preview").style.display = "none";
       displayAdminProducts();
+
+    } catch (err) {
+      showToast("❌ خطا: " + err.message);
+    } finally {
+      isUploading = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = "🚀 آپلود و اضافه کردن به دکان";
+      setTimeout(() => { progressDiv.style.display = "none"; progressBar.style.width = "0%"; }, 2000);
     }
-  } catch (err) {
-    alert("خطای غیرمنتظره: " + err.message);
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.innerText = "🚀 آپلود عکس و اضافه کردن به دکان";
   }
-}
 
-async function displayOrders() {
-  let div = document.getElementById("orders-list");
-  div.innerHTML = "در حال بارگذاری فاکتورها...";
-  try {
-    const { data: orders, error } = await supabaseClient
-      .from('Customer_Order').select('*').order('id', { ascending: false });
-    if (error) { div.innerHTML = "<p style='color:red;'>خطا: " + escapeHtml(error.message) + "</p>"; return; }
-    allOrdersCache = orders || [];
-    document.getElementById("order-count").textContent = allOrdersCache.length;
-    let term = document.getElementById("order-search-input").value.trim();
-    if (term) { filterOrders(); } else { renderOrdersList(allOrdersCache, ""); }
-  } catch (err) {
-    div.innerHTML = "<p style='color:red;'>خطای سرور: " + escapeHtml(err.message) + "</p>";
+  async function displayOrders() {
+    const div = document.getElementById("orders-list");
+    div.innerHTML = "در حال بارگذاری فاکتورها...";
+
+    try {
+      const { data: orders, error } = await supabaseClient
+        .from('Customer_Order').select('*').order('id', { ascending: false });
+
+      if (error) throw error;
+
+      document.getElementById("order-count").textContent = orders ? orders.length : 0;
+
+      if (!orders || orders.length === 0) {
+        div.innerHTML = "<p style='color:#888; padding:20px 0;'>هیچ سفارشی ثبت نشده است.</p>";
+        return;
+      }
+
+      div.innerHTML = "";
+      orders.forEach((order) => {
+        const phone = escapeHtml(order.Phone || "بدون شماره");
+        const statusKey = order.status || 'pending';
+        const STATUS = { pending:'⏳ در انتظار', preparing:'👨‍🍳 آماده‌سازی', shipped:'🛵 ارسال شده', delivered:'✅ تحویل شد' };
+        const statusLabel = STATUS[statusKey] || STATUS.pending;
+
+        const card = document.createElement('div');
+        card.className = "order-card";
+        card.innerHTML = `
+          <div class="order-header">
+            <strong>فاکتور #${escapeHtml(order.id)}</strong>
+            <span>
+              <span class="status-badge status-${escapeHtml(statusKey)}">${statusLabel}</span>
+              📞 <a href="tel:${phone}" style="text-decoration:none; color:#008eb9; font-weight:bold;">${phone}</a>
+            </span>
+          </div>
+          <div class="order-items"><p></p></div>
+          <div class="price-details">
+            <strong style="color:#2ecc71;">💰 جمع کل: ${escapeHtml(String(order.Total_Price))} افغانی</strong>
+          </div>
+          <button class="btn-done">✓ تکمیل و بایگانی فاکتور</button>
+        `;
+
+        // ✅ FIX: textContent for user order data
+        card.querySelector('.order-items p').textContent = order.Items || '';
+        card.querySelector('.btn-done').addEventListener('click', function() {
+          completeOrder(order.id, this);
+        });
+
+        div.appendChild(card);
+      });
+    } catch (err) {
+      div.innerHTML = `<p style="color:red;">خطا در دریافت سفارش‌ها: ${escapeHtml(err.message)}</p>`;
+    }
   }
-}
 
-function filterOrders() {
-  let term = document.getElementById("order-search-input").value.trim();
-  let infoEl = document.getElementById("search-result-info");
-  if (!term) { infoEl.textContent = ""; renderOrdersList(allOrdersCache, ""); return; }
-  let lower = term.toLowerCase();
-  let filtered = allOrdersCache.filter(order => {
-    let phone = String(order.Phone || "");
-    let id = String(order.id || "");
-    let items = String(order.Items || "").toLowerCase();
-    return phone.includes(lower) || id.includes(lower) || items.includes(lower);
-  });
-  infoEl.textContent = filtered.length === 0
-    ? `نتیجه‌ای برای "${term}" پیدا نشد (از ${allOrdersCache.length} سفارش)`
-    : `${filtered.length} سفارش از ${allOrdersCache.length} پیدا شد`;
-  renderOrdersList(filtered, term);
-}
-
-function clearOrderSearch() {
-  document.getElementById("order-search-input").value = "";
-  document.getElementById("search-result-info").textContent = "";
-  renderOrdersList(allOrdersCache, "");
-}
-
-function renderOrdersList(orders, searchTerm) {
-  let div = document.getElementById("orders-list");
-  if (!orders || orders.length === 0) {
-    div.innerHTML = `<h3 style='color:#888;text-align:center;padding:20px 0;'>
-      ${searchTerm ? "سفارشی با این مشخصات پیدا نشد." : "هیچ سفارش جدیدی ثبت نشده است."}
-    </h3>`;
-    return;
+  async function completeOrder(id, btnEl) {
+    if (!confirm("آیا این سفارش تحویل داده شده و از لیست حذف شود؟")) return;
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = "در حال ثبت..."; }
+    try {
+      const { error } = await supabaseClient.from('Customer_Order').delete().eq('id', id);
+      if (error) throw error;
+      showToast("✅ سفارش بایگانی شد");
+      displayOrders();
+    } catch (err) {
+      showToast("❌ خطا: " + err.message);
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = "✓ تکمیل و بایگانی فاکتور"; }
+    }
   }
-  div.innerHTML = "";
-  orders.forEach(order => {
-    let phoneHtml = highlightText(order.Phone || "—", searchTerm);
-    let idHtml = highlightText(String(order.id), searchTerm);
-    let itemsHtml = highlightText(order.Items || "—", searchTerm);
-    let total = Number(order.Total_Price || 0).toLocaleString('fa-AF');
-    div.innerHTML += `
-      <div class="order-card">
-        <div class="order-header">
-          <strong>👤 فاکتور شماره: #${idHtml}</strong>
-          <span style="color:#666;font-size:0.85rem;">📞 تلفن: <span style="direction:ltr;display:inline-block;">${phoneHtml}</span></span>
-        </div>
-        <div class="order-items">
-          <strong>🛒 لیست اجناس درخواستی:</strong>
-          <p style="margin-top:5px;white-space:pre-line;">${itemsHtml}</p>
-        </div>
-        <div class="price-details">
-          <h3 style="margin:0;color:#2ecc71;">💰 جمع کل: ${total} افغانی</h3>
-        </div>
-        <button class="btn-done" onclick="completeOrder(${order.id}, this)">✓ تکمیل و بایگانی فاکتور</button>
-      </div>`;
-  });
-}
 
-async function completeOrder(id, btnEl) {
-  if (!confirm("آیا این سفارش تحویل داده شده و از لیست حذف شود؟")) return;
-  if (btnEl) { btnEl.disabled = true; btnEl.innerText = "در حال ثبت..."; }
-  try {
-    const { error } = await supabaseClient.from('Customer_Order').delete().eq('id', id);
-    if (error) {
-      alert("خطا: " + error.message);
-      if (btnEl) { btnEl.disabled = false; btnEl.innerText = "✓ تکمیل و بایگانی فاکتور"; }
-    } else { displayOrders(); }
-  } catch (err) {
-    alert("خطای سرور: " + err.message);
-    if (btnEl) { btnEl.disabled = false; btnEl.innerText = "✓ تکمیل و بایگانی فاکتور"; }
+  async function archiveAllOrders() {
+    if (!confirm("آیا همه سفارشات به عنوان تحویل‌شده بایگانی شوند؟")) return;
+    try {
+      const { error } = await supabaseClient.from('Customer_Order').delete().neq('id', 0);
+      if (error) throw error;
+      showToast("✅ همه سفارشات بایگانی شدند");
+      displayOrders();
+    } catch (err) {
+      showToast("❌ خطا: " + err.message);
+    }
   }
-}
 
-async function clearAllOrders() {
-  if (!confirm("آیا مطمئن هستید؟ تمام سفارشات پاک می‌شود و قابل بازگشت نیست.")) return;
-  try {
-    const { error } = await supabaseClient.from('Customer_Order').delete().neq('id', 0);
-    if (error) { alert("خطا: " + error.message); }
-    else { displayOrders(); }
-  } catch (err) { alert("خطای سرور: " + err.message); }
-}
+  async function clearAllOrders() {
+    if (!confirm("آیا مطمئن هستید؟ این عمل همه سفارشات را پاک می‌کند و قابل بازگشت نیست!")) return;
+    if (!confirm("تأیید نهایی: پاک کردن کل تاریخچه سفارشات؟")) return;
+    try {
+      const { error } = await supabaseClient.from('Customer_Order').delete().neq('id', 0);
+      if (error) throw error;
+      showToast("✅ همه سفارشات پاک شدند");
+      displayOrders();
+    } catch (err) {
+      showToast("❌ خطا: " + err.message);
+    }
+  }
 </script>
 </body>
 </html>
