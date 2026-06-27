@@ -1,508 +1,808 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>مشاهده محصول</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    /* ===== صفحه جزئیات محصول ===== */
-    .detail-wrapper {
-      max-width: 600px;
-      margin: 16px auto;
-      padding: 0 14px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>جزئیات محصول — اکبری خوراکه فروشی</title>
+<link rel="manifest" href="manifest.json">
+<style>
 
-    /* دکمه بازگشت */
-    .btn-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--gray);
-      text-decoration: none;
-      font-size: .88rem;
-      margin-bottom: 14px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: white;
-      border: 1px solid var(--border);
-      transition: .2s;
-    }
-    .btn-back:hover { color: var(--primary); border-color: var(--primary); }
+/* ══════════════════════════════════════
+   TOKENS
+══════════════════════════════════════ */
+:root {
+  --red:       #ef4056;
+  --red-dark:  #c8293c;
+  --red-dim:   rgba(239,64,86,.10);
+  --green:     #22c55e;
 
-    /* کارت اصلی */
-    .detail-card {
-      background: white;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
+  --ink:       #1a1c2e;
+  --ink-2:     #3a3a4a;
+  --ink-3:     #7a7a8a;
+  --ink-4:     #b8b8c4;
 
-    /* تصویر */
-    .detail-img-wrap {
-      position: relative;
-      background: #f8f8f8;
-      text-align: center;
-      height: 260px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .detail-img-wrap img {
-      max-height: 100%;
-      max-width: 100%;
-      object-fit: contain;
-    }
+  --bg:        #f4f5f7;
+  --white:     #ffffff;
+  --border:    #e8e8ee;
 
-    /* ✅ بج موجودی روی تصویر */
-    .detail-stock-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      font-size: .75rem;
-      font-weight: bold;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
+  --nav:       64px;
+  --r-sm:      10px;
+  --r-md:      16px;
+  --r-lg:      24px;
+}
 
-    /* بدنه کارت */
-    .detail-body {
-      padding: 18px;
-    }
+/* ══════════════════════════════════════
+   RESET
+══════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    .detail-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: var(--text);
-      margin-bottom: 8px;
-      line-height: 1.6;
-    }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background:  var(--bg);
+  color:       var(--ink);
+  direction:   rtl;
+  min-height:  100dvh;
+  padding-bottom: calc(var(--nav) + 16px);
+  -webkit-font-smoothing: antialiased;
+}
 
-    .detail-desc {
-      font-size: .88rem;
-      color: var(--gray);
-      line-height: 1.8;
-      margin-bottom: 16px;
-      padding-bottom: 16px;
-      border-bottom: 1px dashed var(--border);
-    }
+:focus-visible {
+  outline: 2.5px solid var(--red);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 
-    /* ✅ انتخاب واحد + نمایش قیمت */
-    .unit-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .unit-row label {
-      font-size: .82rem;
-      color: var(--gray);
-      white-space: nowrap;
-    }
-    .unit-row select {
-      flex: 1;
-    }
+/* ══════════════════════════════════════
+   TOP BAR
+══════════════════════════════════════ */
+.topbar {
+  position:    sticky;
+  top:         0;
+  z-index:     100;
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  padding:     0 14px;
+  height:      54px;
+  background:  var(--white);
+  border-bottom: 1px solid var(--border);
+  box-shadow:  0 2px 8px rgba(0,0,0,.06);
+}
 
-    /* قیمت */
-    .detail-price-box {
-      background: #fff5f6;
-      border: 1.5px solid #ffd0d6;
-      border-radius: 10px;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .detail-price-label { font-size: .82rem; color: var(--gray); }
-    .detail-price-val {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--primary);
-      direction: ltr;
-    }
-    .detail-price-val span { font-size: .78rem; color: var(--gray); font-weight: normal; }
+.topbar-back {
+  width:        38px;
+  height:       38px;
+  border-radius: 50%;
+  border:       none;
+  background:   var(--bg);
+  color:        var(--ink);
+  font-size:    1.1rem;
+  cursor:       pointer;
+  display:      flex;
+  align-items:  center;
+  justify-content: center;
+  flex-shrink:  0;
+  transition:   background .15s;
+}
+.topbar-back:hover { background: var(--border); }
 
-    /* ✅ انتخاب تعداد */
-    .qty-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .qty-row label { font-size: .82rem; color: var(--gray); }
-    .qty-controls {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .qty-btn {
-      width: 36px; height: 36px;
-      border: none;
-      background: #f4f5f7;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      color: var(--text);
-      transition: background .2s;
-    }
-    .qty-btn:hover { background: #e8e8e8; }
-    #qty-display {
-      width: 40px;
-      text-align: center;
-      font-size: .95rem;
-      font-weight: bold;
-      border: none;
-      border-right: 1.5px solid var(--border);
-      border-left: 1.5px solid var(--border);
-      background: white;
-      color: var(--text);
-    }
+.topbar-title {
+  flex:         1;
+  font-size:    .92rem;
+  font-weight:  700;
+  color:        var(--ink);
+  white-space:  nowrap;
+  overflow:     hidden;
+  text-overflow: ellipsis;
+  text-align:   right;
+}
 
-    /* دکمه افزودن */
-    .btn-add-detail {
-      width: 100%;
-      border: none;
-      background: var(--primary);
-      color: white;
-      padding: 13px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-      font-family: inherit;
-      font-size: 1rem;
-      transition: background .2s, transform .1s;
-    }
-    .btn-add-detail:hover { background: var(--primary-hover); }
-    .btn-add-detail:active { transform: scale(0.98); }
-    .btn-add-detail.added { background: #43a047; }
-    .btn-add-detail:disabled { background: #ccc; cursor: not-allowed; }
+.topbar-logo {
+  color:       var(--red);
+  font-size:   .85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
 
-    /* ===== پیام خطا ===== */
-    .not-found-box {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--gray);
-    }
-    .not-found-box .icon { font-size: 3rem; margin-bottom: 12px; }
-    .not-found-box h3 { margin-bottom: 10px; }
-    .not-found-box a {
-      display: inline-block;
-      margin-top: 14px;
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: bold;
-    }
+/* ══════════════════════════════════════
+   LOADING / ERROR
+══════════════════════════════════════ */
+.state-box {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  justify-content: center;
+  padding:        60px 20px;
+  text-align:     center;
+  color:          var(--ink-3);
+  font-size:      .92rem;
+  gap:            12px;
+}
 
-    /* ===== اسکلتون لودینگ ===== */
-    .skeleton {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.2s infinite;
-      border-radius: 8px;
-    }
-    @keyframes shimmer { to { background-position: -200% 0; } }
-    .skel-img  { height: 260px; }
-    .skel-line { height: 18px; margin-bottom: 10px; }
-    .skel-line.short { width: 60%; }
-    .skel-line.med   { width: 80%; }
+.spinner {
+  width:         32px;
+  height:        32px;
+  border:        3px solid var(--border);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation:     spin .8s linear infinite;
+}
 
-    @media (max-width: 480px) {
-      .detail-img-wrap { height: 210px; }
-      .detail-title { font-size: 1rem; }
-    }
-  </style>
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.retry-btn {
+  margin-top:    8px;
+  padding:       9px 22px;
+  background:    var(--red);
+  color:         white;
+  border:        none;
+  border-radius: var(--r-sm);
+  cursor:        pointer;
+  font-family:   inherit;
+  font-size:     .88rem;
+  font-weight:   700;
+  transition:    background .15s;
+}
+.retry-btn:hover { background: var(--red-dark); }
+
+/* ══════════════════════════════════════
+   IMAGE HERO
+══════════════════════════════════════ */
+.hero {
+  background:  var(--white);
+  position:    relative;
+  overflow:    hidden;
+}
+
+.hero-img-wrap {
+  width:        100%;
+  aspect-ratio: 1 / 1;
+  max-height:   340px;
+  display:      flex;
+  align-items:  center;
+  justify-content: center;
+  background:   var(--bg);
+  overflow:     hidden;
+}
+
+.hero-img-wrap img {
+  width:      100%;
+  height:     100%;
+  object-fit: contain;
+  padding:    20px;
+  transition: transform .35s ease;
+}
+
+.hero-img-wrap img:hover { transform: scale(1.04); }
+
+/* badge موجودی */
+.stock-pill {
+  position:    absolute;
+  top:         12px;
+  left:        12px;
+  display:     inline-flex;
+  align-items: center;
+  gap:         5px;
+  padding:     5px 12px;
+  border-radius: 999px;
+  font-size:   .74rem;
+  font-weight: 700;
+}
+
+.stock-pill.in {
+  background: rgba(34,197,94,.15);
+  color:      #16a34a;
+  border:     1px solid rgba(34,197,94,.25);
+}
+
+.stock-pill.out {
+  background: var(--red-dim);
+  color:      var(--red);
+  border:     1px solid rgba(239,64,86,.2);
+}
+
+.stock-dot {
+  width:         7px;
+  height:        7px;
+  border-radius: 50%;
+  background:    currentColor;
+}
+
+.stock-pill.in .stock-dot { animation: blink 2s infinite; }
+
+@keyframes blink {
+  0%,100% { opacity:1; }
+  50%      { opacity:.3; }
+}
+
+/* ══════════════════════════════════════
+   CONTENT CARD
+══════════════════════════════════════ */
+.content-card {
+  background: var(--white);
+  margin-top: 8px;
+  padding:    18px 18px 22px;
+}
+
+.product-name {
+  font-size:      1.2rem;
+  font-weight:    700;
+  color:          var(--ink);
+  line-height:    1.45;
+  letter-spacing: -.01em;
+}
+
+.product-desc {
+  margin-top: 6px;
+  font-size:  .84rem;
+  color:      var(--ink-3);
+  line-height: 1.6;
+}
+
+.divider {
+  height:     1px;
+  background: var(--border);
+  margin:     16px 0;
+}
+
+/* ══════════════════════════════════════
+   قیمت
+══════════════════════════════════════ */
+.price-row {
+  display:     flex;
+  align-items: baseline;
+  gap:         8px;
+}
+
+.price-label {
+  font-size:  .78rem;
+  color:      var(--ink-3);
+  font-weight: 500;
+}
+
+.price-amount {
+  font-size:      1.55rem;
+  font-weight:    700;
+  color:          var(--red);
+  line-height:    1;
+  letter-spacing: -.02em;
+}
+
+.price-unit {
+  font-size:  .78rem;
+  color:      var(--ink-3);
+}
+
+/* ══════════════════════════════════════
+   واحد فروش
+══════════════════════════════════════ */
+.unit-section {
+  margin-top: 14px;
+}
+
+.section-label {
+  font-size:     .78rem;
+  color:         var(--ink-3);
+  font-weight:   500;
+  margin-bottom: 6px;
+  display:       block;
+}
+
+.unit-selector {
+  width:        100%;
+  padding:      10px 12px;
+  border:       1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-size:    .88rem;
+  font-family:  inherit;
+  background:   var(--bg);
+  color:        var(--ink);
+  direction:    rtl;
+  text-align:   right;
+  outline:      none;
+  cursor:       pointer;
+  transition:   border-color .15s, box-shadow .15s;
+  appearance:   auto;
+}
+
+.unit-selector:focus {
+  border-color: var(--red);
+  box-shadow:   0 0 0 3px var(--red-dim);
+}
+
+/* ══════════════════════════════════════
+   تعداد
+══════════════════════════════════════ */
+.qty-row {
+  display:     flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top:  14px;
+}
+
+.qty-control {
+  display:      flex;
+  align-items:  center;
+  background:   var(--bg);
+  border-radius: var(--r-sm);
+  border:       1.5px solid var(--border);
+  overflow:     hidden;
+}
+
+.qty-btn {
+  width:       42px;
+  height:      42px;
+  border:      none;
+  background:  transparent;
+  color:       var(--ink-2);
+  font-size:   1.25rem;
+  font-weight: 700;
+  cursor:      pointer;
+  display:     flex;
+  align-items: center;
+  justify-content: center;
+  transition:  background .15s, color .15s;
+  line-height: 1;
+  user-select: none;
+}
+
+.qty-btn:hover { background: var(--red-dim); color: var(--red); }
+.qty-btn:active { background: rgba(239,64,86,.2); }
+.qty-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+.qty-num {
+  width:       46px;
+  text-align:  center;
+  font-size:   1rem;
+  font-weight: 700;
+  color:       var(--ink);
+  border:      none;
+  background:  transparent;
+  border-right: 1.5px solid var(--border);
+  border-left:  1.5px solid var(--border);
+  outline:     none;
+  padding:     0;
+  -moz-appearance: textfield;
+}
+.qty-num::-webkit-inner-spin-button,
+.qty-num::-webkit-outer-spin-button { appearance: none; }
+
+/* ══════════════════════════════════════
+   دکمه افزودن
+══════════════════════════════════════ */
+.add-btn {
+  width:         100%;
+  height:        52px;
+  border:        none;
+  border-radius: var(--r-md);
+  background:    var(--red);
+  color:         white;
+  font-family:   inherit;
+  font-size:     1rem;
+  font-weight:   700;
+  cursor:        pointer;
+  margin-top:    16px;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  gap:           8px;
+  letter-spacing: .01em;
+  box-shadow:    0 4px 16px rgba(239,64,86,.3);
+  transition:    background .15s, transform .1s, box-shadow .15s;
+  position:      relative;
+  overflow:      hidden;
+}
+
+.add-btn::before {
+  content:    '';
+  position:   absolute;
+  inset:      0;
+  background: linear-gradient(180deg, rgba(255,255,255,.08) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.add-btn:hover:not(:disabled) {
+  background: var(--red-dark);
+  box-shadow: 0 6px 20px rgba(239,64,86,.4);
+  transform:  translateY(-1px);
+}
+
+.add-btn:active:not(:disabled) {
+  transform:  scale(.98);
+  box-shadow: 0 2px 8px rgba(239,64,86,.2);
+}
+
+.add-btn.success {
+  background: var(--green) !important;
+  box-shadow: 0 4px 16px rgba(34,197,94,.3) !important;
+  transform:  none !important;
+}
+
+.add-btn:disabled {
+  background:  #ccc !important;
+  box-shadow:  none !important;
+  cursor:      not-allowed;
+  transform:   none !important;
+}
+
+/* ══════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════ */
+.dk-bottom-nav {
+  position:   fixed;
+  bottom:     0;
+  left:       0; right: 0;
+  height:     var(--nav);
+  background: var(--white);
+  display:    flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 8px rgba(0,0,0,.06);
+  z-index:    200;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-item {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  text-decoration: none;
+  color:          #888;
+  font-size:      .72rem;
+  gap:            2px;
+  cursor:         pointer;
+  position:       relative;
+  transition:     color .15s;
+  border:         none;
+  background:     transparent;
+  font-family:    inherit;
+}
+
+.nav-item.active { color: var(--red); }
+.nav-icon { font-size: 1.3rem; }
+
+#cart-badge {
+  position:      absolute;
+  top:           -2px;
+  right:         calc(50% - 18px);
+  background:    var(--red);
+  color:         white;
+  font-size:     .65rem;
+  font-weight:   700;
+  border-radius: 50%;
+  min-width:     17px;
+  height:        17px;
+  line-height:   17px;
+  text-align:    center;
+  padding:       0 3px;
+  display:       none;
+  border:        2px solid var(--white);
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+.toast {
+  position:   fixed;
+  bottom:     calc(var(--nav) + 12px);
+  left:       50%;
+  transform:  translateX(-50%) translateY(8px);
+  background: #323232;
+  color:      white;
+  padding:    10px 22px;
+  border-radius: 999px;
+  font-size:  .86rem;
+  font-weight: 500;
+  z-index:    9999;
+  opacity:    0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity .3s, transform .3s;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+}
+
+.toast.show {
+  opacity:   1;
+  transform: translateX(-50%) translateY(0);
+}
+
+</style>
 </head>
 <body>
 
-<!-- ===== هدر ===== -->
-<header class="dk-header">
-  <div class="dk-header-row">
-    <span class="dk-logo-red">🛒 اکبری خوراکه فروشی</span>
-    <div class="dk-notification-icon">🔔</div>
-  </div>
+<!-- TOP BAR -->
+<header class="topbar">
+  <button class="topbar-back" onclick="history.back()" aria-label="بازگشت">→</button>
+  <span class="topbar-title" id="page-title">جزئیات محصول</span>
+  <span class="topbar-logo">🛒 اکبری</span>
 </header>
 
-<!-- ===== محتوا ===== -->
-<div class="detail-wrapper">
-  <a href="index.html" class="btn-back">⬅ بازگشت به فروشگاه</a>
-  <div id="product-content">
-    <!-- اسکلتون لودینگ -->
-    <div class="detail-card">
-      <div class="skeleton skel-img"></div>
-      <div class="detail-body">
-        <div class="skeleton skel-line med"></div>
-        <div class="skeleton skel-line short"></div>
-        <div class="skeleton skel-line med"></div>
-        <div class="skeleton skel-line short"></div>
-      </div>
-    </div>
+<!-- محتوای اصلی — با JS پر می‌شه -->
+<div id="main-content">
+  <div class="state-box">
+    <div class="spinner"></div>
+    <span>در حال بارگذاری...</span>
   </div>
 </div>
 
-<!-- ===== پیام Toast ===== -->
-<div class="toast" id="toast"></div>
-
-<!-- ===== ناوبری پایین ===== -->
+<!-- BOTTOM NAV -->
 <nav class="dk-bottom-nav">
   <a href="index.html" class="nav-item">
     <span class="nav-icon">🏠</span>
-    <span class="nav-text">خانه</span>
+    <span>خانه</span>
   </a>
   <a href="cart.html" class="nav-item" style="position:relative;">
     <span class="nav-icon">🛒</span>
     <span id="cart-badge">0</span>
-    <span class="nav-text">سبد خرید</span>
+    <span>سبد خرید</span>
   </a>
   <a href="orders.html" class="nav-item">
     <span class="nav-icon">📋</span>
-    <span class="nav-text">سفارشات من</span>
+    <span>سفارشات من</span>
   </a>
   <div class="nav-item" onclick="handleAuthAction()">
     <span class="nav-icon" id="user-avatar-icon">👤</span>
-    <span class="nav-text" id="user-welcome">ورود</span>
+    <span id="user-welcome">ورود</span>
   </div>
 </nav>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  let currentProduct = null;
-  let selectedQty = 1;
+const SUPABASE_URL      = "https://affstedmdsqeobtzrkyp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  document.addEventListener("DOMContentLoaded", () => {
-    checkUserSession();
-    updateCartBadge();
-    loadProduct();
-  });
+// ── helpers ────────────────────────────────────────────────
+function escapeHtml(v) {
+  if (v == null) return "";
+  return String(v)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
 
-  // ✅ لود محصول از Supabase با آیدی URL
-  async function loadProduct() {
-    const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get("id"));
-    const contentDiv = document.getElementById("product-content");
+function getParam(key) {
+  return new URLSearchParams(window.location.search).get(key);
+}
 
-    if (!id) {
-      showNotFound(contentDiv, "آیدی محصول مشخص نشده است.");
-      return;
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+function updateCartBadge() {
+  const badge = document.getElementById("cart-badge");
+  if (!badge) return;
+  const cart  = JSON.parse(localStorage.getItem("cart_items") || "[]");
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  badge.textContent = total;
+  badge.style.display = total > 0 ? "block" : "none";
+}
+
+function handleAuthAction() {
+  if (localStorage.getItem("customer_logged_in") === "true") {
+    if (confirm("آیا می‌خواهید خارج شوید؟")) {
+      ["customer_logged_in","customer_id","customer_name","customer_phone"]
+        .forEach(k => localStorage.removeItem(k));
+      location.reload();
     }
+  } else {
+    location.href = "customer-auth.html";
+  }
+}
 
-    const { data, error } = await supabaseClient
-      .from('Products')
-      .select('*')
-      .eq('id', id)
+function checkUserSession() {
+  const loggedIn = localStorage.getItem("customer_logged_in") === "true";
+  const name     = localStorage.getItem("customer_name");
+  const welcome  = document.getElementById("user-welcome");
+  const icon     = document.getElementById("user-avatar-icon");
+  if (loggedIn && welcome) {
+    welcome.textContent   = name ? name.substring(0, 8) : "خروج";
+    welcome.style.color   = "var(--red)";
+    if (icon) icon.textContent = "🚪";
+  }
+}
+
+// ── load product ────────────────────────────────────────────
+async function loadProduct() {
+  const id   = getParam("id");
+  const main = document.getElementById("main-content");
+
+  if (!id) {
+    main.innerHTML = `<div class="state-box">⚠️ شناسه محصول یافت نشد.<br>
+      <button class="retry-btn" onclick="history.back()">بازگشت</button></div>`;
+    return;
+  }
+
+  try {
+    const { data: p, error } = await sb
+      .from("Products")
+      .select("*")
+      .eq("id", id)
       .single();
 
-    if (error || !data) {
-      showNotFound(contentDiv, "محصول مورد نظر یافت نشد.");
-      return;
-    }
+    if (error || !p) throw error || new Error("محصول یافت نشد");
 
-    currentProduct = data;
-    renderProduct(contentDiv, data);
-  }
-
-  // ✅ رندر اطلاعات کامل محصول
-  function renderProduct(container, p) {
+    // parse units
     let units = [];
-    try {
-      units = p.units ? (typeof p.units === 'string' ? JSON.parse(p.units) : p.units) : [];
-    } catch(e) {}
+    try { units = p.units ? (typeof p.units === "string" ? JSON.parse(p.units) : p.units) : []; }
+    catch(e) { units = []; }
 
-    const inStock = p.stock === undefined || p.stock === null || p.stock > 0;
-    const imgSrc = p.Image_URL || `https://placehold.co/400x260/f0f0f0/aaa?text=${encodeURIComponent(p.Name)}`;
-    const firstPrice = units.length > 0 ? units[0].price : 0;
+    const inStock   = p.stock == null || p.stock > 0;
+    const firstPrice = units.length > 0 ? units[0].price : null;
 
-    const unitsHtml = units.map((u, i) =>
-      `<option value="${i}" data-price="${u.price}">${u.name} — ${Number(u.price).toLocaleString()} افغانی</option>`
+    // page title
+    document.title = `${escapeHtml(p.Name)} — اکبری خوراکه فروشی`;
+    document.getElementById("page-title").textContent = p.Name || "محصول";
+
+    // build options
+    const optionsHtml = units.map((u, i) =>
+      `<option value="${i}">${escapeHtml(u.name)} — ${Number(u.price).toLocaleString()} افغانی</option>`
     ).join("");
 
-    container.innerHTML = `
-      <div class="detail-card">
-
-        <!-- تصویر -->
-        <div class="detail-img-wrap">
+    main.innerHTML = `
+      <!-- HERO IMAGE -->
+      <div class="hero">
+        <div class="hero-img-wrap">
           <img
-            src="${imgSrc}"
-            alt="${p.Name}"
-            onerror="this.src='https://placehold.co/400x260/f0f0f0/aaa?text=بدون+تصویر'"
+            id="prod-img"
+            src="${escapeHtml(p.Image_URL || '')}"
+            alt="${escapeHtml(p.Name)}"
+            loading="eager"
+            onerror="this.src='https://placehold.co/400x400/f4f5f7/aaa?text=تصویر+ندارد'"
           >
-          <span class="detail-stock-badge ${inStock ? 'in-stock' : 'out-of-stock'}">
-            ${inStock ? '✔ موجود' : '✖ ناموجود'}
+        </div>
+        <span class="stock-pill ${inStock ? 'in' : 'out'}">
+          <span class="stock-dot"></span>
+          ${inStock ? 'موجود' : 'ناموجود'}
+        </span>
+      </div>
+
+      <!-- INFO -->
+      <div class="content-card">
+        <h1 class="product-name">${escapeHtml(p.Name)}</h1>
+        ${p.description ? `<p class="product-desc">${escapeHtml(p.description)}</p>` : ''}
+
+        <div class="divider"></div>
+
+        <!-- قیمت -->
+        <div class="price-row">
+          <span class="price-label">قیمت:</span>
+          <span class="price-amount" id="price-display">
+            ${firstPrice ? Number(firstPrice).toLocaleString() : '—'}
           </span>
+          <span class="price-unit">افغانی</span>
         </div>
 
-        <!-- اطلاعات -->
-        <div class="detail-body">
-          <h2 class="detail-title">${p.Name}</h2>
-          <p class="detail-desc">${p.description || 'بدون توضیحات اضافی'}</p>
+        <!-- واحد فروش -->
+        ${units.length > 0 ? `
+        <div class="unit-section">
+          <span class="section-label">واحد فروش:</span>
+          <select id="unit-sel" class="unit-selector" aria-label="انتخاب واحد فروش">
+            ${optionsHtml}
+          </select>
+        </div>` : ''}
 
-          ${units.length > 1 ? `
-          <!-- ✅ انتخاب واحد فروش -->
-          <div class="unit-row">
-            <label>واحد فروش:</label>
-            <select class="unit-selector" id="unit-select" onchange="onUnitChange(this)">
-              ${unitsHtml}
-            </select>
-          </div>` : ''}
-
-          <!-- ✅ نمایش قیمت -->
-          <div class="detail-price-box">
-            <span class="detail-price-label">قیمت:</span>
-            <span class="detail-price-val" id="price-display">
-              ${Number(firstPrice).toLocaleString()} <span>افغانی</span>
-            </span>
+        <!-- تعداد -->
+        <div class="qty-row">
+          <span class="section-label" style="margin:0">تعداد:</span>
+          <div class="qty-control" role="group" aria-label="انتخاب تعداد">
+            <button class="qty-btn" id="btn-minus" disabled aria-label="کاهش">−</button>
+            <input  class="qty-num" id="qty-input" type="number" value="1" min="1" max="99" aria-label="تعداد">
+            <button class="qty-btn" id="btn-plus" aria-label="افزایش">+</button>
           </div>
-
-          <!-- ✅ انتخاب تعداد -->
-          <div class="qty-row">
-            <label>تعداد:</label>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="changeQty(-1)">−</button>
-              <div id="qty-display">1</div>
-              <button class="qty-btn" onclick="changeQty(1)">+</button>
-            </div>
-          </div>
-
-          <!-- دکمه افزودن -->
-          <button
-            class="btn-add-detail"
-            id="btn-add"
-            onclick="addToCart()"
-            ${!inStock ? 'disabled' : ''}
-          >
-            ${inStock ? '🛒 افزودن به سبد خرید' : '⛔ این محصول ناموجود است'}
-          </button>
         </div>
+
+        <!-- دکمه افزودن -->
+        <button
+          class="add-btn"
+          id="add-btn"
+          ${!inStock ? 'disabled' : ''}
+          aria-label="افزودن به سبد خرید"
+        >
+          <span>${inStock ? '🛒 افزودن به سبد خرید' : '⛔ ناموجود'}</span>
+        </button>
       </div>
     `;
-  }
 
-  // ✅ تغییر قیمت هنگام تغییر واحد
-  function onUnitChange(select) {
-    const price = select.options[select.selectedIndex].dataset.price;
-    const display = document.getElementById("price-display");
-    if (display) {
-      display.innerHTML = `${Number(price).toLocaleString()} <span>افغانی</span>`;
+    // ── events ──────────────────────────────────────────────
+    const unitSel  = document.getElementById("unit-sel");
+    const qtyInput = document.getElementById("qty-input");
+    const btnMinus = document.getElementById("btn-minus");
+    const btnPlus  = document.getElementById("btn-plus");
+    const addBtn   = document.getElementById("add-btn");
+
+    function getSelectedUnit() {
+      if (!unitSel || units.length === 0) return null;
+      return units[parseInt(unitSel.value)] || null;
     }
-  }
 
-  // ✅ تغییر تعداد
-  function changeQty(delta) {
-    selectedQty = Math.max(1, selectedQty + delta);
-    const el = document.getElementById("qty-display");
-    if (el) el.innerText = selectedQty;
-  }
+    function refreshPrice() {
+      const u   = getSelectedUnit();
+      const qty = parseInt(qtyInput?.value) || 1;
+      const el  = document.getElementById("price-display");
+      if (el && u) el.textContent = (Number(u.price) * qty).toLocaleString();
+      if (btnMinus) btnMinus.disabled = qty <= 1;
+      if (btnPlus)  btnPlus.disabled  = qty >= 99;
+    }
 
-  // ✅ افزودن به سبد — سازگار با cart_items
-  function addToCart() {
-    if (!currentProduct) return;
+    if (unitSel)  unitSel.addEventListener("change", refreshPrice);
 
-    let units = [];
-    try {
-      units = typeof currentProduct.units === 'string'
-        ? JSON.parse(currentProduct.units)
-        : currentProduct.units || [];
-    } catch(e) {}
+    if (btnMinus) btnMinus.addEventListener("click", () => {
+      const v = Math.max(1, (parseInt(qtyInput.value)||1) - 1);
+      qtyInput.value = v; refreshPrice();
+    });
 
-    const selectEl = document.getElementById("unit-select");
-    const unitIndex = selectEl ? parseInt(selectEl.value) : 0;
-    const selectedUnit = units[unitIndex] || { name: 'عدد', price: 0 };
+    if (btnPlus) btnPlus.addEventListener("click", () => {
+      const v = Math.min(99, (parseInt(qtyInput.value)||1) + 1);
+      qtyInput.value = v; refreshPrice();
+    });
 
-    const cart = JSON.parse(localStorage.getItem("cart_items")) || [];
-    const idx = cart.findIndex(i =>
-      i.id === currentProduct.id && i.unitName === selectedUnit.name
-    );
+    if (qtyInput) qtyInput.addEventListener("input", () => {
+      let v = parseInt(qtyInput.value);
+      if (isNaN(v)||v<1) v=1; if(v>99) v=99;
+      qtyInput.value = v; refreshPrice();
+    });
 
-    if (idx > -1) {
-      cart[idx].qty += selectedQty;
-    } else {
-      cart.push({
-        id: currentProduct.id,
-        title: currentProduct.Name,
-        unitName: selectedUnit.name,
-        price: selectedUnit.price,
-        qty: selectedQty
+    if (addBtn && inStock) {
+      addBtn.addEventListener("click", () => {
+        const u   = getSelectedUnit();
+        const qty = parseInt(qtyInput?.value) || 1;
+        if (!u) { showToast("لطفاً واحد فروش را انتخاب کنید"); return; }
+
+        const cart = JSON.parse(localStorage.getItem("cart_items") || "[]");
+        const idx  = cart.findIndex(i => i.id === p.id && i.unitName === u.name);
+        if (idx > -1) { cart[idx].qty += qty; }
+        else { cart.push({ id: p.id, title: p.Name, unitName: u.name, price: u.price, qty }); }
+        localStorage.setItem("cart_items", JSON.stringify(cart));
+        updateCartBadge();
+
+        addBtn.classList.add("success");
+        addBtn.innerHTML = "<span>✅ اضافه شد!</span>";
+        showToast(`«${p.Name}» به سبد اضافه شد`);
+
+        setTimeout(() => {
+          addBtn.classList.remove("success");
+          addBtn.innerHTML = "<span>🛒 افزودن به سبد خرید</span>";
+        }, 2000);
       });
     }
 
-    localStorage.setItem("cart_items", JSON.stringify(cart));
-    updateCartBadge();
+    refreshPrice();
 
-    // انیمیشن دکمه
-    const btn = document.getElementById("btn-add");
-    if (btn) {
-      btn.classList.add('added');
-      btn.innerText = `✅ ${selectedQty} عدد به سبد اضافه شد`;
-      setTimeout(() => {
-        btn.classList.remove('added');
-        btn.innerText = '🛒 افزودن به سبد خرید';
-      }, 2000);
-    }
-
-    showToast(`«${currentProduct.Name}» — ${selectedQty} عدد به سبد اضافه شد`);
+  } catch(err) {
+    main.innerHTML = `
+      <div class="state-box">
+        <span style="font-size:2rem">⚠️</span>
+        <span>خطا در دریافت اطلاعات محصول</span>
+        <small style="color:var(--ink-3)">${escapeHtml(err?.message || '')}</small>
+        <button class="retry-btn" onclick="loadProduct()">🔄 تلاش مجدد</button>
+      </div>`;
   }
+}
 
-  // پیام not found
-  function showNotFound(container, msg) {
-    container.innerHTML = `
-      <div class="not-found-box">
-        <div class="icon">😕</div>
-        <h3>${msg}</h3>
-        <p>لطفاً به صفحه اصلی برگردید.</p>
-        <a href="index.html">⬅ بازگشت به فروشگاه</a>
-      </div>
-    `;
-  }
+// ── init ────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  checkUserSession();
+  updateCartBadge();
+  loadProduct();
+});
 
-  // Toast
-  function showToast(msg) {
-    const t = document.getElementById("toast");
-    t.innerText = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
-  }
-
-  // بج سبد
-  function updateCartBadge() {
-    const badge = document.getElementById("cart-badge");
-    if (!badge) return;
-    const cart = JSON.parse(localStorage.getItem("cart_items")) || [];
-    const total = cart.reduce((s, i) => s + i.qty, 0);
-    badge.innerText = total;
-    badge.style.display = total > 0 ? 'block' : 'none';
-  }
-
-  // بررسی لاگین
-  function checkUserSession() {
-    const loggedIn = localStorage.getItem("customer_logged_in") === "true";
-    const name = localStorage.getItem("customer_name");
-    const welcome = document.getElementById("user-welcome");
-    const icon = document.getElementById("user-avatar-icon");
-    if (loggedIn && welcome) {
-      welcome.innerText = name ? name.substring(0, 8) : "خروج";
-      welcome.style.color = "#ef4056";
-      if (icon) icon.innerText = "🚪";
-    }
-  }
-
-  function handleAuthAction() {
-    if (localStorage.getItem("customer_logged_in") === "true") {
-      if (confirm("آیا می‌خواهید از حساب خارج شوید؟")) {
-        localStorage.clear();
-        window.location.reload();
-      }
-    } else {
-      window.location.href = "login.html";
-    }
-  }
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
