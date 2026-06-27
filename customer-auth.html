@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ورود و ثبت نام مشتریان - دکان اکبری</title>
+  <title>ورود و ثبت نام - دکان اکبری</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -19,54 +19,96 @@
     .auth-card {
       background: #fff;
       border-radius: 16px;
-      padding: 24px;
+      padding: 28px 24px;
       width: 100%;
       max-width: 400px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .auth-logo {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 6px;
     }
     .auth-title {
       color: #2c2f4a;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: bold;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
-    .form-group { margin-bottom: 15px; }
+
+    .form-group { margin-bottom: 16px; position: relative; }
     .form-group label {
       display: block;
-      font-size: 0.85rem;
-      color: #666;
+      font-size: 0.82rem;
+      color: #555;
       margin-bottom: 6px;
+      font-weight: bold;
     }
     .form-group input {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
+      padding: 11px 12px;
+      border: 1.5px solid #ddd;
       border-radius: 8px;
       outline: none;
       font-family: inherit;
+      font-size: 0.9rem;
+      transition: border-color .2s, background .2s;
+      background: #fafafa;
     }
-    .form-group input:focus { border-color: #ef4056; }
+    .form-group input:focus {
+      border-color: #ef4056;
+      background: white;
+    }
+    .form-group input.input-error { border-color: #e53935; background: #fff5f5; }
+    .form-group input.input-ok { border-color: #4caf50; }
+
+    /* ✅ NEW: Password toggle */
+    .pw-wrapper { position: relative; }
+    .pw-toggle {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1rem;
+      user-select: none;
+      color: #999;
+    }
+    .pw-wrapper input { padding-left: 36px; }
+
+    /* ✅ NEW: Password strength bar */
+    .pw-strength { margin-top: 6px; height: 4px; border-radius: 4px; background: #eee; overflow: hidden; }
+    .pw-strength-bar { height: 100%; width: 0; border-radius: 4px; transition: width .3s, background .3s; }
+    .pw-strength-label { font-size: 0.72rem; color: #999; margin-top: 3px; }
+
     .auth-btn {
       background: #ef4056;
       color: white;
       border: none;
-      padding: 12px;
-      border-radius: 8px;
+      padding: 13px;
+      border-radius: 10px;
       font-size: 0.95rem;
       font-weight: bold;
       cursor: pointer;
       width: 100%;
-      margin-top: 10px;
+      margin-top: 6px;
       font-family: inherit;
+      transition: background .2s, transform .1s;
     }
+    .auth-btn:hover { background: #d32f2f; }
+    .auth-btn:active { transform: scale(0.98); }
     .auth-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .auth-btn.green { background: #4caf50; }
+    .auth-btn.green:hover { background: #388e3c; }
+
     .toggle-link {
       text-align: center;
-      margin-top: 15px;
+      margin-top: 16px;
       font-size: 0.85rem;
       color: #ef4056;
       cursor: pointer;
+      text-decoration: underline;
     }
     .back-btn {
       display: block;
@@ -76,48 +118,113 @@
       color: #888;
       text-decoration: none;
     }
+    .back-btn:hover { color: #333; }
+
     .field-error {
-      color: #ef4056;
-      font-size: 0.8rem;
-      margin-top: 6px;
+      color: #e53935;
+      font-size: 0.77rem;
+      margin-top: 5px;
       display: none;
+      line-height: 1.5;
+    }
+    .field-error.show { display: block; }
+
+    /* ✅ NEW: Alert banner for errors */
+    .alert-banner {
+      background: #fff5f5;
+      border: 1px solid #ffcdd2;
+      color: #c62828;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+      display: none;
+      line-height: 1.6;
+    }
+    .alert-banner.show { display: block; }
+    .alert-banner.success {
+      background: #f0fff4;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+
+    /* ✅ NEW: Divider */
+    .section-divider {
+      text-align: center;
+      color: #ccc;
+      font-size: 0.8rem;
+      margin: 6px 0 16px;
+      position: relative;
     }
   </style>
 </head>
 <body>
 
 <div class="auth-card">
+  <!-- ===== LOGIN FORM ===== -->
   <div id="login-form">
-    <div class="auth-title">🔐 ورود به حساب مشتری</div>
+    <div class="auth-logo">🔐</div>
+    <div class="auth-title">ورود به حساب مشتری</div>
+
+    <div class="alert-banner" id="login-alert"></div>
+
     <div class="form-group">
-      <label>شماره موبایل:</label>
-      <input type="tel" id="login-username" placeholder="مثال: 0799123456" style="direction:ltr; text-align:left;">
+      <label for="login-username">شماره موبایل</label>
+      <input type="tel" id="login-username" placeholder="مثال: 0799123456"
+             style="direction:ltr; text-align:left;"
+             autocomplete="username" inputmode="tel" maxlength="12">
+      <div class="field-error" id="err-login-phone">شماره موبایل معتبر وارد کنید</div>
     </div>
+
     <div class="form-group">
-      <label>رمز عبور:</label>
-      <input type="password" id="login-password" placeholder="رمز عبور خودتان را وارد کنید">
+      <label for="login-password">رمز عبور</label>
+      <div class="pw-wrapper">
+        <input type="password" id="login-password" placeholder="رمز عبور خود را وارد کنید"
+               autocomplete="current-password">
+        <span class="pw-toggle" onclick="togglePw('login-password', this)">👁️</span>
+      </div>
+      <div class="field-error" id="err-login-pass">رمز عبور را وارد کنید</div>
     </div>
-    <p class="field-error" id="login-error"></p>
+
     <button class="auth-btn" id="login-btn" onclick="loginCustomer()">ورود به سیستم</button>
     <div class="toggle-link" onclick="toggleForm(true)">حساب کاربری ندارید؟ ثبت نام کنید</div>
   </div>
 
+  <!-- ===== REGISTER FORM ===== -->
   <div id="register-form" style="display: none;">
-    <div class="auth-title">👤 ثبت نام مشتری جدید</div>
+    <div class="auth-logo">👤</div>
+    <div class="auth-title">ثبت نام مشتری جدید</div>
+
+    <div class="alert-banner" id="reg-alert"></div>
+
     <div class="form-group">
-      <label>نام و نام خانوادگی:</label>
-      <input type="text" id="reg-name" placeholder="نام خود را وارد کنید">
+      <label for="reg-name">نام و نام خانوادگی</label>
+      <input type="text" id="reg-name" placeholder="نام خود را وارد کنید"
+             autocomplete="name" maxlength="60">
+      <div class="field-error" id="err-reg-name">نام را وارد کنید (حداقل ۳ حرف)</div>
     </div>
+
     <div class="form-group">
-      <label>شماره موبایل:</label>
-      <input type="tel" id="reg-username" placeholder="مثال: 0799123456" style="direction:ltr; text-align:left;">
+      <label for="reg-username">شماره موبایل</label>
+      <input type="tel" id="reg-username" placeholder="مثال: 0799123456"
+             style="direction:ltr; text-align:left;"
+             autocomplete="username" inputmode="tel" maxlength="12">
+      <div class="field-error" id="err-reg-phone">شماره موبایل معتبر وارد کنید (مثال: 0799123456)</div>
     </div>
+
     <div class="form-group">
-      <label>رمز عبور:</label>
-      <input type="password" id="reg-password" placeholder="حداقل ۴ کاراکتر">
+      <label for="reg-password">رمز عبور</label>
+      <div class="pw-wrapper">
+        <input type="password" id="reg-password" placeholder="حداقل ۶ کاراکتر"
+               autocomplete="new-password" oninput="checkPwStrength(this.value)">
+        <span class="pw-toggle" onclick="togglePw('reg-password', this)">👁️</span>
+      </div>
+      <div class="pw-strength"><div class="pw-strength-bar" id="pw-bar"></div></div>
+      <div class="pw-strength-label" id="pw-label"></div>
+      <div class="field-error" id="err-reg-pass">رمز عبور حداقل ۶ کاراکتر باشد</div>
     </div>
-    <p class="field-error" id="reg-error"></p>
-    <button class="auth-btn" id="reg-btn" onclick="registerCustomer()" style="background: #4caf50;">تکمیل ثبت نام</button>
+
+    <button class="auth-btn green" id="reg-btn" onclick="registerCustomer()">تکمیل ثبت نام</button>
     <div class="toggle-link" onclick="toggleForm(false)">قبلاً ثبت نام کرده‌اید؟ ورود</div>
   </div>
 
@@ -130,42 +237,112 @@
   const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  let isProcessing = false;
+
   function toggleForm(showRegister) {
-    document.getElementById('login-form').style.display = showRegister ? 'none' : 'block';
+    document.getElementById('login-form').style.display   = showRegister ? 'none' : 'block';
     document.getElementById('register-form').style.display = showRegister ? 'block' : 'none';
-    document.getElementById('login-error').style.display = 'none';
-    document.getElementById('reg-error').style.display = 'none';
+    clearAllErrors();
   }
 
-  function showError(elId, msg) {
-    let el = document.getElementById(elId);
+  function clearAllErrors() {
+    document.querySelectorAll('.field-error').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.alert-banner').forEach(el => {
+      el.classList.remove('show', 'success');
+      el.textContent = '';
+    });
+    document.querySelectorAll('input').forEach(el => el.classList.remove('input-error', 'input-ok'));
+  }
+
+  function showAlert(elId, msg, isSuccess = false) {
+    const el = document.getElementById(elId);
     el.textContent = msg;
-    el.style.display = 'block';
+    el.classList.add('show');
+    if (isSuccess) el.classList.add('success');
+    else el.classList.remove('success');
   }
 
-  // ✅ ثبت‌نام واقعی: رمز عبور به‌صورت هش‌شده در سرور ذخیره می‌شود
+  function showFieldError(elId, inputId) {
+    document.getElementById(elId).classList.add('show');
+    if (inputId) document.getElementById(inputId).classList.add('input-error');
+  }
+
+  function cleanPhone(phone) {
+    return phone.replace(/\s+/g, '').trim();
+  }
+
+  function validatePhone(phone) {
+    return /^07\d{8}$/.test(cleanPhone(phone));
+  }
+
+  // ✅ NEW: Password visibility toggle
+  function togglePw(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      btn.textContent = '👁️';
+    }
+  }
+
+  // ✅ NEW: Password strength checker
+  function checkPwStrength(pw) {
+    const bar = document.getElementById('pw-bar');
+    const label = document.getElementById('pw-label');
+    if (!bar) return;
+
+    let strength = 0;
+    if (pw.length >= 6) strength++;
+    if (pw.length >= 10) strength++;
+    if (/[0-9]/.test(pw)) strength++;
+    if (/[a-zA-Z]/.test(pw)) strength++;
+
+    const levels = [
+      { pct: '25%', color: '#e53935', text: 'ضعیف' },
+      { pct: '50%', color: '#ff9800', text: 'متوسط' },
+      { pct: '75%', color: '#ffc107', text: 'خوب' },
+      { pct: '100%', color: '#4caf50', text: 'قوی' },
+    ];
+
+    if (pw.length === 0) {
+      bar.style.width = '0';
+      label.textContent = '';
+      return;
+    }
+
+    const lvl = levels[Math.min(strength - 1, 3)];
+    bar.style.width  = lvl.pct;
+    bar.style.background = lvl.color;
+    label.textContent = `قدرت رمز: ${lvl.text}`;
+    label.style.color = lvl.color;
+  }
+
   async function registerCustomer() {
-    const name = document.getElementById('reg-name').value.trim();
-    const phone = document.getElementById('reg-username').value.trim();
+    if (isProcessing) return;
+    clearAllErrors();
+
+    const name     = document.getElementById('reg-name').value.trim();
+    const phone    = cleanPhone(document.getElementById('reg-username').value);
     const password = document.getElementById('reg-password').value;
+    let valid = true;
+
+    if (!name || name.length < 3) {
+      showFieldError('err-reg-name', 'reg-name'); valid = false;
+    }
+    if (!validatePhone(phone)) {
+      showFieldError('err-reg-phone', 'reg-username'); valid = false;
+    }
+    if (!password || password.length < 6) {
+      showFieldError('err-reg-pass', 'reg-password'); valid = false;
+    }
+    if (!valid) return;
+
+    isProcessing = true;
     const btn = document.getElementById('reg-btn');
-    document.getElementById('reg-error').style.display = 'none';
-
-    if (!name || !phone || !password) {
-      showError('reg-error', "لطفاً تمام فیلدها را پر کنید.");
-      return;
-    }
-    if (phone.length < 6) {
-      showError('reg-error', "شماره موبایل معتبر وارد کنید.");
-      return;
-    }
-    if (password.length < 4) {
-      showError('reg-error', "رمز عبور باید حداقل ۴ کاراکتر باشد.");
-      return;
-    }
-
     btn.disabled = true;
-    btn.innerText = "در حال ثبت‌نام...";
+    btn.textContent = "⏳ در حال ثبت‌نام...";
 
     try {
       const { data, error } = await supabaseClient.rpc('register_customer', {
@@ -175,45 +352,55 @@
       });
 
       if (error) {
-        showError('reg-error', "خطای ارتباط با سرور: " + error.message);
+        showAlert('reg-alert', "خطای سرور: " + error.message);
         return;
       }
 
-      const result = data && data[0];
+      const result = Array.isArray(data) ? data[0] : data;
+
       if (!result || !result.success) {
-        showError('reg-error', (result && result.message) || "ثبت‌نام ناموفق بود.");
+        showAlert('reg-alert', (result && result.message) || "این شماره قبلاً ثبت شده است. لطفاً وارد شوید.");
         return;
       }
 
-      // ذخیره نشست مشتری در گوشی (فقط بعد از تایید واقعی توسط سرور)
       localStorage.setItem("customer_logged_in", "true");
-      localStorage.setItem("customer_id", result.customer_id);
-      localStorage.setItem("customer_name", result.customer_name);
+      localStorage.setItem("customer_id",    result.customer_id);
+      localStorage.setItem("customer_name",  result.customer_name || name);
       localStorage.setItem("customer_phone", phone);
+      localStorage.setItem("dk_customer_phone", phone);
 
-      window.location.href = "cart.html";
+      showAlert('reg-alert', "✅ ثبت نام موفق! در حال انتقال...", true);
+      setTimeout(() => { window.location.href = "cart.html"; }, 900);
+
     } catch (err) {
-      showError('reg-error', "خطای غیرمنتظره: " + err.message);
+      showAlert('reg-alert', "خطای غیرمنتظره: " + err.message);
     } finally {
+      isProcessing = false;
       btn.disabled = false;
-      btn.innerText = "تکمیل ثبت نام";
+      btn.textContent = "تکمیل ثبت نام";
     }
   }
 
-  // ✅ ورود واقعی: رمز عبور با هش ذخیره‌شده در سرور مقایسه می‌شود
   async function loginCustomer() {
-    const phone = document.getElementById('login-username').value.trim();
+    if (isProcessing) return;
+    clearAllErrors();
+
+    const phone    = cleanPhone(document.getElementById('login-username').value);
     const password = document.getElementById('login-password').value;
-    const btn = document.getElementById('login-btn');
-    document.getElementById('login-error').style.display = 'none';
+    let valid = true;
 
-    if (!phone || !password) {
-      showError('login-error', "لطفاً شماره موبایل و رمز عبور را وارد کنید.");
-      return;
+    if (!validatePhone(phone)) {
+      showFieldError('err-login-phone', 'login-username'); valid = false;
     }
+    if (!password) {
+      showFieldError('err-login-pass', 'login-password'); valid = false;
+    }
+    if (!valid) return;
 
+    isProcessing = true;
+    const btn = document.getElementById('login-btn');
     btn.disabled = true;
-    btn.innerText = "در حال ورود...";
+    btn.textContent = "⏳ در حال ورود...";
 
     try {
       const { data, error } = await supabaseClient.rpc('login_customer', {
@@ -222,30 +409,44 @@
       });
 
       if (error) {
-        showError('login-error', "خطای ارتباط با سرور: " + error.message);
+        showAlert('login-alert', "خطای ارتباط با دیتابیس: " + error.message);
         return;
       }
 
-      const result = data && data[0];
+      const result = Array.isArray(data) ? data[0] : data;
+
       if (!result || !result.success) {
-        showError('login-error', (result && result.message) || "ورود ناموفق بود.");
+        showAlert('login-alert', (result && result.message) || "شماره موبایل یا رمز عبور اشتباه است.");
+        // ✅ FIX: Clear password on failed login
+        document.getElementById('login-password').value = '';
         return;
       }
 
       localStorage.setItem("customer_logged_in", "true");
-      localStorage.setItem("customer_id", result.customer_id);
-      localStorage.setItem("customer_name", result.customer_name);
+      localStorage.setItem("customer_id",    result.customer_id);
+      localStorage.setItem("customer_name",  result.customer_name);
       localStorage.setItem("customer_phone", phone);
+      localStorage.setItem("dk_customer_phone", phone);
 
-      window.location.href = "cart.html";
+      showAlert('login-alert', "✅ خوش آمدید! در حال انتقال...", true);
+      setTimeout(() => { window.location.href = "cart.html"; }, 900);
+
     } catch (err) {
-      showError('login-error', "خطای غیرمنتظره: " + err.message);
+      showAlert('login-alert', "خطای غیرمنتظره: " + err.message);
     } finally {
+      isProcessing = false;
       btn.disabled = false;
-      btn.innerText = "ورود به سیستم";
+      btn.textContent = "ورود به سیستم";
     }
   }
-</script>
 
+  // ✅ NEW: Enter key support
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const loginVisible = document.getElementById('login-form').style.display !== 'none';
+    if (loginVisible) loginCustomer();
+    else registerCustomer();
+  });
+</script>
 </body>
 </html>
