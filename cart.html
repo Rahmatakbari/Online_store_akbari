@@ -4,86 +4,63 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>سبد خرید - دکان اکبری</title>
-  <link rel="stylesheet" href="style.css">
   <style>
-
-    /* ===== صفحه سبد خرید ===== */
-    .cart-wrapper {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 14px;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: #f4f5f7;
+      direction: rtl;
+      padding-bottom: 80px;
     }
-
-    /* ===== آیتم سبد ===== */
+    .cart-wrapper { max-width: 600px; margin: 0 auto; padding: 14px; }
     .cart-item {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       gap: 10px;
       padding: 14px 0;
-      border-bottom: 1px solid var(--border, #eee);
+      border-bottom: 1px solid #eee;
     }
     .cart-item:last-child { border-bottom: none; }
-
     .cart-item-info { flex: 1; }
-
-    .cart-item-title {
-      font-size: .92rem;
-      font-weight: bold;
-      color: var(--text, #333);
-      margin-bottom: 4px;
-      line-height: 1.5;
-    }
-
-    .cart-item-unit {
-      font-size: .78rem;
-      color: var(--gray, #777);
-      margin-bottom: 8px;
-    }
-
-    /* کنترل تعداد */
+    .cart-item-title { font-size: .92rem; font-weight: bold; color: #333; margin-bottom: 4px; line-height: 1.5; }
+    .cart-item-unit { font-size: .78rem; color: #777; margin-bottom: 8px; }
     .qty-controls {
       display: inline-flex;
       align-items: center;
-      border: 1.5px solid var(--border, #eee);
+      border: 1.5px solid #eee;
       border-radius: 8px;
       overflow: hidden;
     }
     .btn-qty {
-      width: 30px; height: 30px;
+      width: 32px; height: 32px;
       border: none;
       background: #f4f5f7;
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: bold;
       cursor: pointer;
-      color: var(--text, #333);
+      color: #333;
       transition: background .2s;
       display: flex; align-items: center; justify-content: center;
+      user-select: none;
     }
     .btn-qty:hover { background: #e8e8e8; }
     .qty-num {
-      width: 34px;
+      width: 36px;
       text-align: center;
       font-size: .9rem;
       font-weight: bold;
-      border-right: 1.5px solid var(--border, #eee);
-      border-left: 1.5px solid var(--border, #eee);
+      border-right: 1.5px solid #eee;
+      border-left: 1.5px solid #eee;
     }
-
-    /* سمت راست آیتم */
     .cart-item-right {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 8px;
-      min-width: 90px;
+      min-width: 95px;
     }
-    .cart-item-price {
-      font-size: .95rem;
-      font-weight: bold;
-      color: #ef4056;
-      direction: ltr;
-    }
+    .cart-item-price { font-size: .95rem; font-weight: bold; color: #ef4056; direction: ltr; }
     .btn-delete {
       background: none;
       border: 1.5px solid #ffcdd2;
@@ -97,12 +74,11 @@
     }
     .btn-delete:hover { background: #ffebee; }
 
-    /* ===== کارت سبد ===== */
     .cart-card {
       background: white;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid var(--border, #eee);
+      border: 1px solid #eee;
       padding: 16px;
       margin-bottom: 14px;
     }
@@ -110,16 +86,11 @@
       font-size: 1rem;
       margin-bottom: 10px;
       padding-bottom: 10px;
-      border-bottom: 1px solid var(--border, #eee);
-      color: var(--text, #333);
+      border-bottom: 1px solid #eee;
+      color: #333;
     }
 
-    /* ===== سبد خالی ===== */
-    .empty-cart {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--gray, #777);
-    }
+    .empty-cart { text-align: center; padding: 40px 20px; color: #777; }
     .empty-cart .empty-icon { font-size: 3.5rem; margin-bottom: 12px; }
     .empty-cart p { margin-bottom: 16px; font-size: .92rem; }
     .btn-go-shop {
@@ -131,16 +102,13 @@
       text-decoration: none;
       font-weight: bold;
       font-size: .9rem;
-      transition: background .2s;
     }
-    .btn-go-shop:hover { background: #d32f2f; }
 
-    /* ===== باکس جمع کل ===== */
     .total-card {
       background: white;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid var(--border, #eee);
+      border: 1px solid #eee;
       padding: 16px;
       margin-bottom: 14px;
     }
@@ -150,19 +118,13 @@
       align-items: center;
       padding: 7px 0;
       font-size: .88rem;
-      color: var(--gray, #777);
-      border-bottom: 1px dashed var(--border, #eee);
+      color: #777;
+      border-bottom: 1px dashed #eee;
     }
     .total-row:last-child { border-bottom: none; }
-    .total-row.grand {
-      font-size: 1rem;
-      font-weight: bold;
-      color: var(--text, #333);
-      padding-top: 12px;
-    }
+    .total-row.grand { font-size: 1rem; font-weight: bold; color: #333; padding-top: 12px; }
     .total-row .val { color: #ef4056; font-weight: bold; direction: ltr; }
 
-    /* ===== کارت ورود الزامی ===== */
     .login-required-card {
       background: white;
       border-radius: 12px;
@@ -173,17 +135,8 @@
       text-align: center;
     }
     .login-required-card .lr-icon { font-size: 2.8rem; margin-bottom: 12px; }
-    .login-required-card h3 {
-      font-size: 1rem;
-      color: var(--text, #333);
-      margin-bottom: 8px;
-    }
-    .login-required-card p {
-      font-size: .84rem;
-      color: var(--gray, #777);
-      margin-bottom: 20px;
-      line-height: 1.7;
-    }
+    .login-required-card h3 { font-size: 1rem; color: #333; margin-bottom: 8px; }
+    .login-required-card p { font-size: .84rem; color: #777; margin-bottom: 20px; line-height: 1.7; }
     .btn-go-login {
       display: inline-block;
       background: #ef4056;
@@ -193,16 +146,13 @@
       text-decoration: none;
       font-weight: bold;
       font-size: .92rem;
-      transition: background .2s;
     }
-    .btn-go-login:hover { background: #d32f2f; }
 
-    /* ===== فرم سفارش ===== */
     .order-card {
       background: white;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid var(--border, #eee);
+      border: 1px solid #eee;
       padding: 18px;
       margin-bottom: 14px;
     }
@@ -210,52 +160,38 @@
       font-size: .98rem;
       margin-bottom: 16px;
       padding-bottom: 10px;
-      border-bottom: 1px solid var(--border, #eee);
+      border-bottom: 1px solid #eee;
     }
-
     .form-group { margin-bottom: 14px; }
     .form-group label {
       display: block;
       margin-bottom: 6px;
       font-size: .82rem;
       font-weight: bold;
-      color: var(--text, #333);
+      color: #333;
     }
     .form-group input,
     .form-group textarea {
       width: 100%;
       padding: 10px 12px;
-      border: 1.5px solid var(--border, #eee);
+      border: 1.5px solid #eee;
       border-radius: 8px;
       font-family: inherit;
       font-size: .88rem;
       outline: none;
       transition: border-color .2s;
       background: #fafafa;
-      color: var(--text, #333);
+      color: #333;
     }
     .form-group input:focus,
-    .form-group textarea:focus {
-      border-color: #ef4056;
-      background: white;
-    }
+    .form-group textarea:focus { border-color: #ef4056; background: white; }
     .form-group input.error,
-    .form-group textarea.error {
-      border-color: #e53935;
-      background: #fff5f5;
-    }
-    .field-error {
-      color: #e53935;
-      font-size: .75rem;
-      margin-top: 4px;
-      display: none;
-    }
+    .form-group textarea.error { border-color: #e53935; background: #fff5f5; }
+    .field-error { color: #e53935; font-size: .75rem; margin-top: 4px; display: none; }
     .field-error.show { display: block; }
-
     .form-group textarea { resize: vertical; min-height: 75px; }
     .form-group input[type="tel"] { direction: ltr; text-align: left; }
 
-    /* ===== دکمه ثبت ===== */
     .btn-submit {
       width: 100%;
       border: none;
@@ -274,26 +210,23 @@
     .btn-submit:active { transform: scale(0.98); }
     .btn-submit:disabled { background: #a5d6a7; cursor: not-allowed; }
 
-    /* ===== صفحه موفقیت ===== */
-    .success-screen {
-      text-align: center;
-      padding: 50px 20px;
-      display: none;
-    }
+    .success-screen { text-align: center; padding: 50px 20px; display: none; }
     .success-screen .s-icon { font-size: 4rem; margin-bottom: 16px; }
     .success-screen h2 { color: #2ecc71; margin-bottom: 10px; }
-    .success-screen p { color: var(--gray, #777); font-size: .9rem; line-height: 1.7; margin-bottom: 20px; }
+    .success-screen p { color: #777; font-size: .9rem; line-height: 1.7; margin-bottom: 20px; }
+    .success-screen .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
     .success-screen a {
       display: inline-block;
-      background: #ef4056;
-      color: white;
-      padding: 11px 28px;
+      padding: 11px 24px;
       border-radius: 10px;
       text-decoration: none;
       font-weight: bold;
+      font-size: .9rem;
+      color: white;
     }
+    .success-screen a.btn-orders { background: #2ecc71; }
+    .success-screen a.btn-home { background: #ef4056; }
 
-    /* ===== مودال تأیید حذف ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -313,7 +246,7 @@
       text-align: center;
     }
     .modal-box .m-icon { font-size: 2.5rem; margin-bottom: 10px; }
-    .modal-box p { font-size: .9rem; color: var(--gray, #777); margin-bottom: 20px; line-height: 1.6; }
+    .modal-box p { font-size: .9rem; color: #777; margin-bottom: 20px; line-height: 1.6; }
     .modal-actions { display: flex; gap: 10px; }
     .modal-actions button {
       flex: 1;
@@ -326,26 +259,46 @@
       cursor: pointer;
     }
     .btn-confirm-del { background: #e53935; color: white; }
-    .btn-cancel-del { background: #f4f5f7; color: var(--text, #333); }
+    .btn-cancel-del { background: #f4f5f7; color: #333; }
 
-    /* هدر و ناوبری پایینی */
     .dk-header { background: #fff; padding: 12px 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .dk-header-row { display: flex; justify-content: space-between; align-items: center; }
     .dk-logo-red { color: #ef4056; font-size: 1.1rem; font-weight: bold; }
     .dk-notification-icon { font-size: 1.3rem; cursor: pointer; }
-    
+
     .dk-bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: #fff; display: flex; justify-content: space-around; align-items: center;
-      padding: 8px 0 10px; border-top: 1px solid #eee; z-index: 200; box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+      background: #fff;
+      display: flex; justify-content: space-around; align-items: center;
+      padding: 8px 0 10px;
+      border-top: 1px solid #eee;
+      z-index: 200;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
     }
-    .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #888; font-size: 0.72rem; gap: 2px; cursor: pointer; }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      text-decoration: none; color: #888; font-size: 0.72rem; gap: 2px; cursor: pointer;
+      position: relative;
+    }
     .nav-item.active { color: #ef4056; }
     .nav-icon { font-size: 1.3rem; }
-    .nav-text { font-size: 0.72rem; }
-    #cart-badge { position: absolute; top: -2px; right: -6px; background: #ef4056; color: white; font-size: 0.68rem; font-weight: bold; border-radius: 50%; min-width: 17px; height: 17px; text-align: center; line-height: 17px; padding: 0 3px; display: none; }
-    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #323232; color: white; padding: 10px 20px; border-radius: 24px; font-size: 0.88rem; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    #cart-badge {
+      position: absolute; top: -2px; right: -6px;
+      background: #ef4056; color: white; font-size: 0.68rem; font-weight: bold;
+      border-radius: 50%; min-width: 17px; height: 17px;
+      text-align: center; line-height: 17px; padding: 0 3px; display: none;
+    }
+
+    .toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+      background: #323232; color: white; padding: 10px 20px;
+      border-radius: 24px; font-size: 0.88rem; z-index: 9999;
+      opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
     .toast.show { opacity: 1; }
+
+    /* ✅ NEW: Character counter */
+    .char-count { font-size: .72rem; color: #aaa; text-align: left; margin-top: 3px; }
   </style>
 </head>
 <body>
@@ -358,17 +311,19 @@
 </header>
 
 <div class="cart-wrapper">
-
-  <div class="success-screen" id="success-screen">
+  <!-- Success Screen -->
+  <div class="success-screen" id="success-screen" role="alert">
     <div class="s-icon">🎉</div>
     <h2>سفارش شما ثبت شد!</h2>
     <p>سفارشتان با موفقیت برای دکان اکبری ارسال گردید.<br>به زودی با شما تماس گرفته می‌شود.</p>
-    <a href="orders.html" style="background:#2ecc71; margin-left:10px;">📋 مشاهده فاکتور من</a>
-    <a href="index.html">🏠 صفحه اصلی</a>
+    <div class="btn-group">
+      <a href="orders.html" class="btn-orders">📋 مشاهده فاکتور من</a>
+      <a href="index.html" class="btn-home">🏠 صفحه اصلی</a>
+    </div>
   </div>
 
   <div id="main-cart-content">
-
+    <!-- Cart Items -->
     <div class="cart-card">
       <h2>🛒 سبد خرید شما</h2>
       <div id="cart-list-container">
@@ -379,6 +334,7 @@
       </div>
     </div>
 
+    <!-- Total -->
     <div class="total-card" id="total-card" style="display:none;">
       <div class="total-row">
         <span>تعداد اقلام</span>
@@ -390,7 +346,7 @@
       </div>
     </div>
 
-    <!-- نمایش می‌شود فقط اگر لاگین نباشد -->
+    <!-- Login Required -->
     <div class="login-required-card" id="login-required-card" style="display:none;">
       <div class="lr-icon">🔐</div>
       <h3>برای ثبت سفارش وارد شوید</h3>
@@ -398,37 +354,34 @@
       <a href="customer-auth.html" class="btn-go-login">👤 ورود / ثبت‌نام</a>
     </div>
 
-    <!-- نمایش می‌شود فقط اگر لاگین باشد -->
+    <!-- Order Form -->
     <div class="order-card" id="order-card" style="display:none;">
       <h3>📞 مشخصات گیرنده جهت تحویل</h3>
-
       <div class="form-group">
-        <label>نام و نام خانوادگی *</label>
-        <input type="text" id="order-name" placeholder="مثال: محمد اکبری">
-        <div class="field-error" id="err-name">نام را وارد کنید</div>
+        <label for="order-name">نام و نام خانوادگی *</label>
+        <input type="text" id="order-name" placeholder="مثال: محمد اکبری" maxlength="60" autocomplete="name">
+        <div class="field-error" id="err-name">نام را وارد کنید (حداقل ۳ حرف)</div>
       </div>
-
       <div class="form-group">
-        <label>شماره تماس *</label>
-        <input type="tel" id="order-phone" placeholder="0799XXXXXX" maxlength="12">
+        <label for="order-phone">شماره تماس *</label>
+        <input type="tel" id="order-phone" placeholder="0799XXXXXX" maxlength="12" autocomplete="tel">
         <div class="field-error" id="err-phone">شماره معتبر وارد کنید (مثال: 0799123456)</div>
       </div>
-
       <div class="form-group">
-        <label>آدرس دقیق *</label>
-        <textarea id="order-address" placeholder="کابل، دشت برچی، ایستگاه دوم، کوچه دکان اکبری..."></textarea>
-        <div class="field-error" id="err-address">آدرس را وارد کنید</div>
+        <label for="order-address">آدرس دقیق *</label>
+        <textarea id="order-address" placeholder="کابل، دشت برچی، ایستگاه دوم..." maxlength="300"></textarea>
+        <div class="char-count" id="addr-count">۰ / ۳۰۰</div>
+        <div class="field-error" id="err-address">آدرس را وارد کنید (حداقل ۱۰ حرف)</div>
       </div>
-
-      <button class="btn-submit" id="btn-send-order" onclick="submitOrder()">
+      <button class="btn-submit" id="btn-send-order">
         🚀 ثبت نهایی و ارسال سفارش
       </button>
     </div>
-
   </div>
 </div>
 
-<div class="modal-overlay" id="delete-modal">
+<!-- Delete Modal -->
+<div class="modal-overlay" id="delete-modal" role="dialog" aria-modal="true">
   <div class="modal-box">
     <div class="m-icon">🗑️</div>
     <p id="modal-msg">آیا این محصول از سبد حذف شود؟</p>
@@ -439,7 +392,7 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <nav class="dk-bottom-nav">
   <a href="index.html" class="nav-item">
@@ -469,8 +422,8 @@
 
   let cartItems = [];
   let pendingDeleteIndex = -1;
+  let isSubmitting = false; // ✅ FIX: Prevent double submit
 
-  // ✅ بررسی وضعیت لاگین واقعی — فقط customer_logged_in که از سیستم auth ست شده
   function isLoggedIn() {
     return localStorage.getItem("customer_logged_in") === "true";
   }
@@ -479,11 +432,31 @@
     checkUserSession();
     loadCart();
     prefillForm();
+    setupAddressCounter();
+    // ✅ FIX: Attach submit via addEventListener (not onclick) for better control
+    document.getElementById("btn-send-order").addEventListener("click", submitOrder);
   });
 
+  function setupAddressCounter() {
+    const textarea = document.getElementById("order-address");
+    const counter = document.getElementById("addr-count");
+    if (!textarea || !counter) return;
+    textarea.addEventListener("input", () => {
+      counter.textContent = `${textarea.value.length} / ۳۰۰`;
+    });
+  }
+
   function loadCart() {
-    cartItems = JSON.parse(localStorage.getItem("cart_items")) || [];
+    try {
+      cartItems = JSON.parse(localStorage.getItem("cart_items")) || [];
+    } catch(e) {
+      cartItems = [];
+    }
     renderCart();
+  }
+
+  function fmt(n) {
+    return Number(n).toLocaleString('fa-AF');
   }
 
   function renderCart() {
@@ -519,29 +492,37 @@
 
       const div = document.createElement("div");
       div.className = "cart-item";
+
+      // ✅ FIX: textContent for user-supplied data (no XSS)
       div.innerHTML = `
         <div class="cart-item-info">
-          <div class="cart-item-title">${item.title}</div>
-          <div class="cart-item-unit">واحد: ${item.unitName} | هر واحد: ${fmt(item.price)} افغانی</div>
+          <div class="cart-item-title"></div>
+          <div class="cart-item-unit"></div>
           <div class="qty-controls">
-            <button class="btn-qty" onclick="changeQty(${i}, -1)">−</button>
+            <button class="btn-qty" aria-label="کاهش تعداد">−</button>
             <div class="qty-num">${item.qty}</div>
-            <button class="btn-qty" onclick="changeQty(${i}, 1)">+</button>
+            <button class="btn-qty" aria-label="افزایش تعداد">+</button>
           </div>
         </div>
         <div class="cart-item-right">
           <div class="cart-item-price">${fmt(itemTotal)} <small style="font-size:.7rem;color:#777;font-weight:normal;">افغانی</small></div>
-          <button class="btn-delete" onclick="askDelete(${i})">🗑️ حذف</button>
+          <button class="btn-delete">🗑️ حذف</button>
         </div>
       `;
+
+      div.querySelector('.cart-item-title').textContent = item.title;
+      div.querySelector('.cart-item-unit').textContent = `واحد: ${item.unitName} | هر واحد: ${fmt(item.price)} افغانی`;
+      div.querySelectorAll('.btn-qty')[0].addEventListener('click', () => changeQty(i, -1));
+      div.querySelectorAll('.btn-qty')[1].addEventListener('click', () => changeQty(i, 1));
+      div.querySelector('.btn-delete').addEventListener('click', () => askDelete(i));
+
       container.appendChild(div);
     });
 
-    totalEl.innerText = `${fmt(grandTotal)} افغانی`;
-    itemsEl.innerText = `${totalQty} عدد`;
+    totalEl.textContent = `${fmt(grandTotal)} افغانی`;
+    itemsEl.textContent = `${totalQty} عدد`;
     totalCard.style.display = "block";
 
-    // ✅ نمایش فرم یا پیام لاگین بر اساس وضعیت احراز هویت
     if (isLoggedIn()) {
       orderCard.style.display = "block";
       loginRequiredCard.style.display = "none";
@@ -551,10 +532,6 @@
     }
 
     updateCartBadge();
-  }
-
-  function fmt(n) {
-    return Number(n).toLocaleString('fa-AF');
   }
 
   function changeQty(i, delta) {
@@ -569,13 +546,15 @@
 
   function askDelete(i) {
     pendingDeleteIndex = i;
-    document.getElementById("modal-msg").innerText = `«${cartItems[i].title}» از سبد خرید حذف شود؟`;
+    document.getElementById("modal-msg").textContent = `«${cartItems[i].title}» از سبد خرید حذف شود؟`;
     document.getElementById("delete-modal").classList.add("show");
   }
+
   function closeModal() {
     document.getElementById("delete-modal").classList.remove("show");
     pendingDeleteIndex = -1;
   }
+
   function confirmDelete() {
     if (pendingDeleteIndex < 0) return;
     const title = cartItems[pendingDeleteIndex].title;
@@ -586,15 +565,19 @@
     showToast(`«${title}» از سبد حذف شد`);
   }
 
+  // ✅ FIX: Close modal when clicking overlay background
+  document.getElementById("delete-modal").addEventListener("click", function(e) {
+    if (e.target === this) closeModal();
+  });
+
   function save() {
     localStorage.setItem("cart_items", JSON.stringify(cartItems));
   }
 
   function prefillForm() {
-    // فقط برای کاربران لاگین‌شده فیلدها پیش‌پر می‌شوند
     if (!isLoggedIn()) return;
     const name  = localStorage.getItem("customer_name");
-    const phone = localStorage.getItem("customer_phone") || localStorage.getItem("customer_username");
+    const phone = localStorage.getItem("customer_phone");
     if (name)  document.getElementById("order-name").value  = name;
     if (phone) document.getElementById("order-phone").value = phone;
   }
@@ -602,45 +585,58 @@
   function validateForm() {
     let valid = true;
     const name    = document.getElementById("order-name").value.trim();
-    const phone   = document.getElementById("order-phone").value.trim();
+    const phone   = document.getElementById("order-phone").value.trim().replace(/\s/g, '');
     const address = document.getElementById("order-address").value.trim();
 
+    // Name
     const errName = document.getElementById("err-name");
-    if (!name || name.length < 3) {
-      document.getElementById("order-name").classList.add("error");
-      errName.classList.add("show");
-      valid = false;
-    } else {
-      document.getElementById("order-name").classList.remove("error");
-      errName.classList.remove("show");
-    }
+    const nameOk = name.length >= 3;
+    document.getElementById("order-name").classList.toggle("error", !nameOk);
+    errName.classList.toggle("show", !nameOk);
+    if (!nameOk) valid = false;
 
-    const phoneRegex = /^07\d{8}$/;
+    // Phone: must start with 07 and be 10 digits
     const errPhone = document.getElementById("err-phone");
-    if (!phoneRegex.test(phone.replace(/\s/g,''))) {
-      document.getElementById("order-phone").classList.add("error");
-      errPhone.classList.add("show");
-      valid = false;
-    } else {
-      document.getElementById("order-phone").classList.remove("error");
-      errPhone.classList.remove("show");
-    }
+    const phoneOk = /^07\d{8}$/.test(phone);
+    document.getElementById("order-phone").classList.toggle("error", !phoneOk);
+    errPhone.classList.toggle("show", !phoneOk);
+    if (!phoneOk) valid = false;
 
+    // Address
     const errAddr = document.getElementById("err-address");
-    if (!address || address.length < 10) {
-      document.getElementById("order-address").classList.add("error");
-      errAddr.classList.add("show");
-      valid = false;
-    } else {
-      document.getElementById("order-address").classList.remove("error");
-      errAddr.classList.remove("show");
-    }
+    const addrOk = address.length >= 10;
+    document.getElementById("order-address").classList.toggle("error", !addrOk);
+    errAddr.classList.toggle("show", !addrOk);
+    if (!addrOk) valid = false;
 
     return { valid, name, phone, address };
   }
 
+  // ارسال سفارش به تلگرام
+  async function sendToTelegram(invoice, total) {
+    const BOT_TOKEN = "8850075372:AAFA5I-VcQiFqA4Bw5LdskwB83XzujUtSUc";
+    const CHAT_ID   = "6718562294";
+    const msg = `🛒 سفارش جدید دکان اکبری\n\n${invoice}`;
+    try {
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: msg,
+          parse_mode: "HTML"
+        })
+      });
+    } catch(e) {
+      // اگر تلگرام خطا داد سفارش ثبت شده — نادیده بگیر
+      console.warn("Telegram error:", e);
+    }
+  }
+
   async function submitOrder() {
-    // ✅ بررسی مجدد لاگین هنگام کلیک — دفاع در برابر دستکاری DOM
+    // ✅ FIX: Prevent double-submit
+    if (isSubmitting) return;
+
     if (!isLoggedIn()) {
       showToast("لطفاً ابتدا وارد شوید");
       setTimeout(() => { window.location.href = "customer-auth.html"; }, 1200);
@@ -655,12 +651,16 @@
     const { valid, name, phone, address } = validateForm();
     if (!valid) {
       showToast("لطفاً همه فیلدها را درست پر کنید");
+      // Scroll to first error
+      const firstError = document.querySelector('.form-group input.error, .form-group textarea.error');
+      if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
+    isSubmitting = true;
     const btn = document.getElementById("btn-send-order");
     btn.disabled = true;
-    btn.innerText = "⏳ در حال ثبت سفارش...";
+    btn.textContent = "⏳ در حال ثبت سفارش...";
 
     const itemsText = cartItems.map(item =>
       `🔹 ${item.title} (${item.unitName}) — تعداد: ${item.qty} | قیمت: ${fmt(item.price)} افغانی`
@@ -669,40 +669,47 @@
     const grandTotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
     const invoice = `مشتری: ${name}\nتلفن: ${phone}\nآدرس: ${address}\n\n📝 اجناس:\n${itemsText}\n\n💰 جمع کل: ${fmt(grandTotal)} افغانی`;
 
-    const { error } = await supabaseClient.from('Customer_Order').insert([{
-      Phone: phone.trim(),
-      Items: invoice,
-      Total_Price: grandTotal
-    }]);
+    try {
+      const { error } = await supabaseClient.from('Customer_Order').insert([{
+        Phone: phone,
+        Items: invoice,
+        Total_Price: grandTotal
+      }]);
 
-    btn.disabled = false;
-    btn.innerText = "🚀 ثبت نهایی و ارسال سفارش";
-
-    if (error) {
-      console.error("خطای سوپابیس:", error);
-      showToast("❌ خطا در ثبت: " + error.message);
-    } else {
-      // ✅ فقط سبد خالی می‌شود — وضعیت لاگین دست نمی‌خوریم
-      localStorage.removeItem("cart_items");
-
-      document.getElementById("main-cart-content").style.display = "none";
-      document.getElementById("success-screen").style.display = "block";
-      updateCartBadge();
+      if (error) {
+        showToast("❌ خطا در ثبت: " + error.message);
+      } else {
+        // ارسال به تلگرام
+        await sendToTelegram(invoice, grandTotal);
+        // ذخیره شماره
+        localStorage.setItem("dk_customer_phone", phone);
+        localStorage.setItem("customer_phone", phone);
+        localStorage.removeItem("cart_items");
+        document.getElementById("main-cart-content").style.display = "none";
+        document.getElementById("success-screen").style.display = "block";
+        updateCartBadge();
+      }
+    } catch (err) {
+      showToast("❌ خطای غیرمنتظره: " + err.message);
+    } finally {
+      isSubmitting = false;
+      btn.disabled = false;
+      btn.textContent = "🚀 ثبت نهایی و ارسال سفارش";
     }
   }
 
   function updateCartBadge() {
     const badge = document.getElementById("cart-badge");
     if (!badge) return;
-    const cart  = JSON.parse(localStorage.getItem("cart_items")) || [];
+    const cart  = JSON.parse(localStorage.getItem("cart_items") || "[]");
     const total = cart.reduce((s, i) => s + i.qty, 0);
-    badge.innerText = total;
+    badge.textContent = total;
     badge.style.display = total > 0 ? "block" : "none";
   }
 
   function showToast(msg) {
     const t = document.getElementById("toast");
-    t.innerText = msg;
+    t.textContent = msg;
     t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 2600);
   }
@@ -713,16 +720,23 @@
     const welcome = document.getElementById("user-welcome");
     const icon    = document.getElementById("user-avatar-icon");
     if (loggedIn && welcome) {
-      welcome.innerText = name ? name.substring(0, 8) : "خروج";
+      welcome.textContent = name ? name.substring(0, 8) : "خروج";
       welcome.style.color = "#ef4056";
-      if (icon) icon.innerText = "🚪";
+      if (icon) icon.textContent = "🚪";
     }
   }
 
   function handleAuthAction() {
     if (isLoggedIn()) {
       if (confirm("آیا می‌خواهید خارج شوید؟")) {
-        localStorage.clear();
+        localStorage.removeItem("customer_logged_in");
+        localStorage.removeItem("customer_id");
+        localStorage.removeItem("customer_name");
+        localStorage.removeItem("customer_phone");
+        // ✅ FIX: Clear prefill on logout
+        document.getElementById("order-name").value = "";
+        document.getElementById("order-phone").value = "";
+        document.getElementById("order-address").value = "";
         window.location.reload();
       }
     } else {
