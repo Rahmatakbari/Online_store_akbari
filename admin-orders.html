@@ -2,33 +2,75 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>مدیریت سفارشات دکان اکبری</title>
   <style>
+    * { box-sizing: border-box; }
     body { font-family: Tahoma, sans-serif; padding: 15px; background: #f0f3f6; direction: rtl; margin: 0; }
     .admin-container { max-width: 800px; margin: 20px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ef4056; padding-bottom: 15px; margin-bottom: 20px; }
-    .admin-header h2 { margin: 0; color: #3f4064; }
-    .refresh-btn { background: #ef4056; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .logout-btn { background: #eee; color: #333; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-right: 8px; }
-    .order-card { background: #fff; border: 1px solid #e2e2e5; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative; }
-    .order-card.status-pending { border-right: 6px solid #f1c40f; }
-    .order-card.status-preparing { border-right: 6px solid #3498db; }
-    .order-card.status-shipped { border-right: 6px solid #e67e22; }
-    .order-card.status-delivered { border-right: 6px solid #2ecc71; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ef4056; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .admin-header h2 { margin: 0; color: #3f4064; font-size: 1.05rem; }
+    .refresh-btn { background: #ef4056; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: inherit; }
+    .logout-btn { background: #eee; color: #333; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-family: inherit; }
 
-    .order-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-size: 0.85rem; color: #777; margin-bottom: 10px; background: #f8f9fa; padding: 8px; border-radius: 6px; }
-    .order-details { font-size: 0.95rem; color: #333; white-space: pre-line; line-height: 1.6; margin: 12px 0; padding: 5px; }
+    .order-card { background: #fff; border: 1px solid #e2e2e5; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-right: 6px solid #f1c40f; position: relative; }
+    .order-card.status-pending   { border-right-color: #f1c40f; }
+    .order-card.status-preparing { border-right-color: #3498db; }
+    .order-card.status-shipped   { border-right-color: #e67e22; }
+    .order-card.status-delivered { border-right-color: #2ecc71; opacity: 0.85; }
+
+    .order-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-size: 0.82rem; color: #777; margin-bottom: 10px; background: #f8f9fa; padding: 8px; border-radius: 6px; }
+    .order-details { font-size: 0.9rem; color: #333; white-space: pre-line; line-height: 1.6; margin: 12px 0; padding: 10px; background: #f9f9f9; border-radius: 6px; }
     .order-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; flex-wrap: wrap; gap: 8px; }
-    .total-price { font-weight: bold; color: #2ecc71; font-size: 1.05rem; }
+    .total-price { font-weight: bold; color: #2ecc71; font-size: 1rem; }
 
-    .status-select { padding: 6px; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; outline: none; background: #fff; cursor: pointer; }
+    .status-select {
+      padding: 7px 10px; border-radius: 6px; border: 1.5px solid #ccc;
+      font-family: inherit; outline: none; background: #fff; cursor: pointer;
+      transition: border-color .2s;
+    }
+    .status-select:focus { border-color: #ef4056; }
+    .status-select:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ✅ NEW: Status badge in meta */
+    .status-badge { font-weight: bold; padding: 2px 8px; border-radius: 8px; font-size: 0.8rem; }
+    .badge-pending   { background: #fff8dc; color: #856404; }
+    .badge-preparing { background: #dbeafe; color: #1d4ed8; }
+    .badge-shipped   { background: #ffedd5; color: #9a3412; }
+    .badge-delivered { background: #dcfce7; color: #166534; }
+
     .nav-links { margin-bottom: 15px; }
     .nav-links a { text-decoration: none; color: #008eb9; font-weight: bold; font-size: 0.9rem; margin-left: 15px; }
 
     .login-box { max-width: 380px; margin: 100px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-    .login-box input { width: 100%; padding: 10px; margin: 12px 0; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; text-align: center; box-sizing: border-box; }
-    .login-box button { background-color: #ef4056; color:white; width:100%; border-radius:8px; padding:10px; border:none; cursor:pointer; font-weight: bold; }
+    .login-box input { width: 100%; padding: 10px; margin: 12px 0; border: 1.5px solid #ccc; border-radius: 8px; font-family: inherit; text-align: center; }
+    .login-box input:focus { border-color: #ef4056; outline: none; }
+    .login-box button { background-color: #ef4056; color: white; width: 100%; border-radius: 8px; padding: 11px; border: none; cursor: pointer; font-weight: bold; font-family: inherit; }
+
+    .stats-bar {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .stat-chip {
+      background: #f4f5f7; border-radius: 8px; padding: 8px 14px;
+      font-size: 0.82rem; color: #555;
+    }
+    .stat-chip strong { color: #ef4056; }
+
+    /* ✅ NEW: Auto-refresh indicator */
+    .auto-refresh-bar { font-size: 0.75rem; color: #aaa; text-align: left; margin-bottom: 10px; }
+
+    /* ✅ NEW: Toast */
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: #323232; color: white; padding: 10px 24px;
+      border-radius: 24px; font-size: 0.9rem; z-index: 9999;
+      opacity: 0; transition: opacity .3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    .loading-state { text-align: center; padding: 40px; color: #888; }
+    .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #eee; border-top-color: #ef4056; border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -44,8 +86,8 @@
 <div id="admin-container" class="admin-container" style="display:none;">
   <div class="admin-header">
     <h2>🛠️ پنل مدیریت سفارشات دریافتی</h2>
-    <div>
-      <button class="refresh-btn" onclick="loadAllIncomingOrders()">🔄 به‌روزرسانی لیست</button>
+    <div style="display:flex; gap:8px;">
+      <button class="refresh-btn" onclick="loadAllIncomingOrders()">🔄 به‌روزرسانی</button>
       <button class="logout-btn" onclick="doLogout()">🚪 خروج</button>
     </div>
   </div>
@@ -55,14 +97,32 @@
     <a href="admin.html">➕ افزودن جنس جدید</a>
   </div>
 
-  <div id="admin-orders-container">در حال دریافت آخرین سفارشات...</div>
+  <!-- ✅ NEW: Stats summary -->
+  <div class="stats-bar" id="stats-bar" style="display:none;">
+    <div class="stat-chip">کل: <strong id="stat-total">0</strong></div>
+    <div class="stat-chip">⏳ انتظار: <strong id="stat-pending">0</strong></div>
+    <div class="stat-chip">👨‍🍳 آماده‌سازی: <strong id="stat-preparing">0</strong></div>
+    <div class="stat-chip">🛵 ارسال: <strong id="stat-shipped">0</strong></div>
+    <div class="stat-chip">✅ تحویل: <strong id="stat-delivered">0</strong></div>
+  </div>
+
+  <div class="auto-refresh-bar" id="auto-refresh-bar"></div>
+
+  <div id="admin-orders-container">
+    <div class="loading-state"><div class="spinner"></div><br>در حال دریافت سفارشات...</div>
+  </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let autoRefreshTimer = null;
+  const AUTO_REFRESH_SECONDS = 60;
 
   function escapeHtml(value) {
     if (value === null || value === undefined) return "";
@@ -74,53 +134,89 @@
       .replace(/'/g, "&#39;");
   }
 
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
+  }
+
   function showAdmin() {
     document.getElementById("login-section").style.display = "none";
     document.getElementById("admin-container").style.display = "block";
     loadAllIncomingOrders();
+    startAutoRefresh();
   }
 
   function showLogin() {
     document.getElementById("admin-container").style.display = "none";
     document.getElementById("login-section").style.display = "block";
+    stopAutoRefresh();
+  }
+
+  // ✅ NEW: Auto-refresh every 60 seconds
+  function startAutoRefresh() {
+    stopAutoRefresh();
+    let remaining = AUTO_REFRESH_SECONDS;
+    const bar = document.getElementById("auto-refresh-bar");
+
+    autoRefreshTimer = setInterval(() => {
+      remaining--;
+      if (bar) bar.textContent = `🔄 بروزرسانی خودکار در ${remaining} ثانیه`;
+      if (remaining <= 0) {
+        remaining = AUTO_REFRESH_SECONDS;
+        loadAllIncomingOrders();
+      }
+    }, 1000);
+  }
+
+  function stopAutoRefresh() {
+    if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
   }
 
   async function doLogin() {
-    let email = document.getElementById("admin-email").value.trim();
-    let password = document.getElementById("admin-password").value;
-    let btn = document.getElementById("login-btn");
-    let errorEl = document.getElementById("login-error");
+    const email    = document.getElementById("admin-email").value.trim();
+    const password = document.getElementById("admin-password").value;
+    const btn      = document.getElementById("login-btn");
+    const errorEl  = document.getElementById("login-error");
     errorEl.style.display = "none";
 
     if (!email || !password) {
-      errorEl.textContent = "لطفاً ایمیل و رمز عبور را وارد کنید.";
+      errorEl.textContent = "ایمیل و رمز عبور را وارد کنید.";
       errorEl.style.display = "block";
       return;
     }
 
     btn.disabled = true;
-    btn.innerText = "در حال ورود...";
+    btn.textContent = "در حال ورود...";
 
     try {
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) {
-        errorEl.textContent = "ورود ناموفق بود: ایمیل یا رمز عبور اشتباه است.";
+        errorEl.textContent = "ورود ناموفق: ایمیل یا رمز عبور اشتباه است.";
         errorEl.style.display = "block";
+        document.getElementById("admin-password").value = "";
       } else {
         document.getElementById("admin-password").value = "";
         showAdmin();
       }
     } catch (err) {
-      errorEl.textContent = "خطای ارتباط با سرور: " + err.message;
+      errorEl.textContent = "خطای ارتباط: " + err.message;
       errorEl.style.display = "block";
     } finally {
       btn.disabled = false;
-      btn.innerText = "ورود به سیستم";
+      btn.textContent = "ورود به سیستم";
     }
   }
 
+  // Enter key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && document.getElementById("login-section").style.display !== "none") doLogin();
+  });
+
   async function doLogout() {
     if (!confirm("آیا می‌خواهید از پنل خارج شوید؟")) return;
+    stopAutoRefresh();
     await supabaseClient.auth.signOut();
     showLogin();
   }
@@ -131,97 +227,129 @@
 
   async function initAuth() {
     const { data } = await supabaseClient.auth.getSession();
-    if (data && data.session) {
-      showAdmin();
-    } else {
-      showLogin();
-    }
+    if (data && data.session) showAdmin();
+    else showLogin();
   }
   initAuth();
 
-  // 🚀 تابع لود کردن تمام سفارشات دکان از سوپابیس (فقط برای ادمین لاگین‌شده کار می‌کند)
+  const STATUS_MAP = {
+    pending:   { label: "⏳ در انتظار بررسی",   badge: "badge-pending" },
+    preparing: { label: "👨‍🍳 در حال آماده‌سازی", badge: "badge-preparing" },
+    shipped:   { label: "🛵 ارسال شده",           badge: "badge-shipped" },
+    delivered: { label: "✅ تحویل داده شد",       badge: "badge-delivered" },
+  };
+
   async function loadAllIncomingOrders() {
-    let container = document.getElementById("admin-orders-container");
-    container.innerHTML = "<p style='text-align:center; color:#666;'>در حال خواندن اطلاعات دیتابیس...</p>";
+    const container = document.getElementById("admin-orders-container");
+    container.innerHTML = '<div class="loading-state"><div class="spinner"></div><br>در حال خواندن سفارشات...</div>';
+
+    // Reset auto-refresh countdown
+    startAutoRefresh();
 
     try {
       const { data: orders, error } = await supabaseClient
-        .from('Customer_Order')
-        .select('*')
-        .order('id', { ascending: false });
+        .from('Customer_Order').select('*').order('id', { ascending: false });
 
-      if (error) {
-        container.innerHTML = `<p style="color:red; text-align:center;">خطا در ارتباط با سوپابیس: ${escapeHtml(error.message)}</p>`;
-        return;
-      }
+      if (error) throw error;
 
       if (!orders || orders.length === 0) {
         container.innerHTML = "<p style='text-align:center; color:#888; padding:30px;'>هنوز هیچ سفارشی ثبت نشده است.</p>";
+        document.getElementById("stats-bar").style.display = "none";
         return;
       }
 
-      container.innerHTML = "";
-      orders.forEach(order => {
-        let statusClass = order.status ? `status-${order.status}` : 'status-pending';
-        let currentStatus = order.status || 'pending';
+      // ✅ NEW: Stats
+      const stats = { pending: 0, preparing: 0, shipped: 0, delivered: 0 };
+      orders.forEach(o => { const s = o.status || 'pending'; if (stats[s] !== undefined) stats[s]++; });
+      document.getElementById("stat-total").textContent = orders.length;
+      document.getElementById("stat-pending").textContent = stats.pending;
+      document.getElementById("stat-preparing").textContent = stats.preparing;
+      document.getElementById("stat-shipped").textContent = stats.shipped;
+      document.getElementById("stat-delivered").textContent = stats.delivered;
+      document.getElementById("stats-bar").style.display = "flex";
 
-        let dateStr = order.created_at
-          ? new Date(order.created_at).toLocaleTimeString('fa-IR') + " - " + new Date(order.created_at).toLocaleDateString('fa-IR')
+      container.innerHTML = "";
+
+      orders.forEach(order => {
+        const status     = order.status || 'pending';
+        const statusInfo = STATUS_MAP[status] || STATUS_MAP.pending;
+
+        const dateStr = order.created_at
+          ? new Date(order.created_at).toLocaleDateString('fa-IR') + " " +
+            new Date(order.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })
           : 'نامشخص';
 
-        let phone = escapeHtml(order.Phone || '');
+        const phone = escapeHtml(order.Phone || '');
 
-        container.innerHTML += `
-          <div class="order-card ${statusClass}">
-            <div class="order-meta">
-              <span>📦 <strong>شماره فاکتور: #${escapeHtml(order.id)}</strong></span>
-              <span>🕒 زمان: ${escapeHtml(dateStr)}</span>
-              <span>📞 تلفن مشتری: <a href="tel:${phone}" style="text-decoration:none; color:#008eb9; font-weight:bold;">${phone}</a></span>
-            </div>
+        const card = document.createElement('div');
+        card.className = `order-card status-${status}`;
+        card.dataset.orderId = order.id;
 
-            <div class="order-details">
-              ${escapeHtml(order.Items || 'هیچ جزئیاتی ثبت نشده است')}
-            </div>
-
-            <div class="order-footer">
-              <div class="total-price">مبلغ کل: ${escapeHtml(order.Total_Price || 0)} افغانی</div>
-
-              <div>
-                <label style="font-size:0.8rem; color:#555;">وضعیت سفارش: </label>
-                <select class="status-select" onchange="updateOrderStatus(${order.id}, this.value, this)">
-                  <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>⏳ در انتظار بررسی</option>
-                  <option value="preparing" ${currentStatus === 'preparing' ? 'selected' : ''}>👨‍🍳 در حال آماده‌سازی</option>
-                  <option value="shipped" ${currentStatus === 'shipped' ? 'selected' : ''}>🛵 ارسال شده</option>
-                  <option value="delivered" ${currentStatus === 'delivered' ? 'selected' : ''}>✅ تحویل داده شد</option>
-                </select>
-              </div>
+        card.innerHTML = `
+          <div class="order-meta">
+            <span>📦 <strong>فاکتور: #${escapeHtml(String(order.id))}</strong></span>
+            <span>🕒 ${escapeHtml(dateStr)}</span>
+            <span>📞 <a href="tel:${phone}" style="text-decoration:none; color:#008eb9; font-weight:bold;">${phone}</a></span>
+            <span class="status-badge ${statusInfo.badge}">${statusInfo.label}</span>
+          </div>
+          <div class="order-details"></div>
+          <div class="order-footer">
+            <div class="total-price">مبلغ: ${escapeHtml(String(order.Total_Price || 0))} افغانی</div>
+            <div>
+              <label style="font-size:0.8rem; color:#555;">وضعیت: </label>
+              <select class="status-select" data-order-id="${order.id}" data-current="${status}">
+                <option value="pending"   ${status === 'pending'   ? 'selected' : ''}>⏳ در انتظار</option>
+                <option value="preparing" ${status === 'preparing' ? 'selected' : ''}>👨‍🍳 آماده‌سازی</option>
+                <option value="shipped"   ${status === 'shipped'   ? 'selected' : ''}>🛵 ارسال شده</option>
+                <option value="delivered" ${status === 'delivered' ? 'selected' : ''}>✅ تحویل داده شد</option>
+              </select>
             </div>
           </div>
         `;
+
+        // ✅ FIX: textContent for user data (no XSS)
+        card.querySelector('.order-details').textContent = order.Items || 'بدون جزئیات';
+
+        // ✅ FIX: Optimistic UI for status change
+        const select = card.querySelector('.status-select');
+        select.addEventListener('change', async function() {
+          const newStatus = this.value;
+          const prevStatus = this.dataset.current;
+          const orderId = parseInt(this.dataset.orderId);
+
+          // Optimistic: update UI immediately
+          this.disabled = true;
+          card.className = `order-card status-${newStatus}`;
+          const badge = card.querySelector('.status-badge');
+          const newInfo = STATUS_MAP[newStatus];
+          badge.className = `status-badge ${newInfo.badge}`;
+          badge.textContent = newInfo.label;
+
+          try {
+            const { error } = await supabaseClient
+              .from('Customer_Order').update({ status: newStatus }).eq('id', orderId);
+
+            if (error) throw error;
+            this.dataset.current = newStatus;
+            showToast("✅ وضعیت سفارش بروز شد");
+          } catch (err) {
+            // ✅ FIX: Rollback on error
+            card.className = `order-card status-${prevStatus}`;
+            const oldInfo = STATUS_MAP[prevStatus];
+            badge.className = `status-badge ${oldInfo.badge}`;
+            badge.textContent = oldInfo.label;
+            this.value = prevStatus;
+            showToast("❌ خطا در تغییر وضعیت: " + err.message);
+          } finally {
+            this.disabled = false;
+          }
+        });
+
+        container.appendChild(card);
       });
-    } catch (err) {
-      container.innerHTML = `<p style="color:red; text-align:center;">خطای ارتباط با سرور: ${escapeHtml(err.message)}</p>`;
-    }
-  }
 
-  // 📝 تابع آپدیت آنلاین وضعیت سفارش در سوپابیس
-  async function updateOrderStatus(orderId, newStatus, selectEl) {
-    if (selectEl) selectEl.disabled = true;
-    try {
-      const { error } = await supabaseClient
-        .from('Customer_Order')
-        .update({ status: newStatus })
-        .eq('id', orderId);
-
-      if (error) {
-        alert("خطا در تغییر وضعیت: " + error.message);
-        if (selectEl) selectEl.disabled = false;
-      } else {
-        loadAllIncomingOrders();
-      }
     } catch (err) {
-      alert("خطای ارتباط با سرور: " + err.message);
-      if (selectEl) selectEl.disabled = false;
+      container.innerHTML = `<p style="color:red; text-align:center; padding:20px;">خطای ارتباط با سرور: ${escapeHtml(err.message)}</p>`;
     }
   }
 </script>
