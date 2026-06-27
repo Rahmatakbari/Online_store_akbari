@@ -4,291 +4,276 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>سفارشات من - دکان اکبری</title>
-  <link rel="stylesheet" href="style.css">
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Tahoma, sans-serif; padding: 15px; background: #f4f4f4; direction: rtl; padding-bottom: 80px; }
 
-    .order-card {
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      border-right: 5px solid #2ecc71;
-      text-align: right;
-    }
+    .page-header { max-width: 600px; margin: 0 auto 16px; }
+    .page-header h2 { margin-bottom: 6px; font-size: 1.1rem; }
+    .page-header a { text-decoration: none; color: #555; font-size: 0.9rem; }
 
-    .order-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-      color: #666;
-      margin-bottom: 8px;
-      border-bottom: 1px dashed #eee;
-      padding-bottom: 8px;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .order-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-right: 5px solid #eee; text-align: right; }
+    .order-card.status-pending   { border-right-color: #f1c40f; }
+    .order-card.status-preparing { border-right-color: #3498db; }
+    .order-card.status-shipped   { border-right-color: #e67e22; }
+    .order-card.status-delivered { border-right-color: #2ecc71; }
 
-    .order-number {
-      background: #2ecc71;
-      color: white;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
+    .order-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #666; margin-bottom: 8px; border-bottom: 1px dashed #eee; padding-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+    .order-number { background: #2ecc71; color: white; padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
+    .order-date { color: #999; font-size: 0.8rem; }
+    .order-items { font-size: 0.9rem; color: #333; white-space: pre-line; line-height: 1.8; background: #f9f9f9; padding: 10px; border-radius: 8px; margin: 8px 0; }
+    .order-price { font-weight: bold; color: #2ecc71; margin-top: 10px; font-size: 1rem; text-align: left; direction: ltr; }
 
-    .order-date {
-      color: #999;
-      font-size: 0.8rem;
-    }
+    .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 8px; }
+    .status-badge.pending   { background: #fff8dc; color: #856404; }
+    .status-badge.preparing { background: #dbeafe; color: #1d4ed8; }
+    .status-badge.shipped   { background: #ffedd5; color: #9a3412; }
+    .status-badge.delivered { background: #dcfce7; color: #166534; }
 
-    .order-items {
-      font-size: 0.9rem;
-      color: #333;
-      white-space: pre-line;
-      line-height: 1.8;
-    }
+    .phone-info-bar { background: #fff; border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 0.9rem; color: #555; text-align: center; }
 
-    .order-price {
-      font-weight: bold;
-      color: #2ecc71;
-      margin-top: 10px;
-      font-size: 1rem;
-      text-align: left;
-      direction: ltr;
-    }
+    .state-box { text-align: center; background: white; padding: 40px 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #666; line-height: 2; }
+    .state-box .icon { font-size: 3rem; display: block; margin-bottom: 10px; }
+    .state-box a.btn { display: inline-block; margin-top: 14px; background: #ef4056; color: white; padding: 10px 24px; border-radius: 10px; text-decoration: none; font-weight: bold; }
+    .state-box small { color: #aaa; font-size: 0.82rem; }
 
-    .phone-box {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      margin-bottom: 15px;
-      text-align: center;
-    }
+    .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #eee; border-top-color: #ef4056; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .phone-box p {
-      color: #555;
-      margin-bottom: 12px;
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-
-    .phone-box input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-family: inherit;
-      text-align: center;
-      box-sizing: border-box;
-      margin: 8px 0;
-      font-size: 1rem;
-      direction: ltr;
-    }
-
-    .phone-box input:focus {
-      outline: none;
-      border-color: #2ecc71;
-      box-shadow: 0 0 0 3px rgba(46,204,113,0.15);
-    }
-
-    .phone-box button {
-      width: 100%;
-      padding: 13px;
-      background: #2ecc71;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-top: 4px;
-      transition: background 0.2s;
-    }
-
-    .phone-box button:hover { background: #27ae60; }
-
-    .loading-msg {
-      text-align: center;
-      color: #888;
-      padding: 30px 0;
-      font-size: 0.95rem;
-    }
-
-    .empty-msg {
-      text-align: center;
-      color: #aaa;
-      padding: 40px 0;
-      font-size: 0.95rem;
-      line-height: 2;
-    }
-
-    .empty-msg .emoji { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+    .dk-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; display: flex; justify-content: space-around; align-items: center; padding: 8px 0 10px; border-top: 1px solid #eee; z-index: 200; box-shadow: 0 -2px 8px rgba(0,0,0,0.06); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #888; font-size: 0.72rem; gap: 2px; cursor: pointer; position: relative; }
+    .nav-item.active { color: #ef4056; }
+    .nav-icon { font-size: 1.3rem; }
+    #cart-badge { position: absolute; top: -2px; right: -6px; background: #ef4056; color: white; font-size: 0.68rem; font-weight: bold; border-radius: 50%; min-width: 17px; height: 17px; text-align: center; line-height: 17px; padding: 0 3px; display: none; }
   </style>
 </head>
 <body>
 
 <div style="max-width: 600px; margin: 0 auto;">
-  <h2 style="margin-bottom: 4px;">📋 سفارشات من</h2>
-  <a href="index.html" style="text-decoration: none; color: #555; font-size: 0.9rem; font-weight: bold;">⬅ بازگشت به فروشگاه</a>
-  <br><br>
-
-  <div id="phone-entry-section" class="phone-box" style="display:none;">
-    <p>برای دیدن سفارش‌هایت، شماره تلفنی که هنگام ثبت سفارش وارد کرده بودی را بنویس:</p>
-    <input type="tel" id="phone-input" placeholder="مثال: 0700000000" inputmode="numeric">
-    <button onclick="submitPhone()">نمایش سفارش‌های من</button>
-    <p id="phone-error" style="color:#ff3b30; font-size:0.85rem; display:none; margin-top:8px;"></p>
+  <div class="page-header">
+    <h2>📋 سفارشات من</h2>
+    <a href="index.html">⬅ بازگشت به فروشگاه</a>
   </div>
 
-  <div id="phone-info-bar" style="display:none; background:#fff; border-radius:10px; padding:10px 15px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.06); font-size:0.85rem; color:#666; text-align:center;">
-    📞 نمایش سفارشات برای شماره: <strong id="shown-phone" style="color:#2ecc71; direction:ltr; display:inline-block;"></strong>
-    <button onclick="changePhone()" style="background:none; border:none; color:#ff3b30; font-family:inherit; font-size:0.8rem; margin-right:8px; cursor:pointer; text-decoration:underline;">(تغییر شماره)</button>
+  <div id="phone-info-bar" class="phone-info-bar" style="display:none;">
+    🔒 سفارشات شما با شماره:
+    <strong id="shown-phone" style="color:#2ecc71; direction:ltr; display:inline-block;"></strong>
   </div>
 
-  <div id="orders-list-container"></div>
+  <div id="orders-list-container">
+    <div class="state-box">
+      <span class="icon"><div class="spinner"></div></span>
+    </div>
+  </div>
 </div>
 
 <nav class="dk-bottom-nav">
   <a href="index.html" class="nav-item">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-text">خانه</span>
+    <span class="nav-icon">🏠</span><span class="nav-text">خانه</span>
   </a>
-  <a href="cart.html" class="nav-item">
+  <a href="cart.html" class="nav-item" style="position:relative;">
     <span class="nav-icon">🛒</span>
+    <span id="cart-badge">0</span>
     <span class="nav-text">سبد خرید</span>
   </a>
   <a href="orders.html" class="nav-item active">
-    <span class="nav-icon">📋</span>
-    <span class="nav-text">سفارشات من</span>
+    <span class="nav-icon">📋</span><span class="nav-text">سفارشات من</span>
   </a>
+  <div class="nav-item" onclick="handleAuthAction()">
+    <span class="nav-icon" id="user-avatar-icon">👤</span>
+    <span class="nav-text" id="user-welcome">ورود</span>
+  </div>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
+  const SUPABASE_URL  = "https://affstedmdsqeobtzrkyp.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const PHONE_STORAGE_KEY = "dk_customer_phone";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  function escapeHtml(value) {
-    if (value === null || value === undefined) return "";
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
+  /* ── helpers ── */
+  function esc(v) {
+    if (v == null) return "";
+    return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+  function normPhone(p) {
+    // strip spaces, convert +93 / 0093 → 0
+    return String(p).replace(/\s+/g,"").replace(/^\+93/,"0").replace(/^0093/,"0");
+  }
+  function formatDate(s) {
+    if (!s) return "";
+    try { return new Date(s).toLocaleDateString("fa-AF",{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"}); }
+    catch { return s; }
   }
 
-  function formatDate(dateStr) {
-    if (!dateStr) return "";
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString("fa-AF", {
-        year: "numeric", month: "long", day: "numeric",
-        hour: "2-digit", minute: "2-digit"
-      });
-    } catch {
-      return dateStr;
-    }
+  const STATUS = {
+    pending:   { label:"⏳ در انتظار بررسی",    cls:"pending"   },
+    preparing: { label:"👨‍🍳 در حال آماده‌سازی", cls:"preparing" },
+    shipped:   { label:"🛵 ارسال شده",           cls:"shipped"   },
+    delivered: { label:"✅ تحویل داده شد",       cls:"delivered" },
+  };
+
+  /* ── get ALL phones linked to this customer ── */
+  function getSessionPhone() {
+    const p1 = normPhone(localStorage.getItem("customer_phone") || "");
+    const p2 = normPhone(localStorage.getItem("dk_customer_phone") || "");
+    // Return primary phone (both should be same, but fallback to whichever exists)
+    return p1 || p2 || null;
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    let savedPhone = localStorage.getItem(PHONE_STORAGE_KEY);
-    if (savedPhone) {
-      showPhoneInfoBar(savedPhone);
-      loadOrdersForPhone(savedPhone);
-    } else {
-      document.getElementById("phone-entry-section").style.display = "block";
-    }
-  });
-
-  function showPhoneInfoBar(phone) {
-    document.getElementById("phone-info-bar").style.display = "block";
-    document.getElementById("shown-phone").textContent = phone;
+  function getAllSessionPhones() {
+    const phones = new Set();
+    ["customer_phone", "dk_customer_phone"].forEach(key => {
+      const v = normPhone(localStorage.getItem(key) || "");
+      if (v) phones.add(v);
+      // Also add without leading zero
+      if (v.startsWith("0")) phones.add(v.slice(1));
+    });
+    return [...phones].filter(p => p.length >= 7);
   }
 
-  function changePhone() {
-    localStorage.removeItem(PHONE_STORAGE_KEY);
-    document.getElementById("phone-info-bar").style.display = "none";
-    document.getElementById("orders-list-container").innerHTML = "";
-    document.getElementById("phone-entry-section").style.display = "block";
-    document.getElementById("phone-input").value = "";
-  }
+  /* ── main ── */
+  document.addEventListener("DOMContentLoaded", () => {
+    updateCartBadge();
+    checkUserSession();
 
-  function submitPhone() {
-    let phone = document.getElementById("phone-input").value.trim();
-    let errorEl = document.getElementById("phone-error");
-    errorEl.style.display = "none";
+    const phone = getSessionPhone();
 
-    if (!phone || phone.length < 6) {
-      errorEl.textContent = "لطفاً شماره تلفن معتبر وارد کن.";
-      errorEl.style.display = "block";
+    if (!phone) {
+      // Not logged in / never ordered
+      showState(
+        "🔐",
+        "برای دیدن سفارشات وارد شوید",
+        "پس از ورود، فاکتورهای شما اینجا نمایش داده می‌شود.",
+        "customer-auth.html", "👤 ورود / ثبت‌نام"
+      );
       return;
     }
 
-    localStorage.setItem(PHONE_STORAGE_KEY, phone);
-    document.getElementById("phone-entry-section").style.display = "none";
-    showPhoneInfoBar(phone);
-    loadOrdersForPhone(phone);
-  }
+    // Show which phone we're using (masked for privacy)
+    const masked = phone.slice(0,4) + "***" + phone.slice(-3);
+    document.getElementById("phone-info-bar").style.display = "block";
+    document.getElementById("shown-phone").textContent = masked;
 
-  // ✅ تغییر اساسی: دریافت مستقیم داده‌ها از جدول بجای rpc
-  async function loadOrdersForPhone(phone) {
-    let container = document.getElementById("orders-list-container");
-    container.innerHTML = '<div class="loading-msg">⏳ در حال بارگذاری سفارشات...</div>';
+    loadOrders(phone);
+  });
+
+async function loadOrders(phone) {
+    const container = document.getElementById("orders-list-container");
+    container.innerHTML = `<div class="state-box"><span class="icon"><div class="spinner"></div></span><br>در حال بارگذاری...</div>`;
 
     try {
-      // دریافت مستقیم سفارشات از جدول 'Customer_Order' که فیلد Phone آن‌ها برابر با شماره مشتری است
-      const { data: orders, error } = await supabaseClient
-        .from('Customer_Order')
-        .select('*')
-        .eq('Phone', phone)
-        .order('id', { ascending: false });
+      // ✅ جمع‌آوری همه شماره‌های مرتبط با این مشتری
+      const allPhones = getAllSessionPhones();
+      const phoneNorm = normPhone(phone);
+      const last9 = phoneNorm.slice(-9);
+      let orders = null;
 
-      if (error) {
-        container.innerHTML = `<p style="color:red; text-align:center;">خطا در بارگذاری: ${escapeHtml(error.message)}</p>`;
-        return;
+      // روش ۱: جستجو با همه شماره‌های ذخیره‌شده (in query)
+      if (allPhones.length > 0) {
+        const r1 = await sb.from('Customer_Order')
+          .select('id, Phone, Items, Total_Price, status')
+          .in('Phone', allPhones)
+          .order('id', { ascending: false });
+        if (!r1.error && r1.data && r1.data.length > 0) orders = r1.data;
+      }
+
+      // روش ۲: آخر ۹ رقم — فرمت‌های مختلف
+      if (!orders || orders.length === 0) {
+        const r2 = await sb.from('Customer_Order')
+          .select('id, Phone, Items, Total_Price, status')
+          .ilike('Phone', `%${last9}`)
+          .order('id', { ascending: false });
+        if (!r2.error && r2.data && r2.data.length > 0)
+          orders = r2.data.filter(o => normPhone(o.Phone||"").endsWith(last9));
+      }
+
+      // روش ۳: جستجو داخل متن فاکتور
+      if (!orders || orders.length === 0) {
+        const r3 = await sb.from('Customer_Order')
+          .select('id, Phone, Items, Total_Price, status')
+          .ilike('Items', `%${last9}%`)
+          .order('id', { ascending: false });
+        if (!r3.error && r3.data && r3.data.length > 0)
+          orders = r3.data.filter(o =>
+            normPhone(o.Phone||"").endsWith(last9) || (o.Items||"").includes(last9)
+          );
       }
 
       if (!orders || orders.length === 0) {
-        container.innerHTML = `
-          <div class="empty-msg">
-            <span class="emoji">📭</span>
-            هیچ سفارشی برای شماره شما پیدا نشد.<br>
-            <small>اگر فکر می‌کنی اشتباهی رخ داده، شماره ثبت شده را بررسی کن.</small>
-          </div>`;
+        showState("📭", "هیچ سفارشی پیدا نشد",
+          "هنوز سفارشی با این حساب ثبت نشده است.",
+          "index.html", "🛒 شروع خرید");
         return;
       }
 
       container.innerHTML = "";
+      orders.forEach(order => {
+        const info  = STATUS[order.status] || STATUS.pending;
+        const total = Number(order.Total_Price || 0).toLocaleString('fa-AF');
 
-      orders.forEach((order) => {
-        const orderNum = escapeHtml(order.id);
-        const totalFormatted = Number(order.Total_Price || 0).toLocaleString('fa-AF');
-        const dateStr = order.created_at ? formatDate(order.created_at) : "";
-
-        container.innerHTML += `
-          <div class="order-card">
-            <div class="order-header">
-              <span class="order-number">سفارش #${orderNum}</span>
-              ${dateStr ? `<span class="order-date">🕐 ${escapeHtml(dateStr)}</span>` : ""}
-            </div>
-            <div class="order-items">${escapeHtml(order.Items || 'جزئیاتی ثبت نشده است')}</div>
-            <div class="order-price">💰 ${totalFormatted} افغانی</div>
+        const card = document.createElement('div');
+        card.className = `order-card status-${info.cls}`;
+        card.innerHTML = `
+          <div class="order-header">
+            <span class="order-number">سفارش #${esc(String(order.id))}</span>
           </div>
+          <div class="order-items"></div>
+          <div class="order-price">💰 ${total} افغانی</div>
+          <span class="status-badge ${info.cls}">${info.label}</span>
         `;
+        card.querySelector('.order-items').textContent = order.Items || '—';
+        container.appendChild(card);
       });
 
     } catch (err) {
-      container.innerHTML = `<p style="color:red; text-align:center;">خطای ارتباط با سرور: ${escapeHtml(err.message)}</p>`;
+      container.innerHTML = `
+        <div class="state-box" style="background:#fff5f5; border:1px solid #ffcdd2; color:#c62828;">
+          <span class="icon">⚠️</span>
+          خطا در بارگذاری سفارشات<br>
+          <small>${esc(err.message)}</small><br>
+          <a class="btn" href="orders.html">🔄 تلاش مجدد</a>
+        </div>`;
+    }
+  }
+
+
+  function showState(icon, title, desc, href, btnText) {
+    document.getElementById("orders-list-container").innerHTML = `
+      <div class="state-box">
+        <span class="icon">${icon}</span>
+        <strong>${esc(title)}</strong><br>
+        <small>${esc(desc)}</small><br>
+        <a class="btn" href="${esc(href)}">${btnText}</a>
+      </div>`;
+  }
+
+  function updateCartBadge() {
+    const badge = document.getElementById("cart-badge");
+    if (!badge) return;
+    const total = (JSON.parse(localStorage.getItem("cart_items") || "[]")).reduce((s,i)=>s+i.qty,0);
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'block' : 'none';
+  }
+
+  function checkUserSession() {
+    const ok   = localStorage.getItem("customer_logged_in") === "true";
+    const name = localStorage.getItem("customer_name");
+    const w    = document.getElementById("user-welcome");
+    const ic   = document.getElementById("user-avatar-icon");
+    if (ok && w) { w.textContent = name ? name.substring(0,8) : "خروج"; w.style.color="#ef4056"; if(ic) ic.textContent="🚪"; }
+  }
+
+  function handleAuthAction() {
+    if (localStorage.getItem("customer_logged_in") === "true") {
+      if (confirm("آیا می‌خواهید خارج شوید؟")) {
+        ["customer_logged_in","customer_id","customer_name","customer_phone"].forEach(k=>localStorage.removeItem(k));
+        window.location.reload();
+      }
+    } else {
+      window.location.href = "customer-auth.html";
     }
   }
 </script>
-
 </body>
 </html>
