@@ -2,7 +2,6 @@
 <html lang="fa">
 <head>
 <link rel="manifest" href="manifest.json">
-<link rel="orders" href="orders.html">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>فروشگاه مواد غذایی اکبری</title>
@@ -29,15 +28,8 @@
       align-items: center;
       margin-bottom: 10px;
     }
-    .dk-logo-red {
-      color: #ef4056;
-      font-size: 1.1rem;
-      font-weight: bold;
-    }
-    .dk-notification-icon {
-      font-size: 1.3rem;
-      cursor: pointer;
-    }
+    .dk-logo-red { color: #ef4056; font-size: 1.1rem; font-weight: bold; }
+    .dk-notification-icon { font-size: 1.3rem; cursor: pointer; }
     .dk-search-box {
       display: flex;
       align-items: center;
@@ -119,7 +111,6 @@
       transition: box-shadow 0.2s;
     }
     .product-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
-
     .product-card img {
       width: 100%;
       height: 130px;
@@ -141,7 +132,6 @@
       margin-bottom: 6px;
       min-height: 20px;
     }
-
     .price-display {
       font-size: 0.85rem;
       font-weight: bold;
@@ -150,11 +140,7 @@
       text-align: left;
       direction: ltr;
     }
-    .price-display span {
-      font-size: 0.72rem;
-      color: #888;
-      font-weight: normal;
-    }
+    .price-display span { font-size: 0.72rem; color: #888; font-weight: normal; }
 
     .unit-selector {
       width: 100%;
@@ -188,6 +174,7 @@
     .btn-add-to-cart:hover { background: #d32f2f; }
     .btn-add-to-cart:active { transform: scale(0.97); }
     .btn-add-to-cart.added { background: #4caf50; }
+    .btn-add-to-cart:disabled { background: #ccc; cursor: not-allowed; }
 
     .toast {
       position: fixed;
@@ -205,10 +192,7 @@
       pointer-events: none;
       white-space: nowrap;
     }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .stock-badge {
       display: inline-block;
@@ -231,8 +215,7 @@
 
     .dk-bottom-nav {
       position: fixed;
-      bottom: 0;
-      left: 0; right: 0;
+      bottom: 0; left: 0; right: 0;
       background: #fff;
       display: flex;
       justify-content: space-around;
@@ -258,15 +241,13 @@
     .nav-text { font-size: 0.72rem; }
     #cart-badge {
       position: absolute;
-      top: -2px;
-      right: -6px;
+      top: -2px; right: -6px;
       background: #ef4056;
       color: white;
       font-size: 0.68rem;
       font-weight: bold;
       border-radius: 50%;
-      min-width: 17px;
-      height: 17px;
+      min-width: 17px; height: 17px;
       text-align: center;
       line-height: 17px;
       padding: 0 3px;
@@ -290,24 +271,40 @@
       margin-bottom: 10px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ✅ FIX: Error state */
+    .error-msg {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 20px;
+      color: #c62828;
+    }
+    .error-msg button {
+      margin-top: 12px;
+      padding: 8px 20px;
+      background: #ef4056;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+    }
   </style>
 </head>
 <body>
 
 <header class="dk-header">
   <div class="dk-header-row">
-    <div class="dk-logo-area">
-      <span class="dk-logo-red">🛒 اکبری خوراکه فروشی</span>
-    </div>
-    <div class="dk-notification-icon">🔔</div>
+    <span class="dk-logo-red">🛒 اکبری خوراکه فروشی</span>
+    <div class="dk-notification-icon" id="secret-bell" onclick="secretTap()">🔔</div>
   </div>
   <div class="dk-search-box">
     <span>🔍</span>
-    <input id="search" onkeyup="searchProducts()" placeholder="جستجو در اجناس دکان اکبری...">
+    <input id="search" onkeyup="searchProducts()" placeholder="جستجو در اجناس دکان اکبری..." autocomplete="off">
   </div>
 </header>
 
-<div class="category-wrapper">
+<div class="category-wrapper" role="navigation" aria-label="دسته‌بندی‌ها">
   <button class="category-btn active" onclick="filterByCategory('all', this)">همه اجناس</button>
   <button class="category-btn" onclick="filterByCategory('آرد', this)">🌾 آرد</button>
   <button class="category-btn" onclick="filterByCategory('روغن', this)">💧 روغن</button>
@@ -339,19 +336,31 @@
     <span class="nav-text">سبد خرید</span>
   </a>
   <a href="orders.html" class="nav-item">
-  <span class="nav-icon">📋</span>
-  <span class="nav-text">سفارشات من</span>
-</a>
- 
+    <span class="nav-icon">📋</span>
+    <span class="nav-text">سفارشات من</span>
+  </a>
   <div class="nav-item" id="user-profile-toggle" onclick="handleAuthAction()">
     <span class="nav-icon" id="user-avatar-icon">👤</span>
     <span class="nav-text" id="user-welcome">ورود</span>
   </div>
 </nav>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // 🔐 Secret: tap bell 5 times to open admin
+  let _tapCount = 0, _tapTimer = null;
+  function secretTap() {
+    _tapCount++;
+    clearTimeout(_tapTimer);
+    if (_tapCount >= 5) {
+      _tapCount = 0;
+      window.location.href = "admin.html";
+    }
+    _tapTimer = setTimeout(() => { _tapCount = 0; }, 2000);
+  }
+</script>
 <script>
   const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
@@ -359,6 +368,18 @@
 
   let allProducts = [];
   let searchTimeout;
+  let currentCategory = 'all';
+
+  // ✅ FIX: XSS prevention - escape all dynamic text before DOM insertion
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return "";
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
     checkUserSession();
@@ -369,23 +390,30 @@
   async function loadOnlineProducts() {
     const listDiv = document.getElementById("list");
 
-    const { data: products, error } = await supabaseClient
-      .from('Products')
-      .select('*')
-      .order('id', { ascending: false });
+    try {
+      const { data: products, error } = await supabaseClient
+        .from('Products')
+        .select('*')
+        .order('id', { ascending: false });
 
-    if (error) {
-      listDiv.innerHTML = `<p class="empty-msg" style="color:#e53935;">⚠️ خطا در دریافت اطلاعات!<br><small>${error.message}</small></p>`;
-      return;
+      if (error) throw error;
+
+      if (!products || products.length === 0) {
+        listDiv.innerHTML = `<p class="empty-msg">هیچ محصولی در فروشگاه موجود نیست.</p>`;
+        return;
+      }
+
+      allProducts = products;
+      renderProducts(allProducts);
+
+    } catch (err) {
+      listDiv.innerHTML = `
+        <div class="error-msg">
+          ⚠️ خطا در دریافت اطلاعات!<br>
+          <small>${escapeHtml(err.message)}</small><br>
+          <button onclick="loadOnlineProducts()">🔄 تلاش مجدد</button>
+        </div>`;
     }
-
-    if (!products || products.length === 0) {
-      listDiv.innerHTML = `<p class="empty-msg">هیچ محصولی در فروشگاه موجود نیست.</p>`;
-      return;
-    }
-
-    allProducts = products;
-    renderProducts(allProducts);
   }
 
   function renderProducts(list) {
@@ -402,53 +430,72 @@
       try {
         parsedUnits = p.units ? (typeof p.units === 'string' ? JSON.parse(p.units) : p.units) : [];
       } catch(e) { parsedUnits = []; }
-      
 
       const firstPrice = parsedUnits.length > 0 ? parsedUnits[0].price : null;
-
-      const optionsHtml = parsedUnits.map((u, idx) =>
-        `<option value="${idx}">${u.name} — ${Number(u.price).toLocaleString()} افغانی</option>`
-      ).join("");
-
       const inStock = p.stock === undefined || p.stock === null || p.stock > 0;
-      const stockBadge = inStock
-        ? `<span class="stock-badge in-stock">✔ موجود</span>`
-        : `<span class="stock-badge out-of-stock">✖ ناموجود</span>`;
 
-      const imgSrc = p.Image_URL || `https://placehold.co/150x130/f0f0f0/aaa?text=${encodeURIComponent(p.Name)}`;
-
+      // ✅ FIX: Use safe DOM creation instead of innerHTML for user data
       const card = document.createElement('div');
       card.className = 'product-card';
-      
-      // ✅ اصلاح اصلی: کلیک روی کل بخش محتوای محصول مستقیماً آدرس دقیق را باز می‌کند
+
+      // Build safe options HTML
+      const optionsHtml = parsedUnits.map((u, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${u.name} — ${Number(u.price).toLocaleString()} افغانی`;
+        return opt.outerHTML;
+      }).join("");
+
+      const imgSrc = escapeHtml(p.Image_URL || '');
+      const productName = escapeHtml(p.Name || 'بدون نام');
+      const productDesc = escapeHtml(p.description || '');
+
       card.innerHTML = `
-        <div onclick="if(!event.target.closest('button') && !event.target.closest('select') && !event.target.closest('label')){ window.location.href='product.html?id=${p.id}'; }" style="cursor:pointer;">
+        <div class="card-top" style="cursor:pointer;">
           <img
             src="${imgSrc}"
-            alt="${p.Name}"
+            alt="${productName}"
             loading="lazy"
-            onerror="this.src='https://placehold.co/150x130/f0f0f0/aaa?text=بدون+تصویر'"
+            onerror="this.src='https://placehold.co/150x130/f0f0f0/aaa?text=%D8%AA%D8%B5%D9%88%DB%8C%D8%B1+%D9%86%D8%AF%D8%A7%D8%B1%D8%AF'"
           >
-          <h3>${p.Name}</h3>
-          <p class="desc">${p.description || ''}</p>
-          ${stockBadge}
+          <h3>${productName}</h3>
+          <p class="desc">${productDesc}</p>
+          <span class="stock-badge ${inStock ? 'in-stock' : 'out-of-stock'}">
+            ${inStock ? '✔ موجود' : '✖ ناموجود'}
+          </span>
           ${firstPrice ? `<div class="price-display">${Number(firstPrice).toLocaleString()} <span>افغانی</span></div>` : ''}
         </div>
         <div>
           <label style="font-size:0.73rem;color:#999;display:block;margin-bottom:4px;">واحد فروش:</label>
-          <select id="unit-select-${p.id}" class="unit-selector" onchange="updatePrice(${p.id}, this)">
+          <select id="unit-select-${p.id}" class="unit-selector" aria-label="انتخاب واحد">
             ${optionsHtml}
           </select>
           <button
             class="btn-add-to-cart"
             id="btn-${p.id}"
-            onclick="addToCartClick(${p.id}, '${p.Name.replace(/'/g, "\\'")}')"
-            ${!inStock ? 'disabled style="background:#ccc;cursor:not-allowed;"' : ''}
+            ${!inStock ? 'disabled' : ''}
           >
             ${inStock ? '🛒 افزودن به سبد' : '⛔ ناموجود'}
           </button>
         </div>
       `;
+
+      // ✅ FIX: Attach events safely (no inline onclick with user data)
+      card.querySelector('.card-top').addEventListener('click', () => {
+        window.location.href = `product.html?id=${encodeURIComponent(p.id)}`;
+      });
+
+      const select = card.querySelector(`#unit-select-${p.id}`);
+      select.addEventListener('change', () => updatePrice(p.id, select));
+
+      const btn = card.querySelector(`#btn-${p.id}`);
+      if (inStock) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          addToCartClick(p.id, p.Name);
+        });
+      }
+
       listDiv.appendChild(card);
     });
   }
@@ -467,8 +514,11 @@
   }
 
   function filterByCategory(cat, btn) {
+    currentCategory = cat;
     document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    // ✅ FIX: Also clear search when changing category
+    document.getElementById("search").value = "";
     const filtered = cat === 'all'
       ? allProducts
       : allProducts.filter(p =>
@@ -483,8 +533,14 @@
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
       const q = document.getElementById("search").value.trim().toLowerCase();
-      if (!q) { renderProducts(allProducts); return; }
-      const filtered = allProducts.filter(p =>
+      let base = currentCategory === 'all'
+        ? allProducts
+        : allProducts.filter(p =>
+            (p.Name && p.Name.includes(currentCategory)) ||
+            (p.description && p.description.includes(currentCategory))
+          );
+      if (!q) { renderProducts(base); return; }
+      const filtered = base.filter(p =>
         (p.Name && p.Name.toLowerCase().includes(q)) ||
         (p.description && p.description.toLowerCase().includes(q))
       );
@@ -503,14 +559,21 @@
     try { units = typeof p.units === 'string' ? JSON.parse(p.units) : p.units; }
     catch(e) { return; }
 
-    const selected = units[selectEl.value];
+    const selected = units[parseInt(selectEl.value)];
+    if (!selected) return;
 
     const cart = JSON.parse(localStorage.getItem("cart_items")) || [];
     const idx = cart.findIndex(item => item.id === productId && item.unitName === selected.name);
     if (idx > -1) {
       cart[idx].qty += 1;
     } else {
-      cart.push({ id: productId, title: productTitle, unitName: selected.name, price: selected.price, qty: 1 });
+      cart.push({
+        id: productId,
+        title: productTitle,
+        unitName: selected.name,
+        price: selected.price,
+        qty: 1
+      });
     }
     localStorage.setItem("cart_items", JSON.stringify(cart));
     updateCartBadge();
@@ -518,10 +581,12 @@
     const btn = document.getElementById(`btn-${productId}`);
     if (btn) {
       btn.classList.add('added');
-      btn.innerText = '✅ اضافه شد!';
+      btn.textContent = '✅ اضافه شد!';
+      btn.disabled = true;
       setTimeout(() => {
         btn.classList.remove('added');
-        btn.innerText = '🛒 افزودن به سبد';
+        btn.textContent = '🛒 افزودن به سبد';
+        btn.disabled = false;
       }, 1500);
     }
 
@@ -530,7 +595,7 @@
 
   function showToast(msg) {
     const t = document.getElementById("toast");
-    t.innerText = msg;
+    t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
@@ -540,7 +605,7 @@
     if (!badge) return;
     const cart = JSON.parse(localStorage.getItem("cart_items")) || [];
     const total = cart.reduce((s, i) => s + i.qty, 0);
-    badge.innerText = total;
+    badge.textContent = total;
     badge.style.display = total > 0 ? 'block' : 'none';
   }
 
@@ -550,33 +615,35 @@
     const welcome = document.getElementById("user-welcome");
     const icon = document.getElementById("user-avatar-icon");
     if (loggedIn && welcome) {
-      welcome.innerText = name ? name.substring(0, 8) : "خروج";
+      welcome.textContent = name ? name.substring(0, 8) : "خروج";
       welcome.style.color = "#ef4056";
-      if (icon) icon.innerText = "🚪";
+      if (icon) icon.textContent = "🚪";
     }
   }
 
   function handleAuthAction() {
-  if (localStorage.getItem("customer_logged_in") === "true") {
-    if (confirm("آیا می‌خواهید خارج شوید؟")) {
-      localStorage.clear();
-      window.location.reload();
+    if (localStorage.getItem("customer_logged_in") === "true") {
+      if (confirm("آیا می‌خواهید خارج شوید؟")) {
+        localStorage.removeItem("customer_logged_in");
+        localStorage.removeItem("customer_id");
+        localStorage.removeItem("customer_name");
+        localStorage.removeItem("customer_phone");
+        // ✅ FIX: Do NOT remove dk_customer_phone so orders history remains accessible
+        window.location.reload();
+      }
+    } else {
+      window.location.href = "customer-auth.html";
     }
-  } else {
-    // باز کردن فایل احراز هویت مشتریان
-    window.location.href = "customer-auth.html"; 
   }
-}
 
   if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
-    navigator.serviceWorker
-      .register("sw.js")
-      .then(res => console.log("سرویس ورکر فعال شد"))
-      .catch(err => console.log("خطا در فعال‌سازی", err));
-  });
-}
-
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("sw.js")
+        .then(() => console.log("سرویس ورکر فعال شد"))
+        .catch(err => console.warn("خطا در سرویس ورکر:", err));
+    });
+  }
 </script>
 </body>
 </html>
