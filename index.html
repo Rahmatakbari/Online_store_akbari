@@ -29,7 +29,30 @@
       margin-bottom: 10px;
     }
     .dk-logo-red { color: #ef4056; font-size: 1.1rem; font-weight: bold; }
-    .dk-notification-icon { font-size: 1.3rem; cursor: pointer; }
+
+    /* ===== زنگوله با badge ===== */
+    .bell-wrap {
+      position: relative;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .bell-wrap .bell-icon { font-size: 1.3rem; display: block; }
+    #notif-badge {
+      position: absolute;
+      top: -2px; left: -4px;
+      background: #ef4056;
+      color: white;
+      font-size: .62rem;
+      font-weight: 700;
+      border-radius: 50%;
+      min-width: 17px; height: 17px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+      border: 2px solid white;
+    }
+
     .dk-search-box {
       display: flex;
       align-items: center;
@@ -272,7 +295,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ✅ FIX: Error state */
     .error-msg {
       grid-column: 1 / -1;
       text-align: center;
@@ -296,7 +318,12 @@
 <header class="dk-header">
   <div class="dk-header-row">
     <span class="dk-logo-red">🛒 اکبری خوراکه فروشی</span>
-    <div class="dk-notification-icon" id="secret-bell" onclick="secretTap()">🔔</div>
+
+    <!-- ✅ زنگوله با badge اعلان -->
+    <div class="bell-wrap" id="secret-bell" onclick="handleBellClick()">
+      <span class="bell-icon">🔔</span>
+      <span id="notif-badge"></span>
+    </div>
   </div>
   <div class="dk-search-box">
     <span>🔍</span>
@@ -349,16 +376,22 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // 🔐 Secret: tap bell 5 times to open admin
+  // 🔐 Secret: tap bell 5 times → admin | logged in → notifications
   let _tapCount = 0, _tapTimer = null;
-  function secretTap() {
+  function handleBellClick() {
     _tapCount++;
     clearTimeout(_tapTimer);
     if (_tapCount >= 5) {
       _tapCount = 0;
       window.location.href = "admin.html";
+      return;
     }
-    _tapTimer = setTimeout(() => { _tapCount = 0; }, 2000);
+    _tapTimer = setTimeout(() => {
+      _tapCount = 0;
+      if (localStorage.getItem("customer_logged_in") === "true") {
+        window.location.href = "notifications.html";
+      }
+    }, 400);
   }
 </script>
 <script>
@@ -370,15 +403,11 @@
   let searchTimeout;
   let currentCategory = 'all';
 
-  // ✅ FIX: XSS prevention - escape all dynamic text before DOM insertion
   function escapeHtml(value) {
     if (value === null || value === undefined) return "";
     return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -389,23 +418,16 @@
 
   async function loadOnlineProducts() {
     const listDiv = document.getElementById("list");
-
     try {
       const { data: products, error } = await supabaseClient
-        .from('Products')
-        .select('*')
-        .order('id', { ascending: false });
-
+        .from('Products').select('*').order('id', { ascending: false });
       if (error) throw error;
-
       if (!products || products.length === 0) {
         listDiv.innerHTML = `<p class="empty-msg">هیچ محصولی در فروشگاه موجود نیست.</p>`;
         return;
       }
-
       allProducts = products;
       renderProducts(allProducts);
-
     } catch (err) {
       listDiv.innerHTML = `
         <div class="error-msg">
@@ -419,83 +441,50 @@
   function renderProducts(list) {
     const listDiv = document.getElementById("list");
     listDiv.innerHTML = "";
-
     if (list.length === 0) {
       listDiv.innerHTML = `<p class="empty-msg">😕 هیچ محصولی در این دسته‌بندی یافت نشد.</p>`;
       return;
     }
-
     list.forEach(p => {
       let parsedUnits = [];
-      try {
-        parsedUnits = p.units ? (typeof p.units === 'string' ? JSON.parse(p.units) : p.units) : [];
-      } catch(e) { parsedUnits = []; }
-
+      try { parsedUnits = p.units ? (typeof p.units === 'string' ? JSON.parse(p.units) : p.units) : []; }
+      catch(e) { parsedUnits = []; }
       const firstPrice = parsedUnits.length > 0 ? parsedUnits[0].price : null;
       const inStock = p.stock === undefined || p.stock === null || p.stock > 0;
-
-      // ✅ FIX: Use safe DOM creation instead of innerHTML for user data
       const card = document.createElement('div');
       card.className = 'product-card';
-
-      // Build safe options HTML
       const optionsHtml = parsedUnits.map((u, idx) => {
         const opt = document.createElement('option');
         opt.value = idx;
         opt.textContent = `${u.name} — ${Number(u.price).toLocaleString()} افغانی`;
         return opt.outerHTML;
       }).join("");
-
       const imgSrc = escapeHtml(p.Image_URL || '');
       const productName = escapeHtml(p.Name || 'بدون نام');
       const productDesc = escapeHtml(p.description || '');
-
       card.innerHTML = `
         <div class="card-top" style="cursor:pointer;">
-          <img
-            src="${imgSrc}"
-            alt="${productName}"
-            loading="lazy"
-            onerror="this.src='https://placehold.co/150x130/f0f0f0/aaa?text=%D8%AA%D8%B5%D9%88%DB%8C%D8%B1+%D9%86%D8%AF%D8%A7%D8%B1%D8%AF'"
-          >
+          <img src="${imgSrc}" alt="${productName}" loading="lazy"
+            onerror="this.src='https://placehold.co/150x130/f0f0f0/aaa?text=%D8%AA%D8%B5%D9%88%DB%8C%D8%B1+%D9%86%D8%AF%D8%A7%D8%B1%D8%AF'">
           <h3>${productName}</h3>
           <p class="desc">${productDesc}</p>
-          <span class="stock-badge ${inStock ? 'in-stock' : 'out-of-stock'}">
-            ${inStock ? '✔ موجود' : '✖ ناموجود'}
-          </span>
+          <span class="stock-badge ${inStock ? 'in-stock' : 'out-of-stock'}">${inStock ? '✔ موجود' : '✖ ناموجود'}</span>
           ${firstPrice ? `<div class="price-display">${Number(firstPrice).toLocaleString()} <span>افغانی</span></div>` : ''}
         </div>
         <div>
           <label style="font-size:0.73rem;color:#999;display:block;margin-bottom:4px;">واحد فروش:</label>
-          <select id="unit-select-${p.id}" class="unit-selector" aria-label="انتخاب واحد">
-            ${optionsHtml}
-          </select>
-          <button
-            class="btn-add-to-cart"
-            id="btn-${p.id}"
-            ${!inStock ? 'disabled' : ''}
-          >
+          <select id="unit-select-${p.id}" class="unit-selector">${optionsHtml}</select>
+          <button class="btn-add-to-cart" id="btn-${p.id}" ${!inStock ? 'disabled' : ''}>
             ${inStock ? '🛒 افزودن به سبد' : '⛔ ناموجود'}
           </button>
-        </div>
-      `;
-
-      // ✅ FIX: Attach events safely (no inline onclick with user data)
+        </div>`;
       card.querySelector('.card-top').addEventListener('click', () => {
         window.location.href = `product.html?id=${encodeURIComponent(p.id)}`;
       });
-
       const select = card.querySelector(`#unit-select-${p.id}`);
       select.addEventListener('change', () => updatePrice(p.id, select));
-
       const btn = card.querySelector(`#btn-${p.id}`);
-      if (inStock) {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          addToCartClick(p.id, p.Name);
-        });
-      }
-
+      if (inStock) btn.addEventListener('click', (e) => { e.stopPropagation(); addToCartClick(p.id, p.Name); });
       listDiv.appendChild(card);
     });
   }
@@ -507,9 +496,7 @@
       const units = typeof p.units === 'string' ? JSON.parse(p.units) : p.units;
       const selected = units[selectEl.value];
       const priceDiv = selectEl.closest('.product-card').querySelector('.price-display');
-      if (priceDiv && selected) {
-        priceDiv.innerHTML = `${Number(selected.price).toLocaleString()} <span>افغانی</span>`;
-      }
+      if (priceDiv && selected) priceDiv.innerHTML = `${Number(selected.price).toLocaleString()} <span>افغانی</span>`;
     } catch(e) {}
   }
 
@@ -517,15 +504,10 @@
     currentCategory = cat;
     document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    // ✅ FIX: Also clear search when changing category
     document.getElementById("search").value = "";
-    const filtered = cat === 'all'
-      ? allProducts
-      : allProducts.filter(p =>
-          (p.Name && p.Name.includes(cat)) ||
-          (p.description && p.description.includes(cat)) ||
-          (p.category && p.category.includes(cat))
-        );
+    const filtered = cat === 'all' ? allProducts : allProducts.filter(p =>
+      (p.Name && p.Name.includes(cat)) || (p.description && p.description.includes(cat)) || (p.category && p.category.includes(cat))
+    );
     renderProducts(filtered);
   }
 
@@ -533,70 +515,42 @@
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
       const q = document.getElementById("search").value.trim().toLowerCase();
-      let base = currentCategory === 'all'
-        ? allProducts
-        : allProducts.filter(p =>
-            (p.Name && p.Name.includes(currentCategory)) ||
-            (p.description && p.description.includes(currentCategory))
-          );
-      if (!q) { renderProducts(base); return; }
-      const filtered = base.filter(p =>
-        (p.Name && p.Name.toLowerCase().includes(q)) ||
-        (p.description && p.description.toLowerCase().includes(q))
+      let base = currentCategory === 'all' ? allProducts : allProducts.filter(p =>
+        (p.Name && p.Name.includes(currentCategory)) || (p.description && p.description.includes(currentCategory))
       );
-      renderProducts(filtered);
+      if (!q) { renderProducts(base); return; }
+      renderProducts(base.filter(p =>
+        (p.Name && p.Name.toLowerCase().includes(q)) || (p.description && p.description.toLowerCase().includes(q))
+      ));
     }, 300);
   }
 
   function addToCartClick(productId, productTitle) {
     const selectEl = document.getElementById(`unit-select-${productId}`);
     if (!selectEl) return;
-
     const p = allProducts.find(x => x.id === productId);
     if (!p) return;
-
     let units;
-    try { units = typeof p.units === 'string' ? JSON.parse(p.units) : p.units; }
-    catch(e) { return; }
-
+    try { units = typeof p.units === 'string' ? JSON.parse(p.units) : p.units; } catch(e) { return; }
     const selected = units[parseInt(selectEl.value)];
     if (!selected) return;
-
     const cart = JSON.parse(localStorage.getItem("cart_items")) || [];
     const idx = cart.findIndex(item => item.id === productId && item.unitName === selected.name);
-    if (idx > -1) {
-      cart[idx].qty += 1;
-    } else {
-      cart.push({
-        id: productId,
-        title: productTitle,
-        unitName: selected.name,
-        price: selected.price,
-        qty: 1
-      });
-    }
+    if (idx > -1) { cart[idx].qty += 1; }
+    else { cart.push({ id: productId, title: productTitle, unitName: selected.name, price: selected.price, qty: 1 }); }
     localStorage.setItem("cart_items", JSON.stringify(cart));
     updateCartBadge();
-
     const btn = document.getElementById(`btn-${productId}`);
     if (btn) {
-      btn.classList.add('added');
-      btn.textContent = '✅ اضافه شد!';
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.classList.remove('added');
-        btn.textContent = '🛒 افزودن به سبد';
-        btn.disabled = false;
-      }, 1500);
+      btn.classList.add('added'); btn.textContent = '✅ اضافه شد!'; btn.disabled = true;
+      setTimeout(() => { btn.classList.remove('added'); btn.textContent = '🛒 افزودن به سبد'; btn.disabled = false; }, 1500);
     }
-
     showToast(`«${productTitle}» به سبد اضافه شد`);
   }
 
   function showToast(msg) {
     const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add('show');
+    t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
@@ -624,26 +578,20 @@
   function handleAuthAction() {
     if (localStorage.getItem("customer_logged_in") === "true") {
       if (confirm("آیا می‌خواهید خارج شوید؟")) {
-        localStorage.removeItem("customer_logged_in");
-        localStorage.removeItem("customer_id");
-        localStorage.removeItem("customer_name");
-        localStorage.removeItem("customer_phone");
-        // ✅ FIX: Do NOT remove dk_customer_phone so orders history remains accessible
+        ["customer_logged_in","customer_id","customer_name","customer_phone"].forEach(k => localStorage.removeItem(k));
         window.location.reload();
       }
-    } else {
-      window.location.href = "customer-auth.html";
-    }
+    } else { window.location.href = "customer-auth.html"; }
   }
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("sw.js")
+      navigator.serviceWorker.register("sw.js")
         .then(() => console.log("سرویس ورکر فعال شد"))
         .catch(err => console.warn("خطا در سرویس ورکر:", err));
     });
   }
 </script>
+<script src="notification-bell.js"></script>
 </body>
 </html>
