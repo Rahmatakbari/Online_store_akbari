@@ -6,52 +6,68 @@
   <title>سفارشات من - دکان اکبری</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Tahoma, sans-serif; padding: 15px; background: #f4f4f4; direction: rtl; padding-bottom: 80px; }
+    body { font-family: Tahoma, sans-serif; background: #f4f4f4; direction: rtl; padding-bottom: 80px; }
 
-    .page-header { max-width: 600px; margin: 0 auto 16px; }
-    .page-header h2 { margin-bottom: 6px; font-size: 1.1rem; }
-    .page-header a { text-decoration: none; color: #555; font-size: 0.9rem; }
+    /* ===== هدر ===== */
+    .dk-header { background:#fff; padding:0 16px; height:54px; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; }
+    .dk-logo-red { color:#ef4056; font-size:1rem; font-weight:700; }
 
-    .order-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-right: 5px solid #eee; text-align: right; }
-    .order-card.status-pending   { border-right-color: #f1c40f; }
-    .order-card.status-preparing { border-right-color: #3498db; }
-    .order-card.status-shipped   { border-right-color: #e67e22; }
-    .order-card.status-delivered { border-right-color: #2ecc71; }
+    /* ===== زنگوله ===== */
+    .bell-wrap { position:relative; cursor:pointer; padding:4px; }
+    .bell-wrap .bell-icon { font-size:1.3rem; display:block; }
+    #notif-badge { position:absolute; top:-2px; left:-4px; background:#ef4056; color:white; font-size:.62rem; font-weight:700; border-radius:50%; min-width:17px; height:17px; display:none; align-items:center; justify-content:center; padding:0 3px; border:2px solid white; }
 
-    .order-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #666; margin-bottom: 8px; border-bottom: 1px dashed #eee; padding-bottom: 8px; gap: 8px; flex-wrap: wrap; }
-    .order-number { background: #2ecc71; color: white; padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
-    .order-date { color: #999; font-size: 0.8rem; }
-    .order-items { font-size: 0.9rem; color: #333; white-space: pre-line; line-height: 1.8; background: #f9f9f9; padding: 10px; border-radius: 8px; margin: 8px 0; }
-    .order-price { font-weight: bold; color: #2ecc71; margin-top: 10px; font-size: 1rem; text-align: left; direction: ltr; }
+    .page-content { max-width:600px; margin:0 auto; padding:15px; }
+    .page-header { margin-bottom:16px; }
+    .page-header h2 { margin-bottom:6px; font-size:1.1rem; }
+    .page-header a { text-decoration:none; color:#555; font-size:0.9rem; }
 
-    .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 8px; }
-    .status-badge.pending   { background: #fff8dc; color: #856404; }
-    .status-badge.preparing { background: #dbeafe; color: #1d4ed8; }
-    .status-badge.shipped   { background: #ffedd5; color: #9a3412; }
-    .status-badge.delivered { background: #dcfce7; color: #166534; }
+    .order-card { background:white; padding:15px; border-radius:12px; margin-bottom:12px; box-shadow:0 2px 5px rgba(0,0,0,0.05); border-right:5px solid #eee; text-align:right; }
+    .order-card.status-pending   { border-right-color:#f1c40f; }
+    .order-card.status-preparing { border-right-color:#3498db; }
+    .order-card.status-shipped   { border-right-color:#e67e22; }
+    .order-card.status-delivered { border-right-color:#2ecc71; }
 
-    .phone-info-bar { background: #fff; border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 0.9rem; color: #555; text-align: center; }
+    .order-header { display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; color:#666; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:8px; gap:8px; flex-wrap:wrap; }
+    .order-number { background:#2ecc71; color:white; padding:3px 10px; border-radius:20px; font-weight:bold; font-size:0.9rem; }
+    .order-items { font-size:0.9rem; color:#333; white-space:pre-line; line-height:1.8; background:#f9f9f9; padding:10px; border-radius:8px; margin:8px 0; }
+    .order-price { font-weight:bold; color:#2ecc71; margin-top:10px; font-size:1rem; text-align:left; direction:ltr; }
 
-    .state-box { text-align: center; background: white; padding: 40px 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #666; line-height: 2; }
-    .state-box .icon { font-size: 3rem; display: block; margin-bottom: 10px; }
-    .state-box a.btn { display: inline-block; margin-top: 14px; background: #ef4056; color: white; padding: 10px 24px; border-radius: 10px; text-decoration: none; font-weight: bold; }
-    .state-box small { color: #aaa; font-size: 0.82rem; }
+    .status-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:bold; margin-top:8px; }
+    .status-badge.pending   { background:#fff8dc; color:#856404; }
+    .status-badge.preparing { background:#dbeafe; color:#1d4ed8; }
+    .status-badge.shipped   { background:#ffedd5; color:#9a3412; }
+    .status-badge.delivered { background:#dcfce7; color:#166534; }
 
-    .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #eee; border-top-color: #ef4056; border-radius: 50%; animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .phone-info-bar { background:#fff; border-radius:10px; padding:12px 15px; margin-bottom:15px; box-shadow:0 1px 4px rgba(0,0,0,0.06); font-size:0.9rem; color:#555; text-align:center; }
+    .state-box { text-align:center; background:white; padding:40px 20px; border-radius:12px; box-shadow:0 2px 5px rgba(0,0,0,0.05); color:#666; line-height:2; }
+    .state-box .icon { font-size:3rem; display:block; margin-bottom:10px; }
+    .state-box a.btn { display:inline-block; margin-top:14px; background:#ef4056; color:white; padding:10px 24px; border-radius:10px; text-decoration:none; font-weight:bold; }
+    .state-box small { color:#aaa; font-size:0.82rem; }
 
-    .dk-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; display: flex; justify-content: space-around; align-items: center; padding: 8px 0 10px; border-top: 1px solid #eee; z-index: 200; box-shadow: 0 -2px 8px rgba(0,0,0,0.06); }
-    .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #888; font-size: 0.72rem; gap: 2px; cursor: pointer; position: relative; }
-    .nav-item.active { color: #ef4056; }
-    .nav-icon { font-size: 1.3rem; }
-    #cart-badge { position: absolute; top: -2px; right: -6px; background: #ef4056; color: white; font-size: 0.68rem; font-weight: bold; border-radius: 50%; min-width: 17px; height: 17px; text-align: center; line-height: 17px; padding: 0 3px; display: none; }
+    .spinner { display:inline-block; width:24px; height:24px; border:3px solid #eee; border-top-color:#ef4056; border-radius:50%; animation:spin 0.8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .dk-bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; display:flex; justify-content:space-around; align-items:center; padding:8px 0 10px; border-top:1px solid #eee; z-index:200; box-shadow:0 -2px 8px rgba(0,0,0,0.06); }
+    .nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#888; font-size:0.72rem; gap:2px; cursor:pointer; position:relative; }
+    .nav-item.active { color:#ef4056; }
+    .nav-icon { font-size:1.3rem; }
+    #cart-badge { position:absolute; top:-2px; right:-6px; background:#ef4056; color:white; font-size:0.68rem; font-weight:bold; border-radius:50%; min-width:17px; height:17px; text-align:center; line-height:17px; padding:0 3px; display:none; }
   </style>
 </head>
 <body>
 
-<div style="max-width: 600px; margin: 0 auto;">
+<!-- ✅ هدر با زنگوله -->
+<header class="dk-header">
+  <span class="dk-logo-red">📋 سفارشات من</span>
+  <div class="bell-wrap" onclick="location.href='notifications.html'">
+    <span class="bell-icon">🔔</span>
+    <span id="notif-badge"></span>
+  </div>
+</header>
+
+<div class="page-content">
   <div class="page-header">
-    <h2>📋 سفارشات من</h2>
     <a href="index.html">⬅ بازگشت به فروشگاه</a>
   </div>
 
@@ -68,212 +84,34 @@
 </div>
 
 <nav class="dk-bottom-nav">
-  <a href="index.html" class="nav-item">
-    <span class="nav-icon">🏠</span><span class="nav-text">خانه</span>
-  </a>
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span>خانه</span></a>
   <a href="cart.html" class="nav-item" style="position:relative;">
-    <span class="nav-icon">🛒</span>
-    <span id="cart-badge">0</span>
-    <span class="nav-text">سبد خرید</span>
+    <span class="nav-icon">🛒</span><span id="cart-badge">0</span><span>سبد خرید</span>
   </a>
-  <a href="orders.html" class="nav-item active">
-    <span class="nav-icon">📋</span><span class="nav-text">سفارشات من</span>
-  </a>
+  <a href="orders.html" class="nav-item active"><span class="nav-icon">📋</span><span>سفارشات من</span></a>
   <div class="nav-item" onclick="handleAuthAction()">
     <span class="nav-icon" id="user-avatar-icon">👤</span>
-    <span class="nav-text" id="user-welcome">ورود</span>
+    <span id="user-welcome">ورود</span>
   </div>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL  = "https://affstedmdsqeobtzrkyp.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  /* ── helpers ── */
-  function esc(v) {
-    if (v == null) return "";
-    return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-  }
-  function normPhone(p) {
-    // strip spaces, convert +93 / 0093 → 0
-    return String(p).replace(/\s+/g,"").replace(/^\+93/,"0").replace(/^0093/,"0");
-  }
-  function formatDate(s) {
-    if (!s) return "";
-    try { return new Date(s).toLocaleDateString("fa-AF",{year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"}); }
-    catch { return s; }
-  }
-
-  const STATUS = {
-    pending:   { label:"⏳ در انتظار بررسی",    cls:"pending"   },
-    preparing: { label:"👨‍🍳 در حال آماده‌سازی", cls:"preparing" },
-    shipped:   { label:"🛵 ارسال شده",           cls:"shipped"   },
-    delivered: { label:"✅ تحویل داده شد",       cls:"delivered" },
-  };
-
-  /* ── get ALL phones linked to this customer ── */
-  function getSessionPhone() {
-    const p1 = normPhone(localStorage.getItem("customer_phone") || "");
-    const p2 = normPhone(localStorage.getItem("dk_customer_phone") || "");
-    // Return primary phone (both should be same, but fallback to whichever exists)
-    return p1 || p2 || null;
-  }
-
-  function getAllSessionPhones() {
-    const phones = new Set();
-    ["customer_phone", "dk_customer_phone"].forEach(key => {
-      const v = normPhone(localStorage.getItem(key) || "");
-      if (v) phones.add(v);
-      // Also add without leading zero
-      if (v.startsWith("0")) phones.add(v.slice(1));
-    });
-    return [...phones].filter(p => p.length >= 7);
-  }
-
-  /* ── main ── */
-  document.addEventListener("DOMContentLoaded", () => {
-    updateCartBadge();
-    checkUserSession();
-
-    const phone = getSessionPhone();
-
-    if (!phone) {
-      // Not logged in / never ordered
-      showState(
-        "🔐",
-        "برای دیدن سفارشات وارد شوید",
-        "پس از ورود، فاکتورهای شما اینجا نمایش داده می‌شود.",
-        "customer-auth.html", "👤 ورود / ثبت‌نام"
-      );
-      return;
-    }
-
-    // Show which phone we're using (masked for privacy)
-    const masked = phone.slice(0,4) + "***" + phone.slice(-3);
-    document.getElementById("phone-info-bar").style.display = "block";
-    document.getElementById("shown-phone").textContent = masked;
-
-    loadOrders(phone);
-  });
-
-async function loadOrders(phone) {
-    const container = document.getElementById("orders-list-container");
-    container.innerHTML = `<div class="state-box"><span class="icon"><div class="spinner"></div></span><br>در حال بارگذاری...</div>`;
-
-    try {
-      // ✅ جمع‌آوری همه شماره‌های مرتبط با این مشتری
-      const allPhones = getAllSessionPhones();
-      const phoneNorm = normPhone(phone);
-      const last9 = phoneNorm.slice(-9);
-      let orders = null;
-
-      // روش ۱: جستجو با همه شماره‌های ذخیره‌شده (in query)
-      if (allPhones.length > 0) {
-        const r1 = await sb.from('Customer_Order')
-          .select('id, Phone, Items, Total_Price, status')
-          .in('Phone', allPhones)
-          .order('id', { ascending: false });
-        if (!r1.error && r1.data && r1.data.length > 0) orders = r1.data;
-      }
-
-      // روش ۲: آخر ۹ رقم — فرمت‌های مختلف
-      if (!orders || orders.length === 0) {
-        const r2 = await sb.from('Customer_Order')
-          .select('id, Phone, Items, Total_Price, status')
-          .ilike('Phone', `%${last9}`)
-          .order('id', { ascending: false });
-        if (!r2.error && r2.data && r2.data.length > 0)
-          orders = r2.data.filter(o => normPhone(o.Phone||"").endsWith(last9));
-      }
-
-      // روش ۳: جستجو داخل متن فاکتور
-      if (!orders || orders.length === 0) {
-        const r3 = await sb.from('Customer_Order')
-          .select('id, Phone, Items, Total_Price, status')
-          .ilike('Items', `%${last9}%`)
-          .order('id', { ascending: false });
-        if (!r3.error && r3.data && r3.data.length > 0)
-          orders = r3.data.filter(o =>
-            normPhone(o.Phone||"").endsWith(last9) || (o.Items||"").includes(last9)
-          );
-      }
-
-      if (!orders || orders.length === 0) {
-        showState("📭", "هیچ سفارشی پیدا نشد",
-          "هنوز سفارشی با این حساب ثبت نشده است.",
-          "index.html", "🛒 شروع خرید");
-        return;
-      }
-
-      container.innerHTML = "";
-      orders.forEach(order => {
-        const info  = STATUS[order.status] || STATUS.pending;
-        const total = Number(order.Total_Price || 0).toLocaleString('fa-AF');
-
-        const card = document.createElement('div');
-        card.className = `order-card status-${info.cls}`;
-        card.innerHTML = `
-          <div class="order-header">
-            <span class="order-number">سفارش #${esc(String(order.id))}</span>
-          </div>
-          <div class="order-items"></div>
-          <div class="order-price">💰 ${total} افغانی</div>
-          <span class="status-badge ${info.cls}">${info.label}</span>
-        `;
-        card.querySelector('.order-items').textContent = order.Items || '—';
-        container.appendChild(card);
-      });
-
-    } catch (err) {
-      container.innerHTML = `
-        <div class="state-box" style="background:#fff5f5; border:1px solid #ffcdd2; color:#c62828;">
-          <span class="icon">⚠️</span>
-          خطا در بارگذاری سفارشات<br>
-          <small>${esc(err.message)}</small><br>
-          <a class="btn" href="orders.html">🔄 تلاش مجدد</a>
-        </div>`;
-    }
-  }
-
-
-  function showState(icon, title, desc, href, btnText) {
-    document.getElementById("orders-list-container").innerHTML = `
-      <div class="state-box">
-        <span class="icon">${icon}</span>
-        <strong>${esc(title)}</strong><br>
-        <small>${esc(desc)}</small><br>
-        <a class="btn" href="${esc(href)}">${btnText}</a>
-      </div>`;
-  }
-
-  function updateCartBadge() {
-    const badge = document.getElementById("cart-badge");
-    if (!badge) return;
-    const total = (JSON.parse(localStorage.getItem("cart_items") || "[]")).reduce((s,i)=>s+i.qty,0);
-    badge.textContent = total;
-    badge.style.display = total > 0 ? 'block' : 'none';
-  }
-
-  function checkUserSession() {
-    const ok   = localStorage.getItem("customer_logged_in") === "true";
-    const name = localStorage.getItem("customer_name");
-    const w    = document.getElementById("user-welcome");
-    const ic   = document.getElementById("user-avatar-icon");
-    if (ok && w) { w.textContent = name ? name.substring(0,8) : "خروج"; w.style.color="#ef4056"; if(ic) ic.textContent="🚪"; }
-  }
-
-  function handleAuthAction() {
-    if (localStorage.getItem("customer_logged_in") === "true") {
-      if (confirm("آیا می‌خواهید خارج شوید؟")) {
-        ["customer_logged_in","customer_id","customer_name","customer_phone"].forEach(k=>localStorage.removeItem(k));
-        window.location.reload();
-      }
-    } else {
-      window.location.href = "customer-auth.html";
-    }
-  }
+  const SUPABASE_URL="https://affstedmdsqeobtzrkyp.supabase.co";
+  const SUPABASE_ANON_KEY="sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+  const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  function esc(v){if(v==null)return"";return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+  function normPhone(p){return String(p).replace(/\s+/g,"").replace(/^\+93/,"0").replace(/^0093/,"0");}
+  const STATUS={pending:{label:"⏳ در انتظار بررسی",cls:"pending"},preparing:{label:"👨‍🍳 در حال آماده‌سازی",cls:"preparing"},shipped:{label:"🛵 ارسال شده",cls:"shipped"},delivered:{label:"✅ تحویل داده شد",cls:"delivered"}};
+  function getSessionPhone(){const p1=normPhone(localStorage.getItem("customer_phone")||"");const p2=normPhone(localStorage.getItem("dk_customer_phone")||"");return p1||p2||null;}
+  function getAllSessionPhones(){const phones=new Set();["customer_phone","dk_customer_phone"].forEach(key=>{const v=normPhone(localStorage.getItem(key)||"");if(v)phones.add(v);if(v.startsWith("0"))phones.add(v.slice(1));});return[...phones].filter(p=>p.length>=7);}
+  document.addEventListener("DOMContentLoaded",()=>{updateCartBadge();checkUserSession();const phone=getSessionPhone();if(!phone){showState("🔐","برای دیدن سفارشات وارد شوید","پس از ورود، فاکتورهای شما اینجا نمایش داده می‌شود.","customer-auth.html","👤 ورود / ثبت‌نام");return;}const masked=phone.slice(0,4)+"***"+phone.slice(-3);document.getElementById("phone-info-bar").style.display="block";document.getElementById("shown-phone").textContent=masked;loadOrders(phone);});
+  async function loadOrders(phone){const container=document.getElementById("orders-list-container");container.innerHTML=`<div class="state-box"><span class="icon"><div class="spinner"></div></span><br>در حال بارگذاری...</div>`;try{const allPhones=getAllSessionPhones();const phoneNorm=normPhone(phone);const last9=phoneNorm.slice(-9);let orders=null;if(allPhones.length>0){const r1=await sb.from('Customer_Order').select('id,Phone,Items,Total_Price,status').in('Phone',allPhones).order('id',{ascending:false});if(!r1.error&&r1.data&&r1.data.length>0)orders=r1.data;}if(!orders||orders.length===0){const r2=await sb.from('Customer_Order').select('id,Phone,Items,Total_Price,status').ilike('Phone',`%${last9}`).order('id',{ascending:false});if(!r2.error&&r2.data&&r2.data.length>0)orders=r2.data.filter(o=>normPhone(o.Phone||"").endsWith(last9));}if(!orders||orders.length===0){const r3=await sb.from('Customer_Order').select('id,Phone,Items,Total_Price,status').ilike('Items',`%${last9}%`).order('id',{ascending:false});if(!r3.error&&r3.data&&r3.data.length>0)orders=r3.data.filter(o=>normPhone(o.Phone||"").endsWith(last9)||(o.Items||"").includes(last9));}if(!orders||orders.length===0){showState("📭","هیچ سفارشی پیدا نشد","هنوز سفارشی با این حساب ثبت نشده است.","index.html","🛒 شروع خرید");return;}container.innerHTML="";orders.forEach(order=>{const info=STATUS[order.status]||STATUS.pending;const total=Number(order.Total_Price||0).toLocaleString('fa-AF');const card=document.createElement('div');card.className=`order-card status-${info.cls}`;card.innerHTML=`<div class="order-header"><span class="order-number">سفارش #${esc(String(order.id))}</span></div><div class="order-items"></div><div class="order-price">💰 ${total} افغانی</div><span class="status-badge ${info.cls}">${info.label}</span>`;card.querySelector('.order-items').textContent=order.Items||'—';container.appendChild(card);});}catch(err){container.innerHTML=`<div class="state-box" style="background:#fff5f5;border:1px solid #ffcdd2;color:#c62828;"><span class="icon">⚠️</span>خطا در بارگذاری سفارشات<br><small>${esc(err.message)}</small><br><a class="btn" href="orders.html">🔄 تلاش مجدد</a></div>`;}}
+  function showState(icon,title,desc,href,btnText){document.getElementById("orders-list-container").innerHTML=`<div class="state-box"><span class="icon">${icon}</span><strong>${esc(title)}</strong><br><small>${esc(desc)}</small><br><a class="btn" href="${esc(href)}">${btnText}</a></div>`;}
+  function updateCartBadge(){const badge=document.getElementById("cart-badge");if(!badge)return;const total=(JSON.parse(localStorage.getItem("cart_items")||"[]")).reduce((s,i)=>s+i.qty,0);badge.textContent=total;badge.style.display=total>0?'block':'none';}
+  function checkUserSession(){const ok=localStorage.getItem("customer_logged_in")==="true";const name=localStorage.getItem("customer_name");const w=document.getElementById("user-welcome");const ic=document.getElementById("user-avatar-icon");if(ok&&w){w.textContent=name?name.substring(0,8):"خروج";w.style.color="#ef4056";if(ic)ic.textContent="🚪";}}
+  function handleAuthAction(){if(localStorage.getItem("customer_logged_in")==="true"){if(confirm("آیا می‌خواهید خارج شوید؟")){["customer_logged_in","customer_id","customer_name","customer_phone"].forEach(k=>localStorage.removeItem(k));window.location.reload();}}else{window.location.href="customer-auth.html";}}
 </script>
+<script src="notification-bell.js"></script>
 </body>
 </html>
