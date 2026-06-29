@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>اعلانات - دکان اکبری</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Tahoma, Arial, sans-serif;
+  background: #f4f5f7;
+  direction: rtl;
+  padding-bottom: 80px;
+}
+
+.dk-header {
+  background: #fff;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dk-logo-red { color: #ef4056; font-size: 1.1rem; font-weight: bold; }
+.mark-all-btn {
+  font-size: .78rem;
+  color: #ef4056;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: bold;
+}
+
+.page-wrapper { max-width: 600px; margin: 0 auto; padding: 14px; }
+
+.notif-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border: 1px solid #eee;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background .2s;
+  cursor: pointer;
+  position: relative;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item.unread { background: #fff8f8; }
+.notif-item.unread::before {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: #ef4056;
+  border-radius: 0 3px 3px 0;
+}
+
+.notif-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: #fff0f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.notif-body { flex: 1; }
+.notif-msg {
+  font-size: .88rem;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+.notif-time {
+  font-size: .72rem;
+  color: #aaa;
+}
+
+.unread-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #ef4056;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #aaa;
+}
+.empty-state .e-icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: .9rem; }
+
+.loading { text-align: center; padding: 40px; color: #aaa; font-size: .9rem; }
+
+/* ناوبری پایینی */
+.dk-bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; display: flex; justify-content: space-around; align-items: center;
+  padding: 8px 0 10px; border-top: 1px solid #eee; z-index: 200;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center;
+  text-decoration: none; color: #888; font-size: 0.72rem; gap: 2px; cursor: pointer;
+  position: relative;
+}
+.nav-item.active { color: #ef4056; }
+.nav-icon { font-size: 1.3rem; }
+#notif-badge {
+  position: absolute; top: -2px; right: -6px;
+  background: #ef4056; color: white;
+  font-size: 0.65rem; font-weight: bold;
+  border-radius: 50%; min-width: 17px; height: 17px;
+  display: none; align-items: center; justify-content: center;
+  padding: 0 3px;
+}
+#cart-badge {
+  position: absolute; top: -2px; right: -6px;
+  background: #ef4056; color: white;
+  font-size: 0.65rem; font-weight: bold;
+  border-radius: 50%; min-width: 17px; height: 17px;
+  display: none; align-items: center; justify-content: center;
+  padding: 0 3px;
+}
+</style>
+</head>
+<body>
+
+<header class="dk-header">
+  <span class="dk-logo-red">🔔 اعلانات</span>
+  <button class="mark-all-btn" onclick="markAllRead()">همه را خوانده کن</button>
+</header>
+
+<div class="page-wrapper">
+  <div class="notif-card" id="notif-list">
+    <div class="loading">⏳ در حال بارگذاری...</div>
+  </div>
+</div>
+
+<nav class="dk-bottom-nav">
+  <a href="index.html" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span>خانه</span>
+  </a>
+  <a href="cart.html" class="nav-item" style="position:relative;">
+    <span class="nav-icon">🛒</span>
+    <span id="cart-badge"></span>
+    <span>سبد خرید</span>
+  </a>
+  <a href="orders.html" class="nav-item">
+    <span class="nav-icon">📋</span>
+    <span>سفارشات</span>
+  </a>
+  <a href="notifications.html" class="nav-item active" style="position:relative;">
+    <span class="nav-icon">🔔</span>
+    <span id="notif-badge"></span>
+    <span>اعلانات</span>
+  </a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL      = "https://affstedmdsqeobtzrkyp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const phone = localStorage.getItem("customer_phone");
+
+function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60)    return "همین الان";
+  if (diff < 3600)  return Math.floor(diff/60) + " دقیقه پیش";
+  if (diff < 86400) return Math.floor(diff/3600) + " ساعت پیش";
+  return Math.floor(diff/86400) + " روز پیش";
+}
+
+function iconFor(msg) {
+  if (msg.includes("تأیید") || msg.includes("ثبت"))  return "✅";
+  if (msg.includes("ارسال") || msg.includes("راه"))   return "🚚";
+  if (msg.includes("تحویل"))                           return "📦";
+  if (msg.includes("تخفیف") || msg.includes("جدید"))  return "🎁";
+  return "🔔";
+}
+
+async function loadNotifications() {
+  const container = document.getElementById("notif-list");
+
+  if (!phone) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="e-icon">🔐</div>
+        <p>برای مشاهده اعلانات وارد شوید</p>
+      </div>`;
+    return;
+  }
+
+  const { data, error } = await sb
+    .from("Notifications")
+    .select("*")
+    .eq("phone", phone)
+    .order("created_at", { ascending: false });
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="e-icon">🔔</div>
+        <p>هیچ اعلانی ندارید</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = data.map(n => `
+    <div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="markRead(${n.id}, this)">
+      <div class="notif-icon">${iconFor(n.message)}</div>
+      <div class="notif-body">
+        <div class="notif-msg">${n.message}</div>
+        <div class="notif-time">${timeAgo(n.created_at)}</div>
+      </div>
+      ${!n.is_read ? '<div class="unread-dot"></div>' : ''}
+    </div>
+  `).join('');
+
+  updateBadge(data.filter(n => !n.is_read).length);
+}
+
+async function markRead(id, el) {
+  await sb.from("Notifications").update({ is_read: true }).eq("id", id);
+  el.classList.remove("unread");
+  const dot = el.querySelector(".unread-dot");
+  if (dot) dot.remove();
+  const badge = document.getElementById("notif-badge");
+  const cur = parseInt(badge.textContent) || 0;
+  updateBadge(Math.max(0, cur - 1));
+}
+
+async function markAllRead() {
+  if (!phone) return;
+  await sb.from("Notifications").update({ is_read: true }).eq("phone", phone);
+  document.querySelectorAll(".notif-item.unread").forEach(el => {
+    el.classList.remove("unread");
+    const dot = el.querySelector(".unread-dot");
+    if (dot) dot.remove();
+  });
+  updateBadge(0);
+}
+
+function updateBadge(count) {
+  const badge = document.getElementById("notif-badge");
+  if (!badge) return;
+  badge.textContent = count;
+  badge.style.display = count > 0 ? "flex" : "none";
+}
+
+function updateCartBadge() {
+  const badge = document.getElementById("cart-badge");
+  if (!badge) return;
+  const cart = JSON.parse(localStorage.getItem("cart_items")) || [];
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  badge.textContent = total;
+  badge.style.display = total > 0 ? "flex" : "none";
+}
+
+// Realtime
+if (phone) {
+  sb.channel("notif-page-" + phone)
+    .on("postgres_changes", {
+      event: "INSERT",
+      schema: "public",
+      table: "Notifications",
+      filter: `phone=eq.${phone}`
+    }, () => loadNotifications())
+    .subscribe();
+}
+
+loadNotifications();
+updateCartBadge();
+</script>
+</body>
+</html>
