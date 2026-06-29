@@ -5,350 +5,98 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>مدیریت مشتریان — دکان اکبری</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body {
-  font-family: Tahoma, Arial, sans-serif;
-  background: #f4f5f7;
-  direction: rtl;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── LOGIN ── */
-.login-wrap {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.login-card {
-  background: white;
-  border-radius: 20px;
-  padding: 32px 24px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0,0,0,.10);
-  border: 1px solid #e8e8ee;
-}
-.login-icon { text-align: center; font-size: 2.5rem; margin-bottom: 8px; }
-.login-title { text-align: center; font-size: 1rem; font-weight: 700; color: #1a1c2e; margin-bottom: 4px; }
-.login-sub { text-align: center; font-size: .78rem; color: #7a7a8a; margin-bottom: 24px; }
-
-/* ── HEADER ── */
-.header {
-  background: white;
-  padding: 0 16px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #e8e8ee;
-  box-shadow: 0 2px 8px rgba(0,0,0,.06);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.header-title { font-size: .95rem; font-weight: 700; color: #1a1c2e; }
-.header-logo { color: #ef4056; font-size: .85rem; font-weight: 700; }
-.btn-logout {
-  background: #f4f5f7;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: .78rem;
-  cursor: pointer;
-  font-family: inherit;
-  color: #3a3a4a;
-}
-.btn-logout:hover { background: #e8e8ee; }
-
-/* ── MAIN ── */
-.main { max-width: 800px; margin: 0 auto; padding: 16px; }
-
-/* ── STATS ── */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 14px 10px;
-  text-align: center;
-  border: 1px solid #e8e8ee;
-  box-shadow: 0 2px 8px rgba(0,0,0,.04);
-}
-.stat-num { font-size: 1.4rem; font-weight: 700; color: #ef4056; }
-.stat-label { font-size: .72rem; color: #7a7a8a; margin-top: 3px; }
-
-/* ── SEARCH ── */
-.search-bar {
-  background: white;
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  border: 1px solid #e8e8ee;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.search-input {
-  flex: 1;
-  border: 1.5px solid #e8e8ee;
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-family: inherit;
-  font-size: .88rem;
-  outline: none;
-  background: #f4f5f7;
-  color: #1a1c2e;
-  transition: border-color .15s;
-}
-.search-input:focus { border-color: #ef4056; background: white; }
-.btn-refresh {
-  background: #f4f5f7;
-  border: 1.5px solid #e8e8ee;
-  border-radius: 8px;
-  padding: 9px 14px;
-  font-size: .82rem;
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-}
-.btn-refresh:hover { background: #e8e8ee; }
-
-/* ── CUSTOMER CARDS ── */
-.customer-card {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e8e8ee;
-  margin-bottom: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  transition: box-shadow .15s;
-}
-.customer-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-
-.customer-header {
-  display: flex;
-  align-items: center;
-  padding: 14px 16px;
-  gap: 12px;
-  cursor: pointer;
-}
-.customer-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ef4056, #ff6b81);
-  color: white;
-  font-size: 1rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.customer-info { flex: 1; min-width: 0; }
-.customer-name { font-size: .9rem; font-weight: 700; color: #1a1c2e; margin-bottom: 2px; }
-.customer-meta { font-size: .75rem; color: #7a7a8a; direction: ltr; text-align: right; }
-.expand-icon { color: #b8b8c4; font-size: .8rem; transition: transform .2s; }
-.expand-icon.open { transform: rotate(180deg); }
-
-.customer-body {
-  display: none;
-  padding: 0 16px 16px;
-  border-top: 1px solid #f0f0f4;
-}
-.customer-body.open { display: block; }
-
-/* ── EDIT FORM ── */
-.edit-section { margin-top: 14px; }
-.edit-title { font-size: .78rem; font-weight: 700; color: #3a3a4a; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f4; }
-.edit-group { margin-bottom: 12px; }
-.edit-label { display: block; font-size: .72rem; font-weight: 700; color: #7a7a8a; margin-bottom: 4px; }
-.edit-input {
-  width: 100%;
-  padding: 9px 12px;
-  border: 1.5px solid #e8e8ee;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: .85rem;
-  background: #f4f5f7;
-  color: #1a1c2e;
-  outline: none;
-  transition: border-color .15s;
-}
-.edit-input:focus { border-color: #ef4056; background: white; }
-.edit-input[type="tel"], .edit-input[type="email"] { direction: ltr; text-align: left; }
-
-.btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-.btn-sm {
-  flex: 1;
-  padding: 9px 12px;
-  border: none;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: .8rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .15s, transform .1s;
-  min-width: 80px;
-}
-.btn-sm:active { transform: scale(.97); }
-.btn-sm:disabled { opacity: .5; cursor: not-allowed; }
-.btn-blue { background: #3b82f6; color: white; }
-.btn-blue:hover:not(:disabled) { background: #2563eb; }
-.btn-green { background: #22c55e; color: white; }
-.btn-green:hover:not(:disabled) { background: #16a34a; }
-.btn-orange { background: #f97316; color: white; }
-.btn-orange:hover:not(:disabled) { background: #ea580c; }
-.btn-red-sm { background: #ef4056; color: white; }
-.btn-red-sm:hover:not(:disabled) { background: #c8293c; }
-
-.pw-strength { margin-top: 6px; height: 3px; background: #e8e8ee; border-radius: 3px; overflow: hidden; }
-.pw-bar { height: 100%; width: 0; border-radius: 3px; transition: width .3s, background .3s; }
-.pw-label { font-size: .68rem; margin-top: 3px; color: #b8b8c4; }
-
-/* ── ALERTS ── */
-.inline-alert {
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: .78rem;
-  margin-top: 10px;
-  display: none;
-  line-height: 1.5;
-}
-.inline-alert.show { display: block; }
-.inline-alert.error { background: rgba(239,64,86,.08); border: 1px solid rgba(239,64,86,.2); color: #c8293c; }
-.inline-alert.success { background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.2); color: #16a34a; }
-
-/* ── FORM SHARED ── */
-.form-group { margin-bottom: 14px; }
-.form-label { display: block; font-size: .78rem; font-weight: 700; color: #3a3a4a; margin-bottom: 5px; }
-.form-input {
-  width: 100%;
-  padding: 11px 13px;
-  border: 1.5px solid #e8e8ee;
-  border-radius: 9px;
-  font-family: inherit;
-  font-size: .88rem;
-  background: #f4f5f7;
-  color: #1a1c2e;
-  outline: none;
-  transition: border-color .15s, box-shadow .15s;
-}
-.form-input:focus { border-color: #ef4056; background: white; box-shadow: 0 0 0 3px rgba(239,64,86,.10); }
-.form-input[type="tel"], .form-input[type="email"] { direction: ltr; text-align: left; }
-
-.btn-full {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 9px;
-  font-family: inherit;
-  font-size: .92rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .15s, transform .1s;
-}
-.btn-full:active { transform: scale(.98); }
-.btn-full:disabled { opacity: .5; cursor: not-allowed; }
-.btn-red { background: #ef4056; color: white; box-shadow: 0 4px 14px rgba(239,64,86,.28); }
-.btn-red:hover:not(:disabled) { background: #c8293c; }
-
-.alert {
-  padding: 10px 13px;
-  border-radius: 8px;
-  font-size: .82rem;
-  margin-bottom: 14px;
-  display: none;
-  line-height: 1.5;
-}
-.alert.show { display: block; }
-.alert.error { background: rgba(239,64,86,.08); border: 1px solid rgba(239,64,86,.2); color: #c8293c; }
-.alert.success { background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.2); color: #16a34a; }
-
-/* ── EMPTY / LOADING ── */
-.state-box {
-  text-align: center;
-  padding: 40px 20px;
-  color: #7a7a8a;
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e8e8ee;
-}
-.state-icon { font-size: 2.5rem; margin-bottom: 10px; }
-.spinner {
-  display: inline-block;
-  width: 28px; height: 28px;
-  border: 3px solid #e8e8ee;
-  border-top-color: #ef4056;
-  border-radius: 50%;
-  animation: spin .8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── MODAL ── */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.4);
-  z-index: 3000;
-  align-items: flex-end;
-  justify-content: center;
-  backdrop-filter: blur(3px);
-}
-.modal-overlay.show { display: flex; }
-.modal-box {
-  background: white;
-  border-radius: 20px 20px 0 0;
-  padding: 24px 20px 32px;
-  width: 100%;
-  max-width: 480px;
-  animation: slide-up .25s ease;
-}
-@keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-handle { width: 40px; height: 4px; background: #e8e8ee; border-radius: 2px; margin: 0 auto 20px; }
-.modal-icon { text-align: center; font-size: 2rem; margin-bottom: 10px; }
-.modal-title { text-align: center; font-size: .95rem; font-weight: 700; color: #1a1c2e; margin-bottom: 6px; }
-.modal-msg { text-align: center; font-size: .82rem; color: #7a7a8a; margin-bottom: 20px; line-height: 1.6; }
-.modal-btns { display: flex; gap: 10px; }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(8px);
-  background: #1a1c2e;
-  color: white;
-  padding: 10px 22px;
-  border-radius: 999px;
-  font-size: .84rem;
-  font-weight: 500;
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none;
-  white-space: nowrap;
-  transition: opacity .3s, transform .3s;
-  box-shadow: 0 4px 16px rgba(0,0,0,.2);
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-@media (max-width: 480px) {
-  .stats { grid-template-columns: repeat(3, 1fr); }
-  .stat-num { font-size: 1.1rem; }
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:Tahoma,Arial,sans-serif;background:#f4f5f7;direction:rtl;min-height:100vh;-webkit-font-smoothing:antialiased}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:white;border-radius:20px;padding:32px 24px;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,.10);border:1px solid #e8e8ee}
+.login-icon{text-align:center;font-size:2.5rem;margin-bottom:8px}
+.login-title{text-align:center;font-size:1rem;font-weight:700;color:#1a1c2e;margin-bottom:4px}
+.login-sub{text-align:center;font-size:.78rem;color:#7a7a8a;margin-bottom:24px}
+.header{background:white;padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8e8ee;box-shadow:0 2px 8px rgba(0,0,0,.06);position:sticky;top:0;z-index:100}
+.header-title{font-size:.95rem;font-weight:700;color:#1a1c2e}
+.header-logo{color:#ef4056;font-size:.85rem;font-weight:700}
+.btn-logout{background:#f4f5f7;border:none;border-radius:8px;padding:6px 12px;font-size:.78rem;cursor:pointer;font-family:inherit;color:#3a3a4a}
+.btn-logout:hover{background:#e8e8ee}
+.main{max-width:800px;margin:0 auto;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-card{background:white;border-radius:12px;padding:14px 10px;text-align:center;border:1px solid #e8e8ee;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.stat-num{font-size:1.4rem;font-weight:700;color:#ef4056}
+.stat-label{font-size:.72rem;color:#7a7a8a;margin-top:3px}
+.search-bar{background:white;border-radius:12px;padding:12px 14px;margin-bottom:12px;border:1px solid #e8e8ee;display:flex;gap:10px;align-items:center}
+.search-input{flex:1;border:1.5px solid #e8e8ee;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:.88rem;outline:none;background:#f4f5f7;color:#1a1c2e;transition:border-color .15s}
+.search-input:focus{border-color:#ef4056;background:white}
+.btn-refresh{background:#f4f5f7;border:1.5px solid #e8e8ee;border-radius:8px;padding:9px 14px;font-size:.82rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-refresh:hover{background:#e8e8ee}
+.customer-card{background:white;border-radius:12px;border:1px solid #e8e8ee;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:box-shadow .15s}
+.customer-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.customer-header{display:flex;align-items:center;padding:14px 16px;gap:12px;cursor:pointer}
+.customer-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#ef4056,#ff6b81);color:white;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.customer-info{flex:1;min-width:0}
+.customer-name{font-size:.9rem;font-weight:700;color:#1a1c2e;margin-bottom:2px}
+.customer-meta{font-size:.75rem;color:#7a7a8a;direction:ltr;text-align:right}
+.expand-icon{color:#b8b8c4;font-size:.8rem;transition:transform .2s}
+.expand-icon.open{transform:rotate(180deg)}
+.customer-body{display:none;padding:0 16px 16px;border-top:1px solid #f0f0f4}
+.customer-body.open{display:block}
+.edit-section{margin-top:14px}
+.edit-title{font-size:.78rem;font-weight:700;color:#3a3a4a;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0f0f4}
+.edit-group{margin-bottom:12px}
+.edit-label{display:block;font-size:.72rem;font-weight:700;color:#7a7a8a;margin-bottom:4px}
+.edit-input{width:100%;padding:9px 12px;border:1.5px solid #e8e8ee;border-radius:8px;font-family:inherit;font-size:.85rem;background:#f4f5f7;color:#1a1c2e;outline:none;transition:border-color .15s}
+.edit-input:focus{border-color:#ef4056;background:white}
+.edit-input[type="tel"],.edit-input[type="email"]{direction:ltr;text-align:left}
+.btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn-sm{flex:1;padding:9px 12px;border:none;border-radius:8px;font-family:inherit;font-size:.8rem;font-weight:700;cursor:pointer;transition:background .15s,transform .1s;min-width:80px}
+.btn-sm:active{transform:scale(.97)}
+.btn-sm:disabled{opacity:.5;cursor:not-allowed}
+.btn-blue{background:#3b82f6;color:white}
+.btn-blue:hover:not(:disabled){background:#2563eb}
+.btn-green{background:#22c55e;color:white}
+.btn-green:hover:not(:disabled){background:#16a34a}
+.btn-orange{background:#f97316;color:white}
+.btn-orange:hover:not(:disabled){background:#ea580c}
+.btn-red-sm{background:#ef4056;color:white}
+.btn-red-sm:hover:not(:disabled){background:#c8293c}
+.pw-strength{margin-top:6px;height:3px;background:#e8e8ee;border-radius:3px;overflow:hidden}
+.pw-bar{height:100%;width:0;border-radius:3px;transition:width .3s,background .3s}
+.pw-label{font-size:.68rem;margin-top:3px;color:#b8b8c4}
+.inline-alert{padding:8px 12px;border-radius:8px;font-size:.78rem;margin-top:10px;display:none;line-height:1.5}
+.inline-alert.show{display:block}
+.inline-alert.error{background:rgba(239,64,86,.08);border:1px solid rgba(239,64,86,.2);color:#c8293c}
+.inline-alert.success{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#16a34a}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.78rem;font-weight:700;color:#3a3a4a;margin-bottom:5px}
+.form-input{width:100%;padding:11px 13px;border:1.5px solid #e8e8ee;border-radius:9px;font-family:inherit;font-size:.88rem;background:#f4f5f7;color:#1a1c2e;outline:none;transition:border-color .15s,box-shadow .15s}
+.form-input:focus{border-color:#ef4056;background:white;box-shadow:0 0 0 3px rgba(239,64,86,.10)}
+.form-input[type="tel"],.form-input[type="email"]{direction:ltr;text-align:left}
+.btn-full{width:100%;padding:12px;border:none;border-radius:9px;font-family:inherit;font-size:.92rem;font-weight:700;cursor:pointer;transition:background .15s,transform .1s}
+.btn-full:active{transform:scale(.98)}
+.btn-full:disabled{opacity:.5;cursor:not-allowed}
+.btn-red{background:#ef4056;color:white;box-shadow:0 4px 14px rgba(239,64,86,.28)}
+.btn-red:hover:not(:disabled){background:#c8293c}
+.alert{padding:10px 13px;border-radius:8px;font-size:.82rem;margin-bottom:14px;display:none;line-height:1.5}
+.alert.show{display:block}
+.alert.error{background:rgba(239,64,86,.08);border:1px solid rgba(239,64,86,.2);color:#c8293c}
+.alert.success{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#16a34a}
+.state-box{text-align:center;padding:40px 20px;color:#7a7a8a;background:white;border-radius:12px;border:1px solid #e8e8ee}
+.state-icon{font-size:2.5rem;margin-bottom:10px}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid #e8e8ee;border-top-color:#ef4056;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:3000;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.show{display:flex}
+.modal-box{background:white;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;animation:slide-up .25s ease}
+@keyframes slide-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:#e8e8ee;border-radius:2px;margin:0 auto 20px}
+.modal-icon{text-align:center;font-size:2rem;margin-bottom:10px}
+.modal-title{text-align:center;font-size:.95rem;font-weight:700;color:#1a1c2e;margin-bottom:6px}
+.modal-msg{text-align:center;font-size:.82rem;color:#7a7a8a;margin-bottom:20px;line-height:1.6}
+.modal-btns{display:flex;gap:10px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:#1a1c2e;color:white;padding:10px 22px;border-radius:999px;font-size:.84rem;font-weight:500;z-index:9999;opacity:0;pointer-events:none;white-space:nowrap;transition:opacity .3s,transform .3s;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-section" class="login-wrap">
   <div class="login-card">
     <div class="login-icon">👥</div>
@@ -367,53 +115,28 @@ body {
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
 <div id="admin-section" style="display:none;">
-
   <div class="header">
     <span class="header-logo">🛒 اکبری</span>
     <span class="header-title">👥 مدیریت مشتریان</span>
     <button class="btn-logout" onclick="doLogout()">🚪 خروج</button>
   </div>
-
   <div class="main">
-
-    <!-- آمار -->
-    <div class="stats" id="stats-box">
-      <div class="stat-card">
-        <div class="stat-num" id="stat-total">—</div>
-        <div class="stat-label">کل مشتریان</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-email">—</div>
-        <div class="stat-label">با ایمیل</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-phone">—</div>
-        <div class="stat-label">فقط شماره</div>
-      </div>
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">کل مشتریان</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-email">—</div><div class="stat-label">با ایمیل</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-phone">—</div><div class="stat-label">فقط شماره</div></div>
     </div>
-
-    <!-- جستجو -->
     <div class="search-bar">
-      <input class="search-input" type="text" id="search-input"
-             placeholder="جستجو با نام، شماره یا ایمیل..."
-             oninput="filterCustomers()">
+      <input class="search-input" type="text" id="search-input" placeholder="جستجو با نام، شماره یا ایمیل..." oninput="filterCustomers()">
       <button class="btn-refresh" onclick="loadCustomers()">🔄</button>
     </div>
-
-    <!-- لیست مشتریان -->
     <div id="customers-list">
-      <div class="state-box">
-        <div class="spinner"></div>
-        <p style="margin-top:12px;">در حال بارگذاری...</p>
-      </div>
+      <div class="state-box"><div class="spinner"></div><p style="margin-top:12px;">در حال بارگذاری...</p></div>
     </div>
-
   </div>
 </div>
 
-<!-- DELETE MODAL -->
 <div class="modal-overlay" id="delete-modal">
   <div class="modal-box">
     <div class="modal-handle"></div>
@@ -435,12 +158,12 @@ const SUPABASE_URL      = "https://affstedmdsqeobtzrkyp.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const RESEND_API_KEY = "re_fHLmwCVW_Ed275MpWr4oyhixktHFGUxbQ";
+// ✅ Edge Function — رفع CORS
+const EDGE_EMAIL_URL = "https://affstedmdsqeobtzrkyp.supabase.co/functions/v1/super-handler";
 
 let allCustomers = [];
 let pendingDeleteId = null;
 
-// ── TOAST ──
 function showToast(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg;
@@ -450,11 +173,19 @@ function showToast(msg) {
 
 function showAlert(id, msg, type="error") {
   const el = document.getElementById(id);
+  if (!el) return;
   el.textContent = msg;
   el.className = `alert show ${type}`;
 }
 
-// ── LOGIN ──
+function showInlineAlert(id, type, msg, alertType="error") {
+  const el = document.getElementById(`${type}-alert-${id}`);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `inline-alert show ${alertType}`;
+  setTimeout(() => { el.className = "inline-alert"; }, 4000);
+}
+
 async function doLogin() {
   const email = document.getElementById("admin-email").value.trim();
   const pass  = document.getElementById("admin-pass").value;
@@ -485,10 +216,9 @@ function showAdminPanel() {
   loadCustomers();
 }
 
-// ── LOAD ──
 async function loadCustomers() {
-  document.getElementById("customers-list").innerHTML = `
-    <div class="state-box"><div class="spinner"></div><p style="margin-top:12px;">در حال بارگذاری...</p></div>`;
+  document.getElementById("customers-list").innerHTML =
+    `<div class="state-box"><div class="spinner"></div><p style="margin-top:12px;">در حال بارگذاری...</p></div>`;
   try {
     const { data, error } = await sb
       .from("customers")
@@ -513,15 +243,13 @@ function updateStats() {
 function filterCustomers() {
   const q = document.getElementById("search-input").value.trim().toLowerCase();
   if (!q) { renderCustomers(allCustomers); return; }
-  const filtered = allCustomers.filter(c =>
+  renderCustomers(allCustomers.filter(c =>
     (c.name  && c.name.toLowerCase().includes(q)) ||
     (c.phone && c.phone.includes(q)) ||
     (c.email && c.email.toLowerCase().includes(q))
-  );
-  renderCustomers(filtered);
+  ));
 }
 
-// ── RENDER ──
 function renderCustomers(list) {
   const container = document.getElementById("customers-list");
   if (!list || list.length === 0) {
@@ -530,13 +258,12 @@ function renderCustomers(list) {
   }
   container.innerHTML = "";
   list.forEach(c => {
-    const initials = (c.name || "؟").slice(0,1);
     const card = document.createElement("div");
     card.className = "customer-card";
     card.id = `card-${c.id}`;
     card.innerHTML = `
       <div class="customer-header" onclick="toggleCard(${c.id})">
-        <div class="customer-avatar">${initials}</div>
+        <div class="customer-avatar"></div>
         <div class="customer-info">
           <div class="customer-name"></div>
           <div class="customer-meta"></div>
@@ -544,8 +271,6 @@ function renderCustomers(list) {
         <div class="expand-icon" id="icon-${c.id}">▼</div>
       </div>
       <div class="customer-body" id="body-${c.id}">
-
-        <!-- ویرایش اطلاعات -->
         <div class="edit-section">
           <div class="edit-title">✏️ ویرایش اطلاعات</div>
           <div class="edit-group">
@@ -554,8 +279,7 @@ function renderCustomers(list) {
           </div>
           <div class="edit-group">
             <label class="edit-label">شماره تلفن</label>
-            <input class="edit-input" id="phone-${c.id}" type="tel" maxlength="12"
-                   oninput="this.value=this.value.replace(/[^\d]/g,'')">
+            <input class="edit-input" id="phone-${c.id}" type="tel" maxlength="12" oninput="this.value=this.value.replace(/[^\\d]/g,'')">
           </div>
           <div class="edit-group">
             <label class="edit-label">ایمیل</label>
@@ -563,116 +287,80 @@ function renderCustomers(list) {
           </div>
           <div class="btn-row">
             <button class="btn-sm btn-blue" onclick="saveInfo(${c.id})">💾 ذخیره</button>
-            <button class="btn-sm btn-red-sm" onclick="askDelete(${c.id}, '${(c.name||'').replace(/'/g,"\\'")}')">🗑️ حذف</button>
+            <button class="btn-sm btn-red-sm" onclick="askDelete(${c.id})">🗑️ حذف</button>
           </div>
           <div class="inline-alert" id="info-alert-${c.id}"></div>
         </div>
-
-        <!-- ریست رمز -->
         <div class="edit-section" style="margin-top:16px;">
           <div class="edit-title">🔐 تغییر رمز عبور</div>
           <div class="edit-group">
             <label class="edit-label">رمز عبور جدید</label>
-            <input class="edit-input" id="newpass-${c.id}" type="text"
-                   placeholder="حداقل ۶ کاراکتر"
-                   oninput="checkPw(this.value, ${c.id})">
+            <input class="edit-input" id="newpass-${c.id}" type="text" placeholder="حداقل ۶ کاراکتر" oninput="checkPw(this.value,${c.id})">
             <div class="pw-strength"><div class="pw-bar" id="pwbar-${c.id}"></div></div>
             <div class="pw-label" id="pwlbl-${c.id}"></div>
           </div>
           <div class="btn-row">
             <button class="btn-sm btn-green" onclick="resetPass(${c.id})">✅ تغییر رمز</button>
-            ${c.email ? `<button class="btn-sm btn-orange" onclick="sendPassByEmail(${c.id})">📧 ارسال به ایمیل</button>` : ''}
+            ${c.email ? `<button class="btn-sm btn-orange" id="emailbtn-${c.id}" onclick="sendPassByEmail(${c.id})">📧 ارسال به ایمیل</button>` : ''}
           </div>
           <div class="inline-alert" id="pass-alert-${c.id}"></div>
         </div>
+      </div>`;
 
-      </div>
-    `;
-
-    // set values safely
-    card.querySelector(".customer-name").textContent = c.name || "بدون نام";
-    card.querySelector(".customer-meta").textContent =
-      (c.phone || "") + (c.email ? " • " + c.email : "");
+    card.querySelector(".customer-avatar").textContent = (c.name||"؟").slice(0,1);
+    card.querySelector(".customer-name").textContent   = c.name  || "بدون نام";
+    card.querySelector(".customer-meta").textContent   = (c.phone||"") + (c.email ? " • "+c.email : "");
     card.querySelector(`#name-${c.id}`).value  = c.name  || "";
     card.querySelector(`#phone-${c.id}`).value = c.phone || "";
     card.querySelector(`#email-${c.id}`).value = c.email || "";
-
     container.appendChild(card);
   });
 }
 
 function toggleCard(id) {
-  const body = document.getElementById(`body-${id}`);
-  const icon = document.getElementById(`icon-${id}`);
-  body.classList.toggle("open");
-  icon.classList.toggle("open");
+  document.getElementById(`body-${id}`)?.classList.toggle("open");
+  document.getElementById(`icon-${id}`)?.classList.toggle("open");
 }
 
-// ── SAVE INFO ──
 async function saveInfo(id) {
   const name  = document.getElementById(`name-${id}`).value.trim();
   const phone = document.getElementById(`phone-${id}`).value.trim();
   const email = document.getElementById(`email-${id}`).value.trim();
-  const alert = document.getElementById(`info-alert-${id}`);
-  alert.className = "inline-alert";
-
   if (!name || name.length < 2) { showInlineAlert(id,"info","نام را وارد کنید."); return; }
-  if (!phone || !/^07\d{8}$/.test(phone)) { showInlineAlert(id,"info","شماره معتبر وارد کنید (مثال: 0799123456)"); return; }
+  if (!phone || !/^07\d{8}$/.test(phone)) { showInlineAlert(id,"info","شماره معتبر وارد کنید"); return; }
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showInlineAlert(id,"info","ایمیل معتبر وارد کنید"); return; }
-
   try {
-    const { error } = await sb.from("customers")
-      .update({ name, phone, email: email || null })
-      .eq("id", id);
+    const { error } = await sb.from("customers").update({ name, phone, email: email||null }).eq("id", id);
     if (error) throw error;
-
-    // آپدیت حافظه محلی
     const idx = allCustomers.findIndex(c => c.id === id);
-    if (idx > -1) { allCustomers[idx].name = name; allCustomers[idx].phone = phone; allCustomers[idx].email = email; }
-
-    showInlineAlert(id,"info","✅ اطلاعات ذخیره شد.", "success");
+    if (idx > -1) { allCustomers[idx].name=name; allCustomers[idx].phone=phone; allCustomers[idx].email=email; }
+    showInlineAlert(id,"info","✅ اطلاعات ذخیره شد.","success");
     showToast("✅ اطلاعات مشتری بروز شد");
-  } catch(err) {
-    showInlineAlert(id,"info","خطا: "+err.message);
-  }
+  } catch(err) { showInlineAlert(id,"info","خطا: "+err.message); }
 }
 
-// ── RESET PASSWORD ──
 function checkPw(pw, id) {
   const bar = document.getElementById(`pwbar-${id}`);
   const lbl = document.getElementById(`pwlbl-${id}`);
   if (!pw) { bar.style.width="0"; lbl.textContent=""; return; }
   let s=0;
-  if (pw.length>=6) s++;
-  if (pw.length>=10) s++;
-  if (/\d/.test(pw)) s++;
-  if (/[a-zA-Z]/.test(pw)) s++;
-  const lvl=[
-    {w:"25%",c:"#ef4056",t:"ضعیف"},
-    {w:"50%",c:"#f97316",t:"متوسط"},
-    {w:"75%",c:"#eab308",t:"خوب"},
-    {w:"100%",c:"#22c55e",t:"قوی"},
-  ][Math.min(s-1,3)];
+  if(pw.length>=6)s++; if(pw.length>=10)s++; if(/\d/.test(pw))s++; if(/[a-zA-Z]/.test(pw))s++;
+  const lvl=[{w:"25%",c:"#ef4056",t:"ضعیف"},{w:"50%",c:"#f97316",t:"متوسط"},{w:"75%",c:"#eab308",t:"خوب"},{w:"100%",c:"#22c55e",t:"قوی"}][Math.min(s-1,3)];
   bar.style.width=lvl.w; bar.style.background=lvl.c;
-  lbl.textContent=`قدرت: ${lvl.t}`; lbl.style.color=lvl.c;
+  lbl.textContent="قدرت: "+lvl.t; lbl.style.color=lvl.c;
 }
 
 async function resetPass(id) {
   const pass = document.getElementById(`newpass-${id}`).value.trim();
   if (pass.length < 6) { showInlineAlert(id,"pass","رمز عبور حداقل ۶ کاراکتر باشد."); return; }
   try {
-    const { error } = await sb.rpc("admin_reset_customer_password", {
-      p_customer_id: id,
-      p_new_password: pass
-    });
+    const { error } = await sb.rpc("admin_reset_customer_password", { p_customer_id: id, p_new_password: pass });
     if (error) throw error;
     document.getElementById(`newpass-${id}`).value = "";
     checkPw("", id);
-    showInlineAlert(id,"pass","✅ رمز عبور تغییر کرد.", "success");
+    showInlineAlert(id,"pass","✅ رمز عبور تغییر کرد.","success");
     showToast("✅ رمز عبور با موفقیت تغییر کرد");
-  } catch(err) {
-    showInlineAlert(id,"pass","خطا: "+err.message);
-  }
+  } catch(err) { showInlineAlert(id,"pass","خطا: "+err.message); }
 }
 
 async function sendPassByEmail(id) {
@@ -681,55 +369,54 @@ async function sendPassByEmail(id) {
   if (!c?.email) { showInlineAlert(id,"pass","این مشتری ایمیل ندارد."); return; }
   if (pass.length < 6) { showInlineAlert(id,"pass","ابتدا رمز جدید را وارد کنید (حداقل ۶ کاراکتر)."); return; }
 
-  try {
-    // اول رمز رو تغییر بده
-    const { error } = await sb.rpc("admin_reset_customer_password", {
-      p_customer_id: id,
-      p_new_password: pass
-    });
-    if (error) throw error;
+  const btn = document.getElementById(`emailbtn-${id}`);
+  if (btn) { btn.disabled=true; btn.textContent="⏳ در حال ارسال..."; }
 
-    // بعد ایمیل بفرست
-    const res = await fetch("https://api.resend.com/emails", {
+  try {
+    // ۱. تغییر رمز در دیتابیس
+    const { error: rpErr } = await sb.rpc("admin_reset_customer_password", {
+      p_customer_id: id, p_new_password: pass
+    });
+    if (rpErr) throw rpErr;
+
+    // ۲. ارسال از طریق Edge Function (رفع CORS)
+    const { data: sessionData } = await sb.auth.getSession();
+    const token = sessionData?.session?.access_token || SUPABASE_ANON_KEY;
+
+    const res = await fetch(EDGE_EMAIL_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json"
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
-        from: "Akbari Store <onboarding@resend.dev>",
-        to: c.email,
-        subject: "رمز عبور جدید دکان اکبری",
-        html: `
-          <div dir="rtl" style="font-family:Tahoma,Arial,sans-serif;max-width:400px;margin:auto;padding:20px;">
-            <h2 style="color:#ef4056;">🛒 دکان اکبری</h2>
-            <p>سلام <strong>${c.name || "مشتری عزیز"}</strong>،</p>
-            <p>رمز عبور شما توسط مدیریت تغییر کرده است.</p>
-            <div style="background:#f4f5f7;border-radius:10px;padding:16px;margin:16px 0;text-align:center;">
-              <div style="font-size:12px;color:#7a7a8a;margin-bottom:6px;">رمز عبور جدید شما:</div>
-              <div style="font-size:22px;font-weight:bold;color:#ef4056;letter-spacing:3px;direction:ltr;">${pass}</div>
-            </div>
-            <p style="font-size:13px;color:#7a7a8a;">پس از ورود، رمز عبور خود را تغییر دهید.</p>
-          </div>
-        `
+        to:       c.email,
+        name:     c.name || "مشتری عزیز",
+        password: pass
       })
     });
 
-    if (!res.ok) throw new Error("ارسال ایمیل ناموفق بود");
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData?.message || "خطای سرور: " + res.status);
+    }
 
     document.getElementById(`newpass-${id}`).value = "";
     checkPw("", id);
-    showInlineAlert(id,"pass","✅ رمز تغییر کرد و به ایمیل ارسال شد.", "success");
+    showInlineAlert(id,"pass","✅ رمز تغییر کرد و به ایمیل ارسال شد.","success");
     showToast("✅ ایمیل با موفقیت ارسال شد");
   } catch(err) {
     showInlineAlert(id,"pass","خطا: "+err.message);
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent="📧 ارسال به ایمیل"; }
   }
 }
 
-// ── DELETE ──
-function askDelete(id, name) {
+function askDelete(id) {
   pendingDeleteId = id;
-  document.getElementById("delete-modal-msg").textContent = `آیا مشتری «${name}» حذف شود؟ این عمل قابل بازگشت نیست.`;
+  const c = allCustomers.find(x => x.id === id);
+  document.getElementById("delete-modal-msg").textContent =
+    `آیا مشتری «${c?.name||""}» حذف شود؟ این عمل قابل بازگشت نیست.`;
   document.getElementById("delete-modal").classList.add("show");
 }
 
@@ -747,30 +434,17 @@ async function confirmDelete() {
     if (error) throw error;
     allCustomers = allCustomers.filter(c => c.id !== id);
     updateStats();
-    const card = document.getElementById(`card-${id}`);
-    if (card) card.remove();
+    document.getElementById(`card-${id}`)?.remove();
     showToast("✅ مشتری حذف شد");
-  } catch(err) {
-    showToast("❌ خطا: " + err.message);
-  }
+  } catch(err) { showToast("❌ خطا: "+err.message); }
 }
 
 document.getElementById("delete-modal").addEventListener("click", e => {
   if (e.target === e.currentTarget) closeDeleteModal();
 });
 
-// ── HELPERS ──
-function showInlineAlert(id, type, msg, alertType="error") {
-  const el = document.getElementById(`${type}-alert-${id}`);
-  if (!el) return;
-  el.textContent = msg;
-  el.className = `inline-alert show ${alertType}`;
-  setTimeout(() => { el.className = "inline-alert"; }, 4000);
-}
-
-// ── INIT ──
 document.addEventListener("keydown", e => {
-  if (e.key === "Enter" && document.getElementById("login-section").style.display !== "none") doLogin();
+  if (e.key==="Enter" && document.getElementById("login-section").style.display!=="none") doLogin();
 });
 
 (async () => {
