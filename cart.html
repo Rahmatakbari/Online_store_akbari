@@ -1,748 +1,1064 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>سبد خرید - دکان اکبری</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-      background: #f4f5f7;
-      direction: rtl;
-      padding-bottom: 80px;
-    }
-    .cart-wrapper { max-width: 600px; margin: 0 auto; padding: 14px; }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 14px 0;
-      border-bottom: 1px solid #eee;
-    }
-    .cart-item:last-child { border-bottom: none; }
-    .cart-item-info { flex: 1; }
-    .cart-item-title { font-size: .92rem; font-weight: bold; color: #333; margin-bottom: 4px; line-height: 1.5; }
-    .cart-item-unit { font-size: .78rem; color: #777; margin-bottom: 8px; }
-    .qty-controls {
-      display: inline-flex;
-      align-items: center;
-      border: 1.5px solid #eee;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .btn-qty {
-      width: 32px; height: 32px;
-      border: none;
-      background: #f4f5f7;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      color: #333;
-      transition: background .2s;
-      display: flex; align-items: center; justify-content: center;
-      user-select: none;
-    }
-    .btn-qty:hover { background: #e8e8e8; }
-    .qty-num {
-      width: 36px;
-      text-align: center;
-      font-size: .9rem;
-      font-weight: bold;
-      border-right: 1.5px solid #eee;
-      border-left: 1.5px solid #eee;
-    }
-    .cart-item-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-      min-width: 95px;
-    }
-    .cart-item-price { font-size: .95rem; font-weight: bold; color: #ef4056; direction: ltr; }
-    .btn-delete {
-      background: none;
-      border: 1.5px solid #ffcdd2;
-      color: #e53935;
-      padding: 4px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: .78rem;
-      font-family: inherit;
-      transition: .2s;
-    }
-    .btn-delete:hover { background: #ffebee; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>سبد خرید — اکبری خوراکه فروشی</title>
+<link rel="manifest" href="manifest.json">
+<style>
 
-    .cart-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid #eee;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-    .cart-card h2 {
-      font-size: 1rem;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
-      color: #333;
-    }
+/* ══════════════════════════════════════
+   TOKENS
+══════════════════════════════════════ */
+:root {
+  --red:        #ef4056;
+  --red-dark:   #c8293c;
+  --red-dim:    rgba(239,64,86,.10);
+  --green:      #22c55e;
+  --green-dark: #16a34a;
+  --green-dim:  rgba(34,197,94,.12);
 
-    .empty-cart { text-align: center; padding: 40px 20px; color: #777; }
-    .empty-cart .empty-icon { font-size: 3.5rem; margin-bottom: 12px; }
-    .empty-cart p { margin-bottom: 16px; font-size: .92rem; }
-    .btn-go-shop {
-      display: inline-block;
-      background: #ef4056;
-      color: white;
-      padding: 10px 24px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: .9rem;
-    }
+  --ink:        #1a1c2e;
+  --ink-2:      #3a3a4a;
+  --ink-3:      #7a7a8a;
+  --ink-4:      #b8b8c4;
 
-    .total-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid #eee;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 7px 0;
-      font-size: .88rem;
-      color: #777;
-      border-bottom: 1px dashed #eee;
-    }
-    .total-row:last-child { border-bottom: none; }
-    .total-row.grand { font-size: 1rem; font-weight: bold; color: #333; padding-top: 12px; }
-    .total-row .val { color: #ef4056; font-weight: bold; direction: ltr; }
+  --bg:         #f4f5f7;
+  --white:      #ffffff;
+  --border:     #e8e8ee;
+  --border-2:   #f0f0f4;
 
-    .login-required-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 2px dashed #ef4056;
-      padding: 28px 20px;
-      margin-bottom: 14px;
-      text-align: center;
-    }
-    .login-required-card .lr-icon { font-size: 2.8rem; margin-bottom: 12px; }
-    .login-required-card h3 { font-size: 1rem; color: #333; margin-bottom: 8px; }
-    .login-required-card p { font-size: .84rem; color: #777; margin-bottom: 20px; line-height: 1.7; }
-    .btn-go-login {
-      display: inline-block;
-      background: #ef4056;
-      color: white;
-      padding: 11px 32px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: .92rem;
-    }
+  --nav:        64px;
+  --r-sm:       10px;
+  --r-md:       14px;
+  --r-lg:       20px;
 
-    .order-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid #eee;
-      padding: 18px;
-      margin-bottom: 14px;
-    }
-    .order-card h3 {
-      font-size: .98rem;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
-    }
-    .form-group { margin-bottom: 14px; }
-    .form-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: .82rem;
-      font-weight: bold;
-      color: #333;
-    }
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1.5px solid #eee;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: .88rem;
-      outline: none;
-      transition: border-color .2s;
-      background: #fafafa;
-      color: #333;
-    }
-    .form-group input:focus,
-    .form-group textarea:focus { border-color: #ef4056; background: white; }
-    .form-group input.error,
-    .form-group textarea.error { border-color: #e53935; background: #fff5f5; }
-    .field-error { color: #e53935; font-size: .75rem; margin-top: 4px; display: none; }
-    .field-error.show { display: block; }
-    .form-group textarea { resize: vertical; min-height: 75px; }
-    .form-group input[type="tel"] { direction: ltr; text-align: left; }
+  --shadow-sm:  0 2px 8px  rgba(0,0,0,.05);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.08);
+}
 
-    .btn-submit {
-      width: 100%;
-      border: none;
-      background: #2ecc71;
-      color: white;
-      padding: 13px;
-      border-radius: 12px;
-      font-weight: bold;
-      font-family: inherit;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background .2s, transform .1s;
-      margin-top: 4px;
-    }
-    .btn-submit:hover { background: #27ae60; }
-    .btn-submit:active { transform: scale(0.98); }
-    .btn-submit:disabled { background: #a5d6a7; cursor: not-allowed; }
+/* ══════════════════════════════════════
+   RESET
+══════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    .success-screen { text-align: center; padding: 50px 20px; display: none; }
-    .success-screen .s-icon { font-size: 4rem; margin-bottom: 16px; }
-    .success-screen h2 { color: #2ecc71; margin-bottom: 10px; }
-    .success-screen p { color: #777; font-size: .9rem; line-height: 1.7; margin-bottom: 20px; }
-    .success-screen .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .success-screen a {
-      display: inline-block;
-      padding: 11px 24px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: .9rem;
-      color: white;
-    }
-    .success-screen a.btn-orders { background: #2ecc71; }
-    .success-screen a.btn-home { background: #ef4056; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background:  var(--bg);
+  color:       var(--ink);
+  direction:   rtl;
+  min-height:  100dvh;
+  padding-bottom: calc(var(--nav) + 16px);
+  -webkit-font-smoothing: antialiased;
+}
 
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.45);
-      z-index: 3000;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-overlay.show { display: flex; }
-    .modal-box {
-      background: white;
-      border-radius: 16px;
-      padding: 24px 20px;
-      max-width: 300px;
-      width: 90%;
-      text-align: center;
-    }
-    .modal-box .m-icon { font-size: 2.5rem; margin-bottom: 10px; }
-    .modal-box p { font-size: .9rem; color: #777; margin-bottom: 20px; line-height: 1.6; }
-    .modal-actions { display: flex; gap: 10px; }
-    .modal-actions button {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-family: inherit;
-      font-weight: bold;
-      font-size: .88rem;
-      cursor: pointer;
-    }
-    .btn-confirm-del { background: #e53935; color: white; }
-    .btn-cancel-del { background: #f4f5f7; color: #333; }
+:focus-visible {
+  outline: 2.5px solid var(--red);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 
-    .dk-header { background: #fff; padding: 12px 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .dk-header-row { display: flex; justify-content: space-between; align-items: center; }
-    .dk-logo-red { color: #ef4056; font-size: 1.1rem; font-weight: bold; }
-    .dk-notification-icon { font-size: 1.3rem; cursor: pointer; }
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+.dk-header {
+  background:   var(--white);
+  padding:      0 16px;
+  height:       54px;
+  position:     sticky;
+  top:          0;
+  z-index:      100;
+  box-shadow:   var(--shadow-sm);
+  display:      flex;
+  align-items:  center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
 
-    .dk-bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: #fff;
-      display: flex; justify-content: space-around; align-items: center;
-      padding: 8px 0 10px;
-      border-top: 1px solid #eee;
-      z-index: 200;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center;
-      text-decoration: none; color: #888; font-size: 0.72rem; gap: 2px; cursor: pointer;
-      position: relative;
-    }
-    .nav-item.active { color: #ef4056; }
-    .nav-icon { font-size: 1.3rem; }
-    #cart-badge {
-      position: absolute; top: -2px; right: -6px;
-      background: #ef4056; color: white; font-size: 0.68rem; font-weight: bold;
-      border-radius: 50%; min-width: 17px; height: 17px;
-      text-align: center; line-height: 17px; padding: 0 3px; display: none;
-    }
+.dk-logo-red {
+  color:       var(--red);
+  font-size:   1rem;
+  font-weight: 700;
+}
 
-    .toast {
-      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-      background: #323232; color: white; padding: 10px 20px;
-      border-radius: 24px; font-size: 0.88rem; z-index: 9999;
-      opacity: 0; transition: opacity 0.3s; pointer-events: none;
-    }
-    .toast.show { opacity: 1; }
+.header-title {
+  font-size:   .95rem;
+  font-weight: 700;
+  color:       var(--ink);
+}
 
-    /* ✅ NEW: Character counter */
-    .char-count { font-size: .72rem; color: #aaa; text-align: left; margin-top: 3px; }
-  </style>
+/* ══════════════════════════════════════
+   WRAPPER
+══════════════════════════════════════ */
+.cart-wrapper {
+  max-width: 600px;
+  margin:    0 auto;
+  padding:   16px 14px;
+  display:   flex;
+  flex-direction: column;
+  gap:       12px;
+}
+
+/* ══════════════════════════════════════
+   CARDS
+══════════════════════════════════════ */
+.card {
+  background:    var(--white);
+  border-radius: var(--r-lg);
+  border:        1px solid var(--border);
+  box-shadow:    var(--shadow-sm);
+  overflow:      hidden;
+}
+
+.card-header {
+  padding:       14px 16px 12px;
+  border-bottom: 1px solid var(--border-2);
+  display:       flex;
+  align-items:   center;
+  gap:           8px;
+}
+
+.card-header-icon { font-size: 1rem; }
+
+.card-header-title {
+  font-size:   .9rem;
+  font-weight: 700;
+  color:       var(--ink);
+  flex:        1;
+}
+
+.card-header-count {
+  font-size:     .72rem;
+  font-weight:   600;
+  background:    var(--red-dim);
+  color:         var(--red);
+  padding:       3px 9px;
+  border-radius: 999px;
+}
+
+/* ══════════════════════════════════════
+   CART ITEM
+══════════════════════════════════════ */
+.cart-item {
+  display:       flex;
+  align-items:   center;
+  gap:           12px;
+  padding:       14px 16px;
+  border-bottom: 1px solid var(--border-2);
+  transition:    background .15s;
+}
+
+.cart-item:last-child { border-bottom: none; }
+.cart-item:active     { background: #fafafa; }
+
+.cart-item-body { flex: 1; min-width: 0; }
+
+.cart-item-title {
+  font-size:     .88rem;
+  font-weight:   700;
+  color:         var(--ink);
+  margin-bottom: 3px;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-item-meta {
+  font-size:  .74rem;
+  color:      var(--ink-3);
+  margin-bottom: 10px;
+}
+
+/* qty control */
+.qty-row {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+}
+
+.qty-ctrl {
+  display:       flex;
+  align-items:   center;
+  border:        1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow:      hidden;
+  background:    var(--bg);
+}
+
+.btn-qty {
+  width:       34px;
+  height:      34px;
+  border:      none;
+  background:  transparent;
+  color:       var(--ink-2);
+  font-size:   1.1rem;
+  font-weight: 700;
+  cursor:      pointer;
+  display:     flex;
+  align-items: center;
+  justify-content: center;
+  transition:  background .12s, color .12s;
+  user-select: none;
+  line-height: 1;
+}
+
+.btn-qty:hover  { background: var(--red-dim); color: var(--red); }
+.btn-qty:active { background: rgba(239,64,86,.2); }
+
+.qty-val {
+  min-width:   30px;
+  text-align:  center;
+  font-size:   .9rem;
+  font-weight: 700;
+  color:       var(--ink);
+  border-right: 1.5px solid var(--border);
+  border-left:  1.5px solid var(--border);
+  line-height: 34px;
+}
+
+.btn-item-del {
+  background:    none;
+  border:        none;
+  color:         var(--ink-4);
+  font-size:     1rem;
+  cursor:        pointer;
+  padding:       4px;
+  border-radius: var(--r-sm);
+  transition:    color .12s, background .12s;
+  display:       flex;
+  align-items:   center;
+}
+
+.btn-item-del:hover {
+  color:      var(--red);
+  background: var(--red-dim);
+}
+
+/* item price */
+.cart-item-price {
+  text-align:  left;
+  min-width:   80px;
+  flex-shrink: 0;
+}
+
+.item-price-main {
+  font-size:   .92rem;
+  font-weight: 700;
+  color:       var(--red);
+  direction:   ltr;
+  display:     block;
+  text-align:  right;
+}
+
+.item-price-unit {
+  font-size:  .7rem;
+  color:      var(--ink-4);
+  display:    block;
+  text-align: right;
+}
+
+/* ══════════════════════════════════════
+   TOTAL CARD
+══════════════════════════════════════ */
+.total-card { padding: 16px; }
+
+.total-row {
+  display:       flex;
+  justify-content: space-between;
+  align-items:   center;
+  padding:       8px 0;
+  font-size:     .84rem;
+  color:         var(--ink-3);
+  border-bottom: 1px dashed var(--border);
+}
+
+.total-row:last-child { border-bottom: none; }
+
+.total-row.grand {
+  font-size:   1rem;
+  font-weight: 700;
+  color:       var(--ink);
+  padding-top: 12px;
+}
+
+.total-val      { color: var(--ink-2); font-weight: 600; }
+.total-val.big  { color: var(--red);   font-size: 1.1rem; }
+
+/* ══════════════════════════════════════
+   LOGIN REQUIRED
+══════════════════════════════════════ */
+.login-card {
+  padding:    28px 20px;
+  text-align: center;
+  border:     2px dashed var(--red);
+  border-radius: var(--r-lg);
+  background: var(--white);
+}
+
+.login-card-icon { font-size: 2.4rem; margin-bottom: 12px; }
+
+.login-card h3 {
+  font-size:     .98rem;
+  font-weight:   700;
+  color:         var(--ink);
+  margin-bottom: 8px;
+}
+
+.login-card p {
+  font-size:     .82rem;
+  color:         var(--ink-3);
+  line-height:   1.7;
+  margin-bottom: 20px;
+}
+
+/* ══════════════════════════════════════
+   ORDER FORM
+══════════════════════════════════════ */
+.form-body { padding: 16px; }
+
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display:       block;
+  font-size:     .78rem;
+  font-weight:   700;
+  color:         var(--ink-2);
+  margin-bottom: 6px;
+}
+
+.form-input,
+.form-textarea {
+  width:         100%;
+  padding:       11px 13px;
+  border:        1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-family:   inherit;
+  font-size:     .88rem;
+  color:         var(--ink);
+  background:    var(--bg);
+  outline:       none;
+  transition:    border-color .15s, box-shadow .15s, background .15s;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder { color: var(--ink-4); }
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: var(--red);
+  background:   var(--white);
+  box-shadow:   0 0 0 3px var(--red-dim);
+}
+
+.form-input.err,
+.form-textarea.err {
+  border-color: var(--red);
+  background:   rgba(239,64,86,.04);
+}
+
+.form-textarea {
+  resize:     vertical;
+  min-height: 80px;
+}
+
+input[type="tel"].form-input {
+  direction:  ltr;
+  text-align: left;
+}
+
+.field-err {
+  font-size:  .73rem;
+  color:      var(--red);
+  margin-top: 4px;
+  display:    none;
+}
+
+.field-err.show { display: block; }
+
+.char-count {
+  font-size:  .7rem;
+  color:      var(--ink-4);
+  text-align: left;
+  margin-top: 3px;
+}
+
+/* ══════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════ */
+.btn {
+  display:       inline-flex;
+  align-items:   center;
+  justify-content: center;
+  gap:           6px;
+  padding:       12px 22px;
+  border-radius: var(--r-md);
+  border:        none;
+  font-family:   inherit;
+  font-size:     .92rem;
+  font-weight:   700;
+  cursor:        pointer;
+  text-decoration: none;
+  transition:    background .15s, transform .1s, box-shadow .15s;
+}
+
+.btn-red {
+  background: var(--red);
+  color:      white;
+  box-shadow: 0 4px 14px rgba(239,64,86,.28);
+}
+
+.btn-red:hover {
+  background: var(--red-dark);
+  box-shadow: 0 6px 18px rgba(239,64,86,.38);
+  transform:  translateY(-1px);
+}
+
+.btn-red:active { transform: scale(.98); }
+
+.btn-green {
+  background: var(--green);
+  color:      white;
+  box-shadow: 0 4px 14px rgba(34,197,94,.28);
+}
+
+.btn-green:hover {
+  background: var(--green-dark);
+  box-shadow: 0 6px 18px rgba(34,197,94,.38);
+  transform:  translateY(-1px);
+}
+
+.btn-green:active  { transform: scale(.98); }
+.btn-green:disabled {
+  background: #a5d6a7;
+  box-shadow: none;
+  cursor:     not-allowed;
+  transform:  none;
+}
+
+.btn-ghost {
+  background: var(--bg);
+  color:      var(--ink-2);
+  border:     1.5px solid var(--border);
+}
+
+.btn-ghost:hover { background: var(--border); }
+
+.btn-full { width: 100%; }
+
+/* ══════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════ */
+.empty-state {
+  padding:    48px 20px;
+  text-align: center;
+  color:      var(--ink-3);
+}
+
+.empty-icon    { font-size: 3rem; margin-bottom: 12px; }
+.empty-title   { font-size: .95rem; font-weight: 700; color: var(--ink-2); margin-bottom: 8px; }
+.empty-sub     { font-size: .82rem; margin-bottom: 20px; }
+
+/* ══════════════════════════════════════
+   SUCCESS SCREEN
+══════════════════════════════════════ */
+.success-screen {
+  display:    none;
+  padding:    60px 20px 40px;
+  text-align: center;
+}
+
+.success-anim {
+  width:         72px;
+  height:        72px;
+  background:    var(--green-dim);
+  border-radius: 50%;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  margin:        0 auto 20px;
+  font-size:     2rem;
+  animation:     pop .4s cubic-bezier(.22,.68,0,1.2);
+}
+
+@keyframes pop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.success-screen h2 {
+  font-size:     1.2rem;
+  font-weight:   700;
+  color:         var(--green-dark);
+  margin-bottom: 10px;
+}
+
+.success-screen p {
+  font-size:     .85rem;
+  color:         var(--ink-3);
+  line-height:   1.7;
+  margin-bottom: 28px;
+}
+
+.success-btns {
+  display:   flex;
+  gap:       10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ══════════════════════════════════════
+   MODAL
+══════════════════════════════════════ */
+.modal-overlay {
+  display:         none;
+  position:        fixed;
+  inset:           0;
+  background:      rgba(0,0,0,.4);
+  z-index:         3000;
+  align-items:     flex-end;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal-box {
+  background:    var(--white);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding:       24px 20px 32px;
+  width:         100%;
+  max-width:     480px;
+  text-align:    center;
+  animation:     slide-up .25s cubic-bezier(.22,.68,0,1.2);
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.modal-handle {
+  width:         40px;
+  height:        4px;
+  background:    var(--border);
+  border-radius: 2px;
+  margin:        0 auto 20px;
+}
+
+.modal-icon  { font-size: 2rem; margin-bottom: 10px; }
+
+.modal-title {
+  font-size:     1rem;
+  font-weight:   700;
+  color:         var(--ink);
+  margin-bottom: 6px;
+}
+
+.modal-msg {
+  font-size:     .84rem;
+  color:         var(--ink-3);
+  margin-bottom: 22px;
+  line-height:   1.6;
+}
+
+.modal-btns {
+  display: flex;
+  gap:     10px;
+}
+
+/* ══════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════ */
+.dk-bottom-nav {
+  position:   fixed;
+  bottom:     0; left: 0; right: 0;
+  height:     var(--nav);
+  background: var(--white);
+  display:    flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 8px rgba(0,0,0,.06);
+  z-index:    200;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-item {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  text-decoration: none;
+  color:          var(--ink-4);
+  font-size:      .7rem;
+  gap:            2px;
+  cursor:         pointer;
+  position:       relative;
+  border:         none;
+  background:     transparent;
+  font-family:    inherit;
+  transition:     color .15s;
+}
+
+.nav-item.active { color: var(--red); }
+.nav-icon        { font-size: 1.3rem; }
+
+#cart-badge {
+  position:      absolute;
+  top:           -2px;
+  right:         calc(50% - 18px);
+  background:    var(--red);
+  color:         white;
+  font-size:     .62rem;
+  font-weight:   700;
+  border-radius: 50%;
+  min-width:     17px;
+  height:        17px;
+  line-height:   17px;
+  text-align:    center;
+  padding:       0 3px;
+  display:       none;
+  border:        2px solid var(--white);
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+.toast {
+  position:   fixed;
+  bottom:     calc(var(--nav) + 12px);
+  left:       50%;
+  transform:  translateX(-50%) translateY(8px);
+  background: var(--ink);
+  color:      white;
+  padding:    10px 22px;
+  border-radius: 999px;
+  font-size:  .84rem;
+  font-weight: 500;
+  z-index:    9999;
+  opacity:    0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity .3s, transform .3s;
+  box-shadow: var(--shadow-md);
+}
+
+.toast.show {
+  opacity:   1;
+  transform: translateX(-50%) translateY(0);
+}
+
+</style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header class="dk-header">
-  <div class="dk-header-row">
-    <span class="dk-logo-red">🛒 اکبری خوراکه فروشی</span>
-    <div class="dk-notification-icon">🔔</div>
-  </div>
+  <span class="dk-logo-red">🛒 اکبری خوراکه فروشی</span>
+  <span class="header-title">سبد خرید</span>
 </header>
 
-<div class="cart-wrapper">
-  <!-- Success Screen -->
-  <div class="success-screen" id="success-screen" role="alert">
-    <div class="s-icon">🎉</div>
-    <h2>سفارش شما ثبت شد!</h2>
-    <p>سفارشتان با موفقیت برای دکان اکبری ارسال گردید.<br>به زودی با شما تماس گرفته می‌شود.</p>
-    <div class="btn-group">
-      <a href="orders.html" class="btn-orders">📋 مشاهده فاکتور من</a>
-      <a href="index.html" class="btn-home">🏠 صفحه اصلی</a>
+<!-- SUCCESS -->
+<div class="success-screen" id="success-screen" role="alert">
+  <div class="success-anim">🎉</div>
+  <h2>سفارش ثبت شد!</h2>
+  <p>سفارشتان با موفقیت برای دکان اکبری ارسال شد.<br>به زودی با شما تماس گرفته می‌شود.</p>
+  <div class="success-btns">
+    <a href="orders.html" class="btn btn-green">📋 مشاهده سفارشات</a>
+    <a href="index.html"  class="btn btn-red">🏠 صفحه اصلی</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="cart-wrapper" id="main-cart-content">
+
+  <!-- کارت اقلام -->
+  <div class="card" id="items-card">
+    <div class="card-header">
+      <span class="card-header-icon">🛒</span>
+      <span class="card-header-title">اقلام سبد خرید</span>
+      <span class="card-header-count" id="items-count" style="display:none"></span>
+    </div>
+    <div id="cart-list-container">
+      <div class="empty-state">
+        <div class="empty-icon">🛒</div>
+        <div class="empty-title">سبد خرید خالی است</div>
+        <div class="empty-sub">برای خرید به فروشگاه بروید</div>
+        <a href="index.html" class="btn btn-red">🛍️ رفتن به فروشگاه</a>
+      </div>
     </div>
   </div>
 
-  <div id="main-cart-content">
-    <!-- Cart Items -->
-    <div class="cart-card">
-      <h2>🛒 سبد خرید شما</h2>
-      <div id="cart-list-container">
-        <div class="empty-cart">
-          <div class="empty-icon">🛒</div>
-          <p>در حال بارگذاری...</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Total -->
-    <div class="total-card" id="total-card" style="display:none;">
+  <!-- جمع کل -->
+  <div class="card" id="total-card" style="display:none;">
+    <div class="total-card">
       <div class="total-row">
         <span>تعداد اقلام</span>
-        <span class="val" id="total-items">۰</span>
+        <span class="total-val" id="total-items">—</span>
       </div>
       <div class="total-row grand">
         <span>جمع کل</span>
-        <span class="val" id="cart-total-price">۰ افغانی</span>
+        <span class="total-val big" id="cart-total-price">—</span>
       </div>
     </div>
+  </div>
 
-    <!-- Login Required -->
-    <div class="login-required-card" id="login-required-card" style="display:none;">
-      <div class="lr-icon">🔐</div>
-      <h3>برای ثبت سفارش وارد شوید</h3>
-      <p>لطفاً ابتدا با شماره تلفن خود وارد شوید تا بتوانید سفارش بدهید و تاریخچه خریدتان ذخیره شود.</p>
-      <a href="customer-auth.html" class="btn-go-login">👤 ورود / ثبت‌نام</a>
+  <!-- نیاز به ورود -->
+  <div class="login-card" id="login-required-card" style="display:none;">
+    <div class="login-card-icon">🔐</div>
+    <h3>برای ثبت سفارش وارد شوید</h3>
+    <p>با شماره تلفن خود وارد شوید تا بتوانید سفارش بدهید و تاریخچه خریدتان ذخیره شود.</p>
+    <a href="customer-auth.html" class="btn btn-red">👤 ورود / ثبت‌نام</a>
+  </div>
+
+  <!-- فرم سفارش -->
+  <div class="card" id="order-card" style="display:none;">
+    <div class="card-header">
+      <span class="card-header-icon">📦</span>
+      <span class="card-header-title">مشخصات تحویل</span>
     </div>
+    <div class="form-body">
 
-    <!-- Order Form -->
-    <div class="order-card" id="order-card" style="display:none;">
-      <h3>📞 مشخصات گیرنده جهت تحویل</h3>
       <div class="form-group">
-        <label for="order-name">نام و نام خانوادگی *</label>
-        <input type="text" id="order-name" placeholder="مثال: محمد اکبری" maxlength="60" autocomplete="name">
-        <div class="field-error" id="err-name">نام را وارد کنید (حداقل ۳ حرف)</div>
+        <label class="form-label" for="order-name">نام و نام خانوادگی *</label>
+        <input class="form-input" type="text" id="order-name" placeholder="مثال: محمد اکبری" maxlength="60" autocomplete="name">
+        <div class="field-err" id="err-name">نام را وارد کنید (حداقل ۳ حرف)</div>
       </div>
+
       <div class="form-group">
-        <label for="order-phone">شماره تماس *</label>
-        <input type="tel" id="order-phone" placeholder="0799XXXXXX" maxlength="12" autocomplete="tel">
-        <div class="field-error" id="err-phone">شماره معتبر وارد کنید (مثال: 0799123456)</div>
+        <label class="form-label" for="order-phone">شماره تماس *</label>
+        <input class="form-input" type="tel" id="order-phone" placeholder="0799XXXXXX" maxlength="12" autocomplete="tel">
+        <div class="field-err" id="err-phone">شماره معتبر وارد کنید (مثال: 0799123456)</div>
       </div>
+
       <div class="form-group">
-        <label for="order-address">آدرس دقیق *</label>
-        <textarea id="order-address" placeholder="کابل، دشت برچی، ایستگاه دوم..." maxlength="300"></textarea>
+        <label class="form-label" for="order-address">آدرس دقیق *</label>
+        <textarea class="form-textarea" id="order-address" placeholder="کابل، دشت برچی، ایستگاه دوم..." maxlength="300"></textarea>
         <div class="char-count" id="addr-count">۰ / ۳۰۰</div>
-        <div class="field-error" id="err-address">آدرس را وارد کنید (حداقل ۱۰ حرف)</div>
+        <div class="field-err" id="err-address">آدرس را وارد کنید (حداقل ۱۰ حرف)</div>
       </div>
-      <button class="btn-submit" id="btn-send-order">
+
+      <button class="btn btn-green btn-full" id="btn-send-order">
         🚀 ثبت نهایی و ارسال سفارش
       </button>
+
     </div>
   </div>
+
 </div>
 
-<!-- Delete Modal -->
+<!-- DELETE MODAL -->
 <div class="modal-overlay" id="delete-modal" role="dialog" aria-modal="true">
   <div class="modal-box">
-    <div class="m-icon">🗑️</div>
-    <p id="modal-msg">آیا این محصول از سبد حذف شود؟</p>
-    <div class="modal-actions">
-      <button class="btn-cancel-del" onclick="closeModal()">انصراف</button>
-      <button class="btn-confirm-del" onclick="confirmDelete()">حذف کن</button>
+    <div class="modal-handle"></div>
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">حذف از سبد</div>
+    <div class="modal-msg" id="modal-msg">آیا این محصول از سبد حذف شود؟</div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-full" onclick="closeModal()">انصراف</button>
+      <button class="btn btn-red   btn-full" onclick="confirmDelete()">بله، حذف شود</button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-
+<!-- BOTTOM NAV -->
 <nav class="dk-bottom-nav">
   <a href="index.html" class="nav-item">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-text">خانه</span>
+    <span class="nav-icon">🏠</span><span>خانه</span>
   </a>
   <a href="cart.html" class="nav-item active" style="position:relative;">
     <span class="nav-icon">🛒</span>
     <span id="cart-badge">0</span>
-    <span class="nav-text">سبد خرید</span>
+    <span>سبد خرید</span>
   </a>
   <a href="orders.html" class="nav-item">
-    <span class="nav-icon">📋</span>
-    <span class="nav-text">سفارشات</span>
+    <span class="nav-icon">📋</span><span>سفارشات</span>
   </a>
   <div class="nav-item" onclick="handleAuthAction()">
     <span class="nav-icon" id="user-avatar-icon">👤</span>
-    <span class="nav-text" id="user-welcome">ورود</span>
+    <span id="user-welcome">ورود</span>
   </div>
 </nav>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = "https://affstedmdsqeobtzrkyp.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  let cartItems = [];
-  let pendingDeleteIndex = -1;
-  let isSubmitting = false; // ✅ FIX: Prevent double submit
+const SUPABASE_URL      = "https://affstedmdsqeobtzrkyp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_-6pETy_IFfTgZqN-ePvKeg_CIil3GUK";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  function isLoggedIn() {
-    return localStorage.getItem("customer_logged_in") === "true";
-  }
+let cartItems          = [];
+let pendingDeleteIndex = -1;
+let isSubmitting       = false;
 
-  document.addEventListener("DOMContentLoaded", () => {
-    checkUserSession();
-    loadCart();
-    prefillForm();
-    setupAddressCounter();
-    // ✅ FIX: Attach submit via addEventListener (not onclick) for better control
-    document.getElementById("btn-send-order").addEventListener("click", submitOrder);
-  });
+// ── helpers ─────────────────────────────────────────────────
+function fmt(n)      { return Number(n).toLocaleString('fa-AF'); }
+function isLoggedIn(){ return localStorage.getItem("customer_logged_in") === "true"; }
 
-  function setupAddressCounter() {
-    const textarea = document.getElementById("order-address");
-    const counter = document.getElementById("addr-count");
-    if (!textarea || !counter) return;
-    textarea.addEventListener("input", () => {
-      counter.textContent = `${textarea.value.length} / ۳۰۰`;
-    });
-  }
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2600);
+}
 
-  function loadCart() {
-    try {
-      cartItems = JSON.parse(localStorage.getItem("cart_items")) || [];
-    } catch(e) {
-      cartItems = [];
-    }
-    renderCart();
-  }
+function updateCartBadge() {
+  const badge = document.getElementById("cart-badge");
+  if (!badge) return;
+  const total = cartItems.reduce((s,i) => s + i.qty, 0);
+  badge.textContent = total;
+  badge.style.display = total > 0 ? "block" : "none";
+}
 
-  function fmt(n) {
-    return Number(n).toLocaleString('fa-AF');
-  }
+// ── render ───────────────────────────────────────────────────
+function loadCart() {
+  try { cartItems = JSON.parse(localStorage.getItem("cart_items")) || []; }
+  catch(e) { cartItems = []; }
+  renderCart();
+}
 
-  function renderCart() {
-    const container        = document.getElementById("cart-list-container");
-    const totalCard        = document.getElementById("total-card");
-    const orderCard        = document.getElementById("order-card");
-    const loginRequiredCard = document.getElementById("login-required-card");
-    const totalEl          = document.getElementById("cart-total-price");
-    const itemsEl          = document.getElementById("total-items");
+function renderCart() {
+  const container  = document.getElementById("cart-list-container");
+  const totalCard  = document.getElementById("total-card");
+  const orderCard  = document.getElementById("order-card");
+  const loginCard  = document.getElementById("login-required-card");
+  const countBadge = document.getElementById("items-count");
 
-    if (cartItems.length === 0) {
-      container.innerHTML = `
-        <div class="empty-cart">
-          <div class="empty-icon">🛒</div>
-          <p>سبد خرید شما خالی است</p>
-          <a href="index.html" class="btn-go-shop">🛍️ رفتن به فروشگاه</a>
-        </div>`;
-      totalCard.style.display = "none";
-      orderCard.style.display = "none";
-      loginRequiredCard.style.display = "none";
-      updateCartBadge();
-      return;
-    }
-
-    container.innerHTML = "";
-    let grandTotal = 0;
-    let totalQty   = 0;
-
-    cartItems.forEach((item, i) => {
-      const itemTotal = item.price * item.qty;
-      grandTotal += itemTotal;
-      totalQty   += item.qty;
-
-      const div = document.createElement("div");
-      div.className = "cart-item";
-
-      // ✅ FIX: textContent for user-supplied data (no XSS)
-      div.innerHTML = `
-        <div class="cart-item-info">
-          <div class="cart-item-title"></div>
-          <div class="cart-item-unit"></div>
-          <div class="qty-controls">
-            <button class="btn-qty" aria-label="کاهش تعداد">−</button>
-            <div class="qty-num">${item.qty}</div>
-            <button class="btn-qty" aria-label="افزایش تعداد">+</button>
-          </div>
-        </div>
-        <div class="cart-item-right">
-          <div class="cart-item-price">${fmt(itemTotal)} <small style="font-size:.7rem;color:#777;font-weight:normal;">افغانی</small></div>
-          <button class="btn-delete">🗑️ حذف</button>
-        </div>
-      `;
-
-      div.querySelector('.cart-item-title').textContent = item.title;
-      div.querySelector('.cart-item-unit').textContent = `واحد: ${item.unitName} | هر واحد: ${fmt(item.price)} افغانی`;
-      div.querySelectorAll('.btn-qty')[0].addEventListener('click', () => changeQty(i, -1));
-      div.querySelectorAll('.btn-qty')[1].addEventListener('click', () => changeQty(i, 1));
-      div.querySelector('.btn-delete').addEventListener('click', () => askDelete(i));
-
-      container.appendChild(div);
-    });
-
-    totalEl.textContent = `${fmt(grandTotal)} افغانی`;
-    itemsEl.textContent = `${totalQty} عدد`;
-    totalCard.style.display = "block";
-
-    if (isLoggedIn()) {
-      orderCard.style.display = "block";
-      loginRequiredCard.style.display = "none";
-    } else {
-      orderCard.style.display = "none";
-      loginRequiredCard.style.display = "block";
-    }
-
+  if (cartItems.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🛒</div>
+        <div class="empty-title">سبد خرید خالی است</div>
+        <div class="empty-sub">برای خرید به فروشگاه بروید</div>
+        <a href="index.html" class="btn btn-red">🛍️ رفتن به فروشگاه</a>
+      </div>`;
+    totalCard.style.display = "none";
+    orderCard.style.display = "none";
+    loginCard.style.display = "none";
+    countBadge.style.display = "none";
     updateCartBadge();
+    return;
   }
 
-  function changeQty(i, delta) {
-    cartItems[i].qty += delta;
-    if (cartItems[i].qty <= 0) {
-      askDelete(i);
-    } else {
-      save();
-      renderCart();
-    }
-  }
+  container.innerHTML = "";
+  let grandTotal = 0, totalQty = 0;
 
-  function askDelete(i) {
-    pendingDeleteIndex = i;
-    document.getElementById("modal-msg").textContent = `«${cartItems[i].title}» از سبد خرید حذف شود؟`;
-    document.getElementById("delete-modal").classList.add("show");
-  }
+  cartItems.forEach((item, i) => {
+    const lineTotal = item.price * item.qty;
+    grandTotal += lineTotal;
+    totalQty   += item.qty;
 
-  function closeModal() {
-    document.getElementById("delete-modal").classList.remove("show");
-    pendingDeleteIndex = -1;
-  }
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `
+      <div class="cart-item-body">
+        <div class="cart-item-title"></div>
+        <div class="cart-item-meta"></div>
+        <div class="qty-row">
+          <div class="qty-ctrl">
+            <button class="btn-qty btn-dec" aria-label="کاهش">−</button>
+            <div class="qty-val">${item.qty}</div>
+            <button class="btn-qty btn-inc" aria-label="افزایش">+</button>
+          </div>
+          <button class="btn-item-del" aria-label="حذف">🗑️</button>
+        </div>
+      </div>
+      <div class="cart-item-price">
+        <span class="item-price-main">${fmt(lineTotal)}</span>
+        <span class="item-price-unit">افغانی</span>
+        <span class="item-price-unit" style="margin-top:2px;">هر واحد: ${fmt(item.price)}</span>
+      </div>`;
 
-  function confirmDelete() {
-    if (pendingDeleteIndex < 0) return;
-    const title = cartItems[pendingDeleteIndex].title;
-    cartItems.splice(pendingDeleteIndex, 1);
-    save();
-    closeModal();
-    renderCart();
-    showToast(`«${title}» از سبد حذف شد`);
-  }
+    div.querySelector(".cart-item-title").textContent = item.title;
+    div.querySelector(".cart-item-meta").textContent  = `واحد: ${item.unitName}`;
+    div.querySelector(".btn-dec").addEventListener("click", () => changeQty(i, -1));
+    div.querySelector(".btn-inc").addEventListener("click", () => changeQty(i,  1));
+    div.querySelector(".btn-item-del").addEventListener("click", () => askDelete(i));
 
-  // ✅ FIX: Close modal when clicking overlay background
-  document.getElementById("delete-modal").addEventListener("click", function(e) {
-    if (e.target === this) closeModal();
+    container.appendChild(div);
   });
 
-  function save() {
-    localStorage.setItem("cart_items", JSON.stringify(cartItems));
+  // totals
+  document.getElementById("cart-total-price").textContent = `${fmt(grandTotal)} افغانی`;
+  document.getElementById("total-items").textContent       = `${totalQty} عدد`;
+  totalCard.style.display = "block";
+
+  countBadge.textContent     = `${cartItems.length} قلم`;
+  countBadge.style.display   = "inline-block";
+
+  if (isLoggedIn()) {
+    orderCard.style.display = "block";
+    loginCard.style.display = "none";
+  } else {
+    orderCard.style.display = "none";
+    loginCard.style.display = "block";
   }
 
-  function prefillForm() {
-    if (!isLoggedIn()) return;
-    const name  = localStorage.getItem("customer_name");
-    const phone = localStorage.getItem("customer_phone");
-    if (name)  document.getElementById("order-name").value  = name;
-    if (phone) document.getElementById("order-phone").value = phone;
+  updateCartBadge();
+}
+
+function changeQty(i, delta) {
+  cartItems[i].qty += delta;
+  if (cartItems[i].qty <= 0) { askDelete(i); return; }
+  save(); renderCart();
+}
+
+// ── modal ────────────────────────────────────────────────────
+function askDelete(i) {
+  pendingDeleteIndex = i;
+  document.getElementById("modal-msg").textContent = `«${cartItems[i].title}» از سبد خرید حذف شود؟`;
+  document.getElementById("delete-modal").classList.add("show");
+}
+
+function closeModal() {
+  document.getElementById("delete-modal").classList.remove("show");
+  pendingDeleteIndex = -1;
+}
+
+function confirmDelete() {
+  if (pendingDeleteIndex < 0) return;
+  const title = cartItems[pendingDeleteIndex].title;
+  cartItems.splice(pendingDeleteIndex, 1);
+  save(); closeModal(); renderCart();
+  showToast(`«${title}» از سبد حذف شد`);
+}
+
+document.getElementById("delete-modal").addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// ── form ─────────────────────────────────────────────────────
+function save() { localStorage.setItem("cart_items", JSON.stringify(cartItems)); }
+
+function prefillForm() {
+  if (!isLoggedIn()) return;
+  const name  = localStorage.getItem("customer_name");
+  const phone = localStorage.getItem("customer_phone");
+  if (name)  document.getElementById("order-name").value  = name;
+  if (phone) document.getElementById("order-phone").value = phone;
+}
+
+function setupAddressCounter() {
+  const ta = document.getElementById("order-address");
+  const ct = document.getElementById("addr-count");
+  if (!ta||!ct) return;
+  ta.addEventListener("input", () => { ct.textContent = `${ta.value.length} / ۳۰۰`; });
+}
+
+function validateForm() {
+  let ok = true;
+  const name    = document.getElementById("order-name").value.trim();
+  const phone   = document.getElementById("order-phone").value.trim().replace(/\s/g,"");
+  const address = document.getElementById("order-address").value.trim();
+
+  const nameOk  = name.length >= 3;
+  const phoneOk = /^07\d{8}$/.test(phone);
+  const addrOk  = address.length >= 10;
+
+  [["order-name","err-name",nameOk],["order-phone","err-phone",phoneOk],["order-address","err-address",addrOk]]
+    .forEach(([id, errId, valid]) => {
+      document.getElementById(id).classList.toggle("err", !valid);
+      document.getElementById(errId).classList.toggle("show", !valid);
+      if (!valid) ok = false;
+    });
+
+  return { ok, name, phone, address };
+}
+
+// ── telegram ─────────────────────────────────────────────────
+async function sendToTelegram(invoice) {
+  const BOT_TOKEN = "8850075372:AAFA5I-VcQiFqA4Bw5LdskwB83XzujUtSUc";
+  const CHAT_ID   = "6718562294";
+  try {
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: `🛒 سفارش جدید دکان اکبری\n\n${invoice}`, parse_mode: "HTML" })
+    });
+  } catch(e) { console.warn("Telegram:", e); }
+}
+
+// ── submit ───────────────────────────────────────────────────
+async function submitOrder() {
+  if (isSubmitting) return;
+  if (!isLoggedIn()) { showToast("لطفاً ابتدا وارد شوید"); setTimeout(() => location.href="customer-auth.html",1200); return; }
+  if (cartItems.length === 0) { showToast("سبد خرید خالی است!"); return; }
+
+  const { ok, name, phone, address } = validateForm();
+  if (!ok) {
+    showToast("لطفاً همه فیلدها را درست پر کنید");
+    document.querySelector(".form-input.err, .form-textarea.err")?.scrollIntoView({ behavior:"smooth", block:"center" });
+    return;
   }
 
-  function validateForm() {
-    let valid = true;
-    const name    = document.getElementById("order-name").value.trim();
-    const phone   = document.getElementById("order-phone").value.trim().replace(/\s/g, '');
-    const address = document.getElementById("order-address").value.trim();
+  isSubmitting = true;
+  const btn = document.getElementById("btn-send-order");
+  btn.disabled     = true;
+  btn.textContent  = "⏳ در حال ثبت سفارش...";
 
-    // Name
-    const errName = document.getElementById("err-name");
-    const nameOk = name.length >= 3;
-    document.getElementById("order-name").classList.toggle("error", !nameOk);
-    errName.classList.toggle("show", !nameOk);
-    if (!nameOk) valid = false;
+  const itemsText  = cartItems.map(i => `🔹 ${i.title} (${i.unitName}) — تعداد: ${i.qty} | قیمت: ${fmt(i.price)} افغانی`).join("\n");
+  const grandTotal = cartItems.reduce((s,i) => s + i.price * i.qty, 0);
+  const invoice    = `مشتری: ${name}\nتلفن: ${phone}\nآدرس: ${address}\n\n📝 اجناس:\n${itemsText}\n\n💰 جمع کل: ${fmt(grandTotal)} افغانی`;
 
-    // Phone: must start with 07 and be 10 digits
-    const errPhone = document.getElementById("err-phone");
-    const phoneOk = /^07\d{8}$/.test(phone);
-    document.getElementById("order-phone").classList.toggle("error", !phoneOk);
-    errPhone.classList.toggle("show", !phoneOk);
-    if (!phoneOk) valid = false;
+  try {
+    const { error } = await sb.from("Customer_Order").insert([{ Phone: phone, Items: invoice, Total_Price: grandTotal }]);
+    if (error) throw error;
 
-    // Address
-    const errAddr = document.getElementById("err-address");
-    const addrOk = address.length >= 10;
-    document.getElementById("order-address").classList.toggle("error", !addrOk);
-    errAddr.classList.toggle("show", !addrOk);
-    if (!addrOk) valid = false;
+    await sendToTelegram(invoice);
+    localStorage.setItem("dk_customer_phone", phone);
+    localStorage.setItem("customer_phone", phone);
+    localStorage.removeItem("cart_items");
 
-    return { valid, name, phone, address };
+    document.getElementById("main-cart-content").style.display = "none";
+    document.getElementById("success-screen").style.display    = "block";
+    updateCartBadge();
+  } catch(err) {
+    showToast("❌ خطا در ثبت: " + (err?.message || ""));
+  } finally {
+    isSubmitting    = false;
+    btn.disabled    = false;
+    btn.innerHTML   = "🚀 ثبت نهایی و ارسال سفارش";
   }
+}
 
-  // ارسال سفارش به تلگرام
-  async function sendToTelegram(invoice, total) {
-    const BOT_TOKEN = "8850075372:AAFA5I-VcQiFqA4Bw5LdskwB83XzujUtSUc";
-    const CHAT_ID   = "6718562294";
-    const msg = `🛒 سفارش جدید دکان اکبری\n\n${invoice}`;
-    try {
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: msg,
-          parse_mode: "HTML"
-        })
-      });
-    } catch(e) {
-      // اگر تلگرام خطا داد سفارش ثبت شده — نادیده بگیر
-      console.warn("Telegram error:", e);
+// ── auth ─────────────────────────────────────────────────────
+function checkUserSession() {
+  const loggedIn = isLoggedIn();
+  const name     = localStorage.getItem("customer_name");
+  const welcome  = document.getElementById("user-welcome");
+  const icon     = document.getElementById("user-avatar-icon");
+  if (loggedIn && welcome) {
+    welcome.textContent = name ? name.substring(0,8) : "خروج";
+    welcome.style.color = "var(--red)";
+    if (icon) icon.textContent = "🚪";
+  }
+}
+
+function handleAuthAction() {
+  if (isLoggedIn()) {
+    if (confirm("آیا می‌خواهید خارج شوید؟")) {
+      ["customer_logged_in","customer_id","customer_name","customer_phone"].forEach(k => localStorage.removeItem(k));
+      location.reload();
     }
+  } else {
+    location.href = "customer-auth.html";
   }
+}
 
-  async function submitOrder() {
-    // ✅ FIX: Prevent double-submit
-    if (isSubmitting) return;
+// ── init ─────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  checkUserSession();
+  loadCart();
+  prefillForm();
+  setupAddressCounter();
+  document.getElementById("btn-send-order").addEventListener("click", submitOrder);
+});
 
-    if (!isLoggedIn()) {
-      showToast("لطفاً ابتدا وارد شوید");
-      setTimeout(() => { window.location.href = "customer-auth.html"; }, 1200);
-      return;
-    }
-
-    if (cartItems.length === 0) {
-      showToast("سبد خرید خالی است!");
-      return;
-    }
-
-    const { valid, name, phone, address } = validateForm();
-    if (!valid) {
-      showToast("لطفاً همه فیلدها را درست پر کنید");
-      // Scroll to first error
-      const firstError = document.querySelector('.form-group input.error, .form-group textarea.error');
-      if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    isSubmitting = true;
-    const btn = document.getElementById("btn-send-order");
-    btn.disabled = true;
-    btn.textContent = "⏳ در حال ثبت سفارش...";
-
-    const itemsText = cartItems.map(item =>
-      `🔹 ${item.title} (${item.unitName}) — تعداد: ${item.qty} | قیمت: ${fmt(item.price)} افغانی`
-    ).join("\n");
-
-    const grandTotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
-    const invoice = `مشتری: ${name}\nتلفن: ${phone}\nآدرس: ${address}\n\n📝 اجناس:\n${itemsText}\n\n💰 جمع کل: ${fmt(grandTotal)} افغانی`;
-
-    try {
-      const { error } = await supabaseClient.from('Customer_Order').insert([{
-        Phone: phone,
-        Items: invoice,
-        Total_Price: grandTotal
-      }]);
-
-      if (error) {
-        showToast("❌ خطا در ثبت: " + error.message);
-      } else {
-        // ارسال به تلگرام
-        await sendToTelegram(invoice, grandTotal);
-        // ذخیره شماره
-        localStorage.setItem("dk_customer_phone", phone);
-        localStorage.setItem("customer_phone", phone);
-        localStorage.removeItem("cart_items");
-        document.getElementById("main-cart-content").style.display = "none";
-        document.getElementById("success-screen").style.display = "block";
-        updateCartBadge();
-      }
-    } catch (err) {
-      showToast("❌ خطای غیرمنتظره: " + err.message);
-    } finally {
-      isSubmitting = false;
-      btn.disabled = false;
-      btn.textContent = "🚀 ثبت نهایی و ارسال سفارش";
-    }
-  }
-
-  function updateCartBadge() {
-    const badge = document.getElementById("cart-badge");
-    if (!badge) return;
-    const cart  = JSON.parse(localStorage.getItem("cart_items") || "[]");
-    const total = cart.reduce((s, i) => s + i.qty, 0);
-    badge.textContent = total;
-    badge.style.display = total > 0 ? "block" : "none";
-  }
-
-  function showToast(msg) {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2600);
-  }
-
-  function checkUserSession() {
-    const loggedIn = isLoggedIn();
-    const name    = localStorage.getItem("customer_name");
-    const welcome = document.getElementById("user-welcome");
-    const icon    = document.getElementById("user-avatar-icon");
-    if (loggedIn && welcome) {
-      welcome.textContent = name ? name.substring(0, 8) : "خروج";
-      welcome.style.color = "#ef4056";
-      if (icon) icon.textContent = "🚪";
-    }
-  }
-
-  function handleAuthAction() {
-    if (isLoggedIn()) {
-      if (confirm("آیا می‌خواهید خارج شوید؟")) {
-        localStorage.removeItem("customer_logged_in");
-        localStorage.removeItem("customer_id");
-        localStorage.removeItem("customer_name");
-        localStorage.removeItem("customer_phone");
-        // ✅ FIX: Clear prefill on logout
-        document.getElementById("order-name").value = "";
-        document.getElementById("order-phone").value = "";
-        document.getElementById("order-address").value = "";
-        window.location.reload();
-      }
-    } else {
-      window.location.href = "customer-auth.html";
-    }
-  }
 </script>
 </body>
 </html>
